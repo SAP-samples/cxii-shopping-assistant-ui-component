@@ -1,0 +1,117 @@
+// Styles shared with ask-product chat component from another library!!!
+// Be careful when changing them - check also ask-product component in the same repository
+
+:host {
+  display: block;
+  --_spacer: 20px;
+  --_spacer--extra-small: 5px;
+  --_spacer--small: 10px;
+  --_spacer--big: 36px;
+  --_icon-size: 20px;
+  --_border-radius--small: 5px;
+  --_border-radius--big: 15px;
+  --_border: 1px solid var(--cx-color-medium);
+  --_border--dark: 1px solid var(--cx-color-text);
+  --_shadow--small: 0 2px 4px #22354840;
+  --_chat-min-height: 300px;
+  --_chat-default-height: 600px;
+  --_chat-min-width: 400px;
+  --_chat-bg: #fff;
+}
+
+.cxai-chat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--_spacer);
+  padding: var(--_spacer--big) var(--_spacer);
+  overflow-y: scroll;
+  flex-grow: 1;
+  position: relative;
+
+  .message {
+    --r: var(--_border-radius--big);
+    --c1: var(--cx-color-light);
+    --c2: var(--cx-color-light);
+    --ct: var(--cx-color-text);
+    max-width: 80%;
+    padding: var(--_spacer--small) var(--_spacer);
+    border-radius: var(--_border-radius--big);
+    background: linear-gradient(135deg, var(--c1), var(--c2)) border-box;
+    color: var(--ct);
+    border: var(--_border);
+
+    &.user {
+      --c1: var(--cx-color-primary);
+      --c2: var(--cx-color-primary);
+      --ct: var(--cx-color-inverse);
+
+      border-bottom-right-radius: 0;
+      border: unset;
+      place-self: end;
+    }
+
+    &.assistant {
+      --c1: var(--cx-color-light);
+      --c2: var(--cx-color-light);
+
+      border-bottom-left-radius: 0;
+      place-self: start;
+    }
+
+    &.error {
+      --c1: var(--cx-color-danger);
+      --c2: var(--cx-color-danger);
+      --ct: var(--cx-color-inverse);
+    }
+
+    .message-content {
+      white-space: pre-wrap;
+    }
+  }
+}
+
+.dot-loader {
+  margin: 4px 20px;
+  width: var(--_spacer--small);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  animation: l5 1s infinite linear alternate;
+}
+
+@keyframes l5 {
+  0% {
+    box-shadow: 13px 0 #000, -12px 0 #0002;
+    background: #000;
+  }
+  33% {
+    box-shadow: 13px 0 #000, -12px 0 #0002;
+    background: #0002;
+  }
+  66% {
+    box-shadow: 13px 0 #0002, -12px 0 #000;
+    background: #0002;
+  }
+  100% {
+    box-shadow: 13px 0 #0002, -12px 0 #000;
+    background: #000;
+  }
+}
+
+form.cxai-chat-form textarea.cxai-chat-input {
+  height: var(--_spacer--big);
+  min-height: unset;
+  background-color: var(--cx-color-background);
+  border: var(--_border);
+  border-radius: var(--_border-radius--small);
+  border-bottom: var(--_border--dark);
+  padding: var(--_spacer--extra-small);
+  &:is(:hover, :focus, :active) {
+    box-shadow: var(--_shadow--small);
+    border-radius: var(--_border-radius--small);
+    min-height: unset;
+  }
+  &:is(:not(:hover, :focus, :active)) {
+    border: var(--_border);
+    border-bottom: var(--_border--dark);
+  }
+}

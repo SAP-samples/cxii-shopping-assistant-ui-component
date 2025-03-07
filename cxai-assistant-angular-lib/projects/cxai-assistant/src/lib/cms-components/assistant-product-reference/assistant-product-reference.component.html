@@ -1,0 +1,22 @@
+@if(product$ | async; as product) {
+  <span class="product valid" 
+    [class.active]="popupVisible" 
+    [title]="product.code" 
+    (click)="togglePopup($event)">{{ product | assistantProductName }}</span>
+
+  <div *ngIf="loadPopup" class="product-popup" [style.display]="popupVisible ? '' : 'none'" (click)="close()">
+    <div class="action close-chat" (click)="close()" [title]="'common.close' | cxTranslate">
+      <lib-chat-icon faIcon="fas fa-times"></lib-chat-icon>
+    </div>
+
+    <lib-product-card class="square" [product]="product"></lib-product-card>
+
+    <div class="buttons">
+      <button class="btn btn-primary" (click)="copyToClipboard(product)">
+        {{ 'cxaiAssistant.copyProduct' | cxTranslate }}
+      </button>
+    </div>
+  </div>
+} @else {
+  <span class="product" [class.invalid]="invalidProduct">{{productCode}}</span>
+}

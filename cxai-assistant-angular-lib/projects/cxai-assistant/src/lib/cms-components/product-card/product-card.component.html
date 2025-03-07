@@ -1,0 +1,18 @@
+@if(product) {
+<a tabindex="0" [routerLink]="{ cxRoute: 'product', params: product } | cxUrl">
+  <cx-media
+    [container]="product.images?.['PRIMARY']"
+    format="product"
+    [alt]="product.code ?? ''"
+  ></cx-media>
+  <div class="info">
+    <h3 class="cx-product-name">{{ product | assistantProductName }}</h3>
+    <cx-star-rating
+      *ngIf="product.averageRating"
+      class="rating"
+      [rating]="product.averageRating"
+    ></cx-star-rating>
+    <div class="price">{{ product.price?.formattedValue }}</div>
+  </div>
+</a>
+}

@@ -1,0 +1,58 @@
+<div  class="chat-wrapper cxai-chat-wrapper" *ngIf="productCode$ | async as productCode">
+  <div class="chat cxai-chat" #chat>
+    <div *ngIf="!messages?.length" class="message assistant">
+      <div class="message-content">{{ 'askProduct.welcomeMessage' | cxTranslate }}</div>
+    </div>
+
+    <div
+      class="message {{ message.source }} {{ message.status || '' }}"
+      *ngFor="let message of messages; trackBy: trackByIndex"
+    >
+      <div class="message-content">{{ message.message || ('askProduct.noAnswerMessage' | cxTranslate) }}</div>
+      <div class="sources" *ngIf="message.sources?.length">
+        <div class="source" *ngFor="let source of message.sources">
+          <cx-icon [cxIcon]="icon.FILE"></cx-icon>
+          <a *ngIf="source.downloadUrl" [href]="source.downloadUrl" target="_blank">{{ source.name }}</a>
+          <span *ngIf="!source.downloadUrl">{{ source.name }}</span>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="busy" class="message assistant">
+      <div class="message-content">
+        <div class="dot-loader"></div>
+      </div>
+    </div>
+  </div>
+  <form (ngSubmit)="sendMessage(productCode)" [formGroup]="form" class="cxai-chat-form">
+    <textarea
+      #chatInputField
+      [maxlength]="1000"
+      [readonly]="busy"
+      (keypress)="onKeyPress($event, productCode)"
+      class="form-control cxai-chat-input"
+      name="message"
+      formControlName="message"
+      [class.ng-invalid]="false"
+      placeholder="{{ 'askProduct.inputPlaceholder' | cxTranslate }}"
+    ></textarea>
+    <div class="buttons messages-{{!!messages?.length}} valid-{{form.valid}}">
+      <button type="button" class="btn cxai-btn-clear btn-secondary" [disabled]="busy || !messages?.length" (click)="clearConversation(productCode)">
+        {{ 'askProduct.clearChat' | cxTranslate }}
+      </button>
+      <button class="btn cxai-btn-send btn-primary" [disabled]="busy || !form.valid">
+        <ng-container *ngTemplateOutlet="aiIcon"></ng-container>
+        {{ 'askProduct.send' | cxTranslate }}
+      </button>
+    </div>
+  </form>
+</div>
+
+<ng-template #aiIcon>
+  <div class="ai-icon">
+    <svg viewBox="0 0 512 512">
+      <g role="presentation">
+        <path d="M502.5 109q-31 11-47 27t-27 48q-3 9-13 9t-13-9q-11-32-26.5-48t-47.5-27q-9-3-9-12.5t9-12.5q32-11 47.5-27t26.5-48q3-9 13-9t13 9q11 32 27 48t47 27q10 3 10 12.5t-10 12.5zm-167 250q-28 10-49.5 21.5T248.5 408 221 445t-21.5 50q-2 8-8.5 12.5t-14.5 4.5q-7 0-13.5-4.5t-9.5-12.5q-19-57-49-87t-87-49q-8-3-12-9.5t-4-13.5 4-13.5 12-9.5q29-10 50-21.5t37-27.5 27.5-37.5 21.5-49.5q3-8 9.5-12.5t13.5-4.5q8 0 14.5 4.5t8.5 12.5q10 28 21.5 49.5t27.5 37.5 37.5 27.5 49.5 21.5q8 3 12.5 9.5t4.5 13.5-4.5 13.5-12.5 9.5z"></path>
+      </g>
+    </svg>
+  </div>
+</ng-template>
