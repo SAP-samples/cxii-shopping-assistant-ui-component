@@ -9,8 +9,6 @@ npm pack
 
 #if version_to_unpublish is not empty, then unpublish
 if [ "$1" == "--republish" ]; then
-  #read  current version from projects/cxai-ask-product/package.json
-
   #confirm action
   read -p "UNPUBLISH version $current_version before republish? Press enter to continue"
 
