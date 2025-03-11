@@ -1,9 +1,9 @@
 set -e
 npm run test -- --watch=false --no-progress
 npm run build
-
 lib_name=cxai-assistant
 current_version=$(node -p "require('./projects/$lib_name/package.json').version")
+cp README.md "dist/$lib_name/"
 pushd "dist/$lib_name"
 npm pack
 

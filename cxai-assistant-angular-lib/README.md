@@ -24,19 +24,45 @@ Config is fetched from backend, but can be also provided locally. Backend values
       },
     } satisfies CxaiAssistantConfig),
 ```
+
+Entire config
+```js
+export interface CxaiAssistantConfigInternal {
+  //must be created via API, fetched from backend by default
+  assistantConfigId?: string;
+  //set to null to disable config initializer - then you must provide assistantConfigId locally
+  configInitializerEndpoint?: string;
+  //use sap-icon instead of font-awesome, this requires sap-icons font to be loaded
+  //https://github.com/SAP/theming-base-content/tree/master/content/Base/baseLib/baseTheme/fonts
+  useSapIcons?: boolean;
+  //if product.name doesn't contain entire product name, you can provide a template like "{name} {summary}"
+  //product codes in chat message will be replaced accordingly
+  productNameTemplate?: string;
+  //returns additional context pasted directly into chat message - see sampleAssistantContextProvider for example
+  //context is not visible in the UI, it's appended into each message and stripped before displaying it in the chat
+  //it may allow the user to ask about current product, or cart contents etc (this is temporary solution before API is extended)
+  chatMessageContextProvider?: ((context: AssistantContext) => string) | null;
+}
+
+//default config passed by the library
+export const defaultAssistantConfigInternal: CxaiAssistantConfigInternal = {
+  configInitializerEndpoint: '/cxai/config',
+};
+```
 ## Add component
-Restriction hides component if no valid assistant config is present for current site (e.g. empty config id).
+Restriction (last line) hides component if no valid assistant config is present for current site (e.g. empty config id). Ignore it if you don't use backend extensions.
 
 ```
 INSERT_UPDATE CMSFlexComponent; $contentCV[unique = true]; uid[unique = true]          ; name                        ; flexType
                               ;                          ; AssistantChatFloatComponent ; AssistantChatFloatComponent ; AssistantChatFloatComponent
 
-INSERT_UPDATE AssistantRestriction; $contentCV[unique = true]; uid[unique = true]   ; name                  ; components(uid, $contentCV)
-                                  ;                          ; AssistantRestriction ; Assistant Restriction ; AssistantChatFloatComponent
-
 INSERT_UPDATE ContentSlot; $contentCV[unique = true]; uid[unique = true]; cmsComponents(uid, $contentCV)
                          ;                          ; FooterSlot        ; (-)AssistantChatFloatComponent,(+)AssistantChatFloatComponent
+
+INSERT_UPDATE AssistantRestriction; $contentCV[unique = true]; uid[unique = true]   ; name                  ; components(uid, $contentCV)
+                                  ;                          ; AssistantRestriction ; Assistant Restriction ; AssistantChatFloatComponent
 ```
+
 
 ## Create assistant config using /config endpoint
 https://usea-canary.cxai.dev.sap/shopping-assistant/api/v1/docs#/
@@ -86,4 +112,4 @@ INSERT_UPDATE CxaiConfig; code[unique=true]; baseSites(uid); consumedDestination
                         ; prod             ; $cxaiSites    ; visual-search-prod     ; ask-product-prod         ; true                     ; false                ; false ; $assistantConfigIdCanary ; assistant-canary
 ```
 
-assistantDestination is optional - required only if it's different that default VS destination. If it's empty it will use default VS destination and just change the API suffix.
+assistantDestination is optional - required only if it's different that default Visual Search (VS) destination. If it's empty it will use default VS destination and just change the API suffix.
