@@ -1,0 +1,19 @@
+.sap-icon {
+  font-family: SAP-icons,SAP-Icons !important;
+
+  //decline
+  &.fa-times::before { content: '\e03e'; }
+  &.ai::before { content: '\ee2a5'; }
+  //paper-plane
+  &.fa-paper-plane::before { content: '\e0cc'; }
+  //restart
+  &.fa-retweet::before,
+  &.fa-redo::before
+  { content: '\e204'; }
+  //full-screen
+  &.fa-expand::before { content: '\e166'; }
+  //exit-full-screen
+  &.fa-compress::before { content: '\e1f5'; }
+
+  &.resize-corner::before { content: '\e24f'; }
+}

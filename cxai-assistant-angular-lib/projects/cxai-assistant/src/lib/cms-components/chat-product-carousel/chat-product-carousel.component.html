@@ -1,0 +1,17 @@
+<div class="chat-product-carousel-container">
+  <button class="scroll-button prev-button" (click)="scrollCarousel(-1)" *ngIf="scrollValue > 0">
+    <cx-icon [cxIcon]="iconTypes.CARET_LEFT"></cx-icon>
+  </button>
+
+  <div class="chat-product-carousel inline-snap scroll-{{scrollValue}}" [class.scrollMax]="scrollValue == maxScrollValue" #carousel>
+    @for (product$ of products$; track $index) {
+      @if({ product: product$ | async }; as data) {
+        <lib-product-card [product]="data.product" [class.empty]="!data.product"></lib-product-card>
+      }
+    }
+  </div>
+
+  <button class="scroll-button next-button" (click)="scrollCarousel(1)" *ngIf="scrollValue < maxScrollValue">
+    <cx-icon [cxIcon]="iconTypes.CARET_RIGHT"></cx-icon>
+  </button>
+</div>

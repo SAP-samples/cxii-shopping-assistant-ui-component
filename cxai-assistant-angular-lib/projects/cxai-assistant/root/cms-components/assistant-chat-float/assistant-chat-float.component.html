@@ -1,0 +1,15 @@
+<div [class.chat-opened]="chatOpened$ | async">
+  <button class="btn-primary chat-btn" (click)="openChat()" [@showHide]="buttonState">
+    <i *ngIf="!useSapIcons" class="fa-regular fa-message"></i>
+    <i *ngIf="useSapIcons" class="sap-icon post"></i>
+  </button>
+
+  @if(loadChat$ | async) {
+  <ng-container
+    [cxComponentWrapper]="{
+      flexType: 'AssistantChatWindowComponent',
+    }"
+  >
+  </ng-container>
+  }
+</div>

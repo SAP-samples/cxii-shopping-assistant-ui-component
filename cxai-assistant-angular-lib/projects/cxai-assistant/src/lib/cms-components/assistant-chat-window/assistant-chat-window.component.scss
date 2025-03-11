@@ -1,0 +1,135 @@
+.chat-wrapper {
+  z-index: 10000;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  border-top-left-radius: var(--_border-radius--small);
+  border-bottom-left-radius: var(--_border-radius--big);
+  border-bottom-right-radius: var(--_border-radius--big);
+  box-shadow: var(--_shadow--small);
+  transition: opacity 0.3s;
+  min-height: var(--_chat-min-height);
+  max-height: calc(100% - var(--_spacer));
+  max-width: calc(100% - var(--_spacer));
+  min-width: var(--_chat-min-width);
+  width: var(--_chat-min-width);
+  height: var(--_chat-default-height);
+  background-color: var(--_chat-bg);
+  display: none;
+  flex-direction: column;
+
+  @media (max-width: 576px) {
+    & {
+      --_chat-min-width: 100%;
+    }
+  }
+
+  &.chat-opened {
+    display: flex;
+  }
+
+  &.maximized {
+    height: 100%;
+    width: 50vw;
+
+    //on mobile full width
+    @media (max-width: 767px) {
+      width: 95vw;
+    }
+  }
+}
+
+.title-bar {
+  --_title-bar-height: 50px;
+  border-top-left-radius: var(--_border-radius--small);
+  position: relative;
+  background-color: var(--cx-color-primary);
+  color: var(--cx-color-inverse);
+  display: flex;
+  align-items: center;
+  gap: var(--_icon-size);
+  padding-inline: var(--_icon-size);
+  min-height: var(--_title-bar-height);
+
+  .assistant-title {
+    flex-grow: 1;
+    font-weight: 700;
+  }
+
+  .resize-handle {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--_icon-size);
+    height: var(--_icon-size);
+    overflow: hidden;
+    &:hover {
+      cursor: nw-resize;
+    }
+
+    lib-chat-icon {
+      //rotate SAP icon "corner" to nw position
+      display: block;
+      transform: rotate(180deg) translate(5px, 5px);
+      font-size: 16px;
+    }
+
+    &.resize-nw-icon-gradient {
+      $c1: var(--cx-color-inverse);
+      $c2: transparent;
+      border: unset;
+      background: linear-gradient(
+        135deg,
+        $c2,
+        $c2 4px,
+        $c1 4px,
+        $c1 6px,
+        $c2 6px,
+        $c2 8px,
+        $c1 8px,
+        $c1 10px,
+        $c2 11px
+      );
+    }
+  }
+
+  .action {
+    width: var(--_icon-size);
+    height: var(--_icon-size);
+    background-color: unset;
+    border: unset;
+    display: grid;
+    place-content: center;
+    color: var(--cx-color-inverse);
+    &:not(:disabled):hover {
+      cursor: pointer;
+      filter: drop-shadow(2px 2px 2px var(--cx-color-warning));
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      &:hover {
+        pointer-events: none;
+      }
+    }
+  }
+}
+
+form {
+  display: flex;
+  align-items: center;
+  margin-inline: var(--_spacer);
+  margin-block-end: var(--_spacer);
+  padding-block-start: var(--_spacer);
+  height: min(auto, var(--_spacer--big));
+  gap: var(--_spacer--small);
+  .cxai-btn-send {
+    min-width: var(--_spacer--big);
+    aspect-ratio: 1;
+    display: grid;
+    place-content: center;
+    padding: unset;
+    border-radius: var(--_border-radius--small);
+    min-height: unset;
+  }
+}

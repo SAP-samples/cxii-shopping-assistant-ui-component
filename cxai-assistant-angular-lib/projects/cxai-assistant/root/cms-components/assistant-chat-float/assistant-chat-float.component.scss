@@ -1,0 +1,43 @@
+:host {
+  z-index: 10000;
+  --_border-radius--small: 5px;
+  --_border--light: 1px solid #ffffff4c;
+}
+
+.chat-btn {
+  position: fixed;
+  right: 0;
+  bottom: 20%;
+  width: 60px;
+  aspect-ratio: 4/3;
+  font-size: 20px;
+  border-radius: var(--_border-radius--small) 0 0 var(--_border-radius--small);
+  background-color: var(--cx-color-primary);
+  overflow: clip;
+  border-top: var(--_border--light);
+  border-left: var(--_border--light);
+  border-bottom: var(--_border--light);
+  &:hover,
+  &:focus {
+    pointer-events: auto;
+    cursor: pointer;
+    filter: unset;
+    border-top: var(--_border--light);
+    border-left: var(--_border--light);
+    border-bottom: var(--_border--light);
+  }
+}
+
+.chat-opened > button {
+  display: none;
+}
+
+.fa-message {
+  transform: rotateY(180deg);
+}
+
+.sap-icon.post::before {
+  font-family: SAP-icons, SAP-Icons;
+  content: '\e0ab';
+  font-style: normal;
+}

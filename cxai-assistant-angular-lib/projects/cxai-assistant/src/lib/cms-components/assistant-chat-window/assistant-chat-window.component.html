@@ -1,0 +1,89 @@
+<div
+  class="chat-wrapper cxai-chat-wrapper"
+  [class.chat-opened]="chatOpened$ | async"
+  #chatWindow
+  [style.width.px]="width"
+  [style.height.px]="height"
+  [class.maximized]="maximized"
+>
+  <div class="title-bar">
+    <div
+      *ngIf="!maximized"
+      class="resize-handle"
+      [class.resize-nw-icon-gradient]="!useSapIcons"
+      (mousedown)="setResizeStatus(true, $event)"
+      (window:mouseup)="setResizeStatus(false, $event)"
+    >
+      <lib-chat-icon [faIcon]="'resize-corner'"></lib-chat-icon>
+    </div>
+    <div class="assistant-title">{{ 'cxaiAssistant.title' | cxTranslate : { siteName: currentSiteName } }}</div>
+    <button
+      class="action new-session"
+      [title]="'cxaiAssistant.newSession' | cxTranslate"
+      [disabled]="!messages || (messages.chat_history.length < 2 && !messages.chat_history[0]?.error)"
+      (click)="newSession()"
+    >
+      <lib-chat-icon faIcon="fas fa-redo"></lib-chat-icon>
+    </button>
+    <button
+      class="action maximize"
+      (click)="toggleMaximize()"
+      [title]="'cxaiAssistant.' + (maximized ? 'restore' : 'maximize') | cxTranslate"
+    >
+      <lib-chat-icon [faIcon]="'fas ' + (maximized ? 'fa-compress' : 'fa-expand')"></lib-chat-icon>
+    </button>
+    <button class="action close-chat" (click)="closeChat()" [title]="'cxaiAssistant.close' | cxTranslate">
+      <lib-chat-icon faIcon="fas fa-times"></lib-chat-icon>
+    </button>
+  </div>
+  <div class="chat cxai-chat" #chat (click)="closeAllProductRefences()">
+    @if(messages) {
+      @for (message of messages.chat_history; track $index) {
+        <div class="message {{ message.role }}" [class.error]="!!message.error">
+          @if (message.role === 'assistant') {
+          <div class="message-content">
+            @for (token of message | chatMessage; track $index) { 
+              @if(token.type === 'html') {
+              <span [innerHTML]="token.content"></span>
+              } @else {
+              <lib-assistant-product-reference
+                [productCode]="token.content"
+                (productCopied)="focusInput()"
+              ></lib-assistant-product-reference>
+              }
+            }
+          </div>
+          } @else {
+          <div class="message-content" [attr.title]="message.contextString || ''">{{ message.content }}</div>
+          }
+        </div>
+
+        @if(message.recommendations?.[0]?.codes?.length) {
+          <lib-chat-product-carousel [productCodes]="message.recommendations![0].codes!"></lib-chat-product-carousel>
+        } 
+      } 
+    }
+    <div *ngIf="sendQuestionSubscription || !(messages?.status || messages?.chat_history?.length)" class="message assistant">
+      <div class="message-content">
+        <div class="dot-loader"></div>
+      </div>
+    </div>
+  </div>
+  <form (ngSubmit)="sendMessage()" [formGroup]="form" class="cxai-chat-form">
+    <textarea
+      #chatInputField
+      [maxlength]="1000"
+      [readonly]="sendQuestionSubscription || !messages?.status"
+      (keypress)="onKeyPress($event)"
+      id="chat-input"
+      class="form-control cxai-chat-input"
+      name="message"
+      formControlName="message"
+      [class.ng-invalid]="false"
+      placeholder="{{ 'cxaiAssistant.inputPlaceholder' | cxTranslate }}"
+    ></textarea>
+    <button class="btn cxai-btn-send btn-primary" [disabled]="sendQuestionSubscription || !form.valid || !messages?.status">
+      <lib-chat-icon faIcon="far fa-paper-plane"></lib-chat-icon>
+    </button>
+  </form>
+</div>

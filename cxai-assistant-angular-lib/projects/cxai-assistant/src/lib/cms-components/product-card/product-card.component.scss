@@ -1,0 +1,32 @@
+:host {
+  display: block;
+}
+
+:host:not(.square) cx-media {
+  border-radius: var(--_border-radius--big);
+  overflow: hidden;
+}
+
+.info {
+  color: var(--cx-color-text);
+}
+
+cx-media {
+  box-shadow: var(--_shadow--small);
+  margin-bottom: var(--_spacer--small);
+  height: auto;
+}
+
+.cx-product-name {
+  font-size: var(--machines-font-size--base);
+}
+
+cx-star-rating {
+  display: block;
+  white-space: nowrap;
+  margin: 0 0 var(--_spacer--small);
+}
+
+.price {
+  font-weight: 700;
+}

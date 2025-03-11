@@ -1,0 +1,43 @@
+body.searchbox-is-active.has-searchbox-results cx-searchbox:not(.search-box-v2) .results {
+  display: flex;
+  flex-direction: column;
+}
+
+cx-searchbox.search-box-v2 .results lib-search-box-chat-outlet {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  
+  .chat-search-outlet {
+    padding: 10px 16px;
+  }
+}
+
+cx-searchbox .results lib-search-box-chat-outlet {
+  order: 100;
+
+  .chat-search-outlet {
+    background-color: var(--cx-color-primary);
+    color: var(--cx-color-inverse);
+    padding: 6px 16px;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    cursor: pointer;
+    align-items: center;
+
+    >.sap-icon.post::before {
+      font-family: SAP-icons, SAP-Icons;
+      content: '\e0ab';
+      font-style: normal;
+    }
+
+    >span {
+      flex-grow: 1;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding-right: 2px;
+    }
+  }
+}
