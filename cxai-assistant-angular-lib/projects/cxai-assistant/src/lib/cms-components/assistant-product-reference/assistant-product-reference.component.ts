@@ -8,6 +8,7 @@ import { AssistantProductNamePipe } from '../product-name.pipe';
   templateUrl: './assistant-product-reference.component.html',
   styleUrl: './assistant-product-reference.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AssistantProductReferenceComponent implements OnInit {
   @Input({required: true}) productCode!: string;

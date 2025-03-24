@@ -13,6 +13,7 @@ interface SearchBoxOutlet {
   templateUrl: './search-box-chat-outlet.html',
   styleUrl: './search-box-chat-outlet.scss',
   encapsulation: ViewEncapsulation.None,
+  standalone: false,
 })
 export class SearchBoxChatOutletComponent {
   cxaiAssistantRootService = inject(CxaiAssistantRootService);

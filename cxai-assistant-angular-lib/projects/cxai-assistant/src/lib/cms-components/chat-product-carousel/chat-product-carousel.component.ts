@@ -5,21 +5,21 @@ import {
   ElementRef,
   inject,
   Input,
-  input,
   Renderer2,
-  ViewChild,
+  ViewChild
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Product, ProductService } from '@spartacus/core';
 import { ICON_TYPE } from '@spartacus/storefront';
-import { debounce, debounceTime, Observable } from 'rxjs';
+import { debounceTime, Observable } from 'rxjs';
 import { CxaiAssistantService } from '../../cxai-assistant.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'lib-chat-product-carousel',
   templateUrl: './chat-product-carousel.component.html',
   styleUrl: './chat-product-carousel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ChatProductCarouselComponent {
   productService = inject(ProductService);

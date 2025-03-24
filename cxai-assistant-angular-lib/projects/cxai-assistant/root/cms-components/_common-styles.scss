@@ -1,0 +1,22 @@
+@mixin background-glow {
+  isolation: isolate;
+  z-index: 0;
+  // Glow effect
+  &:after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(
+      -55deg,
+      transparent,
+      white 50%,
+      transparent
+    );
+    opacity: 0.25;
+    transition: opacity var(--cx-transition-duration);
+    z-index: -1;
+  }
+}

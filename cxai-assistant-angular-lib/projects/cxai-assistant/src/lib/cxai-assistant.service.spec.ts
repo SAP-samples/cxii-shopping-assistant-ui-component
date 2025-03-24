@@ -1,6 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { AssistantChatResponse, AssistantChatSession, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
 import { BaseSiteService, LoggerService, OccEndpointsService, TranslationService, WindowRef } from "@spartacus/core";
 import { CurrentProductService } from '@spartacus/storefront';
 import { distinctUntilChanged, EMPTY, of, skip, take } from 'rxjs';
@@ -75,7 +75,7 @@ describe('CxaiAssistantService', () => {
     
     expectCreateSessionRequest();
     expect(service['sessionId$'].value).toBe(mockCreateSessionResponse.session_id);
-    expect(windowRefSpy.sessionStorage?.setItem).toHaveBeenCalled();
+    expect(windowRefSpy.sessionStorage?.setItem).withContext("sessionId saved to storage").toHaveBeenCalled();
 
     //start new session again, should delete previous session
     const secondSession = Object.assign({}, mockCreateSessionResponse, { session_id: 'second-session-id' });
@@ -109,16 +109,13 @@ describe('CxaiAssistantService', () => {
     service.getChatSession().subscribe(session => {
       sessionSeen += 1;
       if(sessionSeen === 1) {
-        //returning empty dummy session until properly created
-        expect(session).toEqual(EMPTY_CHAT_SESSION);
+        expect(session).withContext("return empty dummy session until properly created").toEqual(EMPTY_CHAT_SESSION);
         expect(session.status).toBeUndefined();
         expect(session.session_id).toBeUndefined();
       } else {
-        expect(session.status).toBeTruthy();
-        expect(session.session_id).toBe(mockCreateSessionResponse.session_id);
-        //should overwrite welcome message
-        expect(session.chat_history[0].content).toBe(welcomeMessageOverwrite);
-        //session_id is added to session object in the service, api doesn't return it
+        expect(session.status).withContext("valid session has status set").toBeTruthy();
+        expect(session.session_id).withContext("session_id is attached to the object by the service").toBe(mockCreateSessionResponse.session_id);
+        expect(session.chat_history[0].content).withContext("should overwrite welcome message").toBe(welcomeMessageOverwrite);
         expect(service['sessionId$'].value).toBe(session.session_id!);
       }
     });
@@ -136,7 +133,8 @@ describe('CxaiAssistantService', () => {
     service.getChatSession().subscribe(session => {
       sessionSeen += 1;
       if(sessionSeen === 1) {
-        expect(session.session_id).toEqual(mockCreateSessionResponse.session_id);
+        expect(session.session_id).withContext("Session loaded").toEqual(mockCreateSessionResponse.session_id);
+        expect(session.chat_history.length).withContext("Non-empty session loaded").toBe(mockOldChatSessionResponse.chat_history.length);
       }
     });
 
@@ -145,7 +143,7 @@ describe('CxaiAssistantService', () => {
     tick();
 
     //should load current session
-    expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockFreshChatSessionResponse);
+    expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockOldChatSessionResponse);
     
     expect(sessionSeen).toBe(1);
   }));
@@ -220,14 +218,14 @@ describe('CxaiAssistantService', () => {
     expectGetChatSessionRequest();
     tick();
 
-    const userInput = mockOldChatSessionResponse.chat_history[1].content;
+    const userInput = <string>mockOldChatSessionResponse.chat_history[1].content;
     service.sendQuestion(userInput).pipe(take(1)).subscribe(response => {
       expect(response.content).toBe(mockPostMessageResponse.response);
       expect(response.error).toBeFalsy();
       //recommendations should be flattened
-      expect(response.recommendations?.length).toBe(1);
+      expect(response.recommendations?.length).withContext("Recommendations are merged").toBe(1);
       const allRecommendedProductCodes = mockPostMessageResponse.recommendations?.map(r => r.codes).flat();
-      expect(response.recommendations?.[0]?.codes).toEqual(allRecommendedProductCodes);
+      expect(response.recommendations?.[0]?.codes).withContext("Recommendations are merged").toEqual(allRecommendedProductCodes);
     });
     tick();
 
@@ -260,7 +258,7 @@ describe('CxaiAssistantService', () => {
 
   function expectGetChatSessionRequest(
     sessionId: string = mockCreateSessionResponse.session_id, 
-    payload: AssistantChatSession | { errorStatus: number, statusText?: string } = mockFreshChatSessionResponse) {
+    payload: AssistantChatSessionInternal | { errorStatus: number, statusText?: string } = mockFreshChatSessionResponse) {
     const req = httpMock.expectOne(apiService.buildUrl(`/chat_session/${sessionId}`));
     expect(req.request.method).toBe('GET');
     flushErrorOrPayload(req, payload);

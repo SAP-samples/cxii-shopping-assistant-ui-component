@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  --cxai-spacer: 20px;
+  --cxai-spacer--extra-small: 5px;
+  --cxai-spacer--small: 10px;
+  --cxai-spacer--big: 36px;
+  --cxai-icon-size: 20px;
+  --cxai-border-radius--small: 5px;
+  --cxai-border-radius--big: 15px;
+  --cxai-border: 1px solid var(--cx-color-medium);
+  --cxai-border--dark: 1px solid var(--cx-color-text);
+  --cxai-shadow--small: 0 2px 4px #22354840;
+  --cxai-shadow--big: 0 1px 6px lightgrey;
+  --cxai-chat-min-height: 300px;
+  --cxai-chat-default-height: 600px;
+  --cxai-chat-min-width: 400px;
+  --cxai-font-size: 1rem;
+  --cxai-border-color: #ffffff4c;
+  --cxai-border--light: 1px solid var(--cxai-border-color);
+  --cxai-input-bg: #fff;
+  --cxai-input-active-color: #4682b4;
+  --cxai-placeholder-color: var(--cx-color-text);
+  --cxai-input-color: var(--cx-color-text);
+  --cxai-button-height: 40px;
+  --cxai-chat-input-height: 40px;
+
+  // Colors for the title-bar, float button, default for btn-primary
+  --cxai-primary: var(--cx-color-primary);
+  --cxai-primary-text: var(--cx-color-inverse);
+
+  // Chat background, popup background
+  --cxai-background: var(--cx-color-background);
+
+  // Chat message - assistant
+  --cxai-message-assistant-background: var(--cx-color-light);
+  --cxai-message-assistant-border: 1px solid var(--cx-color-medium);
+  --cxai-message-assistant-text: var(--cx-color-text);
+
+  // Chat message - user
+  --cxai-message-user-background: var(--cx-color-primary);
+  --cxai-message-user-border: unset;
+  --cxai-message-user-text: var(--cx-color-inverse);
+
+  // Error message
+  --cxai-message-error-background: var(--cx-color-danger);
+  --cxai-message-error-border: unset;
+  --cxai-message-error-text: var(--cx-color-inverse);
+}

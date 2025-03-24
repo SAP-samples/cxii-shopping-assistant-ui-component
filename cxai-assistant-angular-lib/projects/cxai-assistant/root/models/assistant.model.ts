@@ -22,15 +22,28 @@ export interface AssistantChatSession {
   status?: string;
 }
 
+//internal api response formats
 export interface AssistantUserInput {
   session_id: string;
   user_input: string;
 }
 
-export interface AssistantChatResponse {
-  session_id: string;
+export interface AssistantChatMessageInternal {
+  content: string | AssistantChatContentInternal;
+  role: 'assistant' | 'user';
+}
+
+export interface AssistantChatSessionInternal {
+  chat_history: AssistantChatMessageInternal[];
+  status: string;
+}
+
+export interface AssistantChatContentInternal {
   response: string;
   recommendations?: AssistantRecommendation[];
+}
+export interface AssistantChatResponse extends AssistantChatContentInternal {
+  session_id: string;
 }
 
 export interface AssistantChatTextData {

@@ -1,5 +1,5 @@
 <div
-  class="chat-wrapper cxai-chat-wrapper"
+  class="cxai-chat-window"
   [class.chat-opened]="chatOpened$ | async"
   #chatWindow
   [style.width.px]="width"
@@ -63,7 +63,7 @@
         } 
       } 
     }
-    <div *ngIf="sendQuestionSubscription || !(messages?.status || messages?.chat_history?.length)" class="message assistant">
+    <div *ngIf="sendQuestionSubscription || !(messages?.status || messages?.chat_history?.length)" class="message assistant waiting">
       <div class="message-content">
         <div class="dot-loader"></div>
       </div>
@@ -75,14 +75,13 @@
       [maxlength]="1000"
       [readonly]="sendQuestionSubscription || !messages?.status"
       (keypress)="onKeyPress($event)"
-      id="chat-input"
       class="form-control cxai-chat-input"
       name="message"
       formControlName="message"
       [class.ng-invalid]="false"
       placeholder="{{ 'cxaiAssistant.inputPlaceholder' | cxTranslate }}"
     ></textarea>
-    <button class="btn cxai-btn-send btn-primary" [disabled]="sendQuestionSubscription || !form.valid || !messages?.status">
+    <button class="cxai-btn-send" [disabled]="sendQuestionSubscription || !form.valid || !messages?.status">
       <lib-chat-icon faIcon="far fa-paper-plane"></lib-chat-icon>
     </button>
   </form>

@@ -16,7 +16,7 @@ See [README](cxai-assistant-angular-lib/README.md) for details.
 ## Download and Installation
 ### Build library
 1. cd into workspace `cxai-assistant-angular-lib`
-3. `nvm use` or use node version specified in `.npmrc`
+3. `nvm use` or use node version specified in `.nvmrc`
 4. `npm i`
 5. `npm run build` to build the library. Look into `build.sh` to build and publish to your npm repository
     > You must define environment variables with your npm repository credentials - see `.npmrc` file to see which variables are required
@@ -30,7 +30,7 @@ See [README](cxai-assistant-angular-lib/README.md) for details.
 4. Run your app `ng s`
 
 ## Known Issues
-This implementation opens chat session as soon as chat window is opened. It can be changed to open session only after user sends 1st message.
+This implementation opens chat session as soon as chat window is opened. It can be changed to open session only after user sends first message.
 
 ## How to obtain support
 [Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.

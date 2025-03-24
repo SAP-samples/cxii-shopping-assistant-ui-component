@@ -12,6 +12,7 @@ export declare type ChatMessageToken = {
 @Pipe({
   name: 'chatMessage',
   pure: true,
+  standalone: false,
 })
 export class ChatMessagePipe implements PipeTransform {
   readonly productMentionRegex = /(?:Product Code:\s*)?\{([^}\s\\"']{4,32})\}/g

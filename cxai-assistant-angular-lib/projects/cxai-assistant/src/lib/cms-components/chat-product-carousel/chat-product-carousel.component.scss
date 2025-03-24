@@ -1,4 +1,5 @@
 .chat-product-carousel-container {
+  --_product-width: 150px;
   position: relative;
   display: flex;
   align-items: center;
@@ -7,14 +8,13 @@
 
 /* Hide scrollbar */
 .chat-product-carousel {
-  --_product-width: 150px;
   display: flex;
-  gap: var(--_spacer);
+  gap: var(--cxai-spacer);
   overflow-x: scroll;
   scrollbar-width: none;
   -ms-overflow-style: none;
   width: 100%;
-  padding-right: var(--_spacer--big);
+  padding-right: var(--cxai-spacer--big);
 
   // Inline snap extracted to separated class added with delay to avoid css glitch
   &.inline-snap {
@@ -29,10 +29,10 @@
   // Transparent glow effect on the sides of carousel
   &:after,
   &:before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
-    width: var(--_spacer);
+    width: var(--cxai-spacer);
     height: 100%;
     pointer-events: none; /* Allows clicks to pass through */
     z-index: 1;
@@ -40,11 +40,19 @@
 
   &:not(.scrollMax)::after {
     right: 0;
-    background: linear-gradient(to left, var(--cx-color-background), transparent);
+    background: linear-gradient(
+      to left,
+      var(--cx-color-background),
+      transparent
+    );
   }
   &:not(.scroll-0)::before {
     left: 0;
-    background: linear-gradient(to right, var(--cx-color-background), transparent);
+    background: linear-gradient(
+      to right,
+      var(--cx-color-background),
+      transparent
+    );
   }
 
   lib-product-card {
@@ -62,11 +70,11 @@
   position: absolute;
   top: calc(var(--_product-width) / 2);
   transform: translateY(-50%);
-  width: var(--_spacer--big);
-  height: var(--_spacer--big);
+  width: var(--cxai-spacer--big);
+  height: var(--cxai-spacer--big);
   display: grid;
   place-content: center;
-  box-shadow: var(--_shadow--small);
+  box-shadow: var(--cxai-shadow--small);
   background: var(--cx-color-background);
   color: var(--cx-color-text);
   border-radius: 50%;
@@ -75,7 +83,7 @@
   z-index: 10;
   font-size: 1.5rem;
   &:hover {
-    background-color: var(--color-light);
+    background-color: var(--cx-color-light);
   }
 
   &.prev-button {

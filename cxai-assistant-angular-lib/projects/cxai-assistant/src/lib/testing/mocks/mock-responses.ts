@@ -1,6 +1,6 @@
 import {
   AssistantChatResponse,
-  AssistantChatSession,
+  AssistantChatSessionInternal,
 } from '@cx-spartacus/cxai-assistant/root';
 
 const welcomeMessage = 'Welcome to the Mock Catalog Assistant!';
@@ -15,7 +15,7 @@ const assistantRecommendations = {
     },
     {
       recommendation_type: 'product',
-      codes: ['BR1021WHI'],
+      codes: ['BR1021WHI', 'BR1021BLA'],
     },
   ],
 }
@@ -31,7 +31,7 @@ export const mockPostMessageResponse: AssistantChatResponse = {
   session_id: mockSessionId,
 };
 
-export const mockFreshChatSessionResponse: AssistantChatSession = {
+export const mockFreshChatSessionResponse: AssistantChatSessionInternal = {
   status: 'active',
   chat_history: [
     {
@@ -41,7 +41,7 @@ export const mockFreshChatSessionResponse: AssistantChatSession = {
   ],
 };
 
-export const mockOldChatSessionResponse: AssistantChatSession = {
+export const mockOldChatSessionResponse: AssistantChatSessionInternal = {
   status: 'active',
   chat_history: [
     {
@@ -53,9 +53,11 @@ export const mockOldChatSessionResponse: AssistantChatSession = {
       content: 'recommend some white sneakers',
     },
     {
-      ...assistantRecommendations,
       role: 'assistant',
-      content: assistantResponse,
+      content: {
+        response: assistantResponse,
+        ...assistantRecommendations,
+      }
     },
   ],
 };
