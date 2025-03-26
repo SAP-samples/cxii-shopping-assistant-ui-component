@@ -6,6 +6,7 @@ import { ASSISTANT_CONFIG_SCOPE, CxaiAssistantConfig } from '@cx-spartacus/cxai-
   templateUrl: './chat-icon.component.html',
   styleUrl: './chat-icon.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class ChatIconComponent {
   @Input() faIcon: string | undefined;

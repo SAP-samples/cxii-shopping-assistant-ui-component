@@ -15,6 +15,7 @@ import { AssistantProductReferenceComponent } from '../assistant-product-referen
     './assistant-chat-window.component.scss',
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: false,
 })
 export class AssistantChatWindowComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChildren(AssistantProductReferenceComponent) children!: QueryList<AssistantProductReferenceComponent>;
@@ -57,6 +58,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   }
 
   ngOnInit() {
+    this.cxaiAssistantRootService.chatWindowLoaded();
   }
 
   ngOnDestroy() {

@@ -8,7 +8,7 @@
 
 ## Backend assumptions
 This library uses cxai backend, which contains:
-1. `/cxai/config` endpoint to fetch configuration - can be configured or turned off via local config
+1. `/cxai/config` endpoint to fetch configuration - can be configured or turned off via local config `configInitializerEndpoint`
 2. `/cxai/assistant/*` proxy which forwards requests to assistant API and handles authorization, this library does not send any credentials and doesn't manage tokens. If you implement this kind of proxy be sure to whitelist allowed API calls and not forward all requests. See `CxaiAssistantApiService` to check which endpoints / methods are required. Other calls to the API should be blocked.
 
 ## Config
@@ -65,26 +65,25 @@ INSERT_UPDATE AssistantRestriction; $contentCV[unique = true]; uid[unique = true
 
 
 ## Create assistant config using /config endpoint
-https://usea-canary.cxai.dev.sap/shopping-assistant/api/v1/docs#/
+https://api.sap.com/api/sap-cxai-apiResource-ShoppingAssistant-v1/resource/create_config_v2_v2_config_post
 
-```json
-{
-  "data": {
-    "catalog_id": "xProductCatalog",
-    "catalog_version": "Online",
-    "classification": "xClassification",
-    "model": "GPT4-o",
-    "temperature": 0.65,
-    "tenant_id": "useapamx8562",
-    "top_p": 0.9,
-    "top_k": 50,
-    "max_tokens": 1000,
-    "persona": "expert"
-  }
+This will return configId which must be provided via local spartacus config, or backend config.
+
+## Modify styles
+By default default OOTB spa colors are used (e.g. `--cx-color-primary`) so library should look good on OOTB spartacus. See `_common-variables.scss` for details. Example of changing some colors:
+```scss
+.cxai-chat-wrapper {
+  //titlebar, float button
+  --cxai-primary: var(--xy-primary);
+  --cxai-primary-text: var(--xy-white);
+  --cxai-font-size: var(--xy-font-size);
+  //color of user's, assistant, error chat bubbles
+  --cxai-message-user-background: var(--cxai-primary);
+  --cxai-message-user-text: var(--cxai-primary-text);
+  --cxai-message-assistant-border: 1px solid black;
+  --cxai-message-error-background: (--xy-danger);
 }
 ```
-
-This will return configId which must be provided via local config, or backend config.
 
 ## Backend extensions
 This section is relevant only if you use cxai backend extensions which provide CXAI section in backoffice.

@@ -1,6 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { WindowRef } from '@spartacus/core';
-import { BehaviorSubject, distinct, distinctUntilChanged, Observable, ReplaySubject, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable, ReplaySubject, Subject } from 'rxjs';
 import { ASSISTANT_CONFIG_SCOPE, CxaiAssistantConfig } from './config/assistant.config';
 import { AssistantChatTextData } from './models/assistant.model';
 
@@ -11,8 +10,11 @@ export class CxaiAssistantRootService {
   readonly useSapIcons = !!inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE]?.useSapIcons;
   readonly moduleEnabled$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   readonly chatTextToSend$: Subject<AssistantChatTextData> = new ReplaySubject<AssistantChatTextData>(1);
-  protected chatOpened$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  
+  //request to open/close chat window
+  readonly chatOpenRequest$: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  //mark that lazy loaded part is ready - to prevent chat button disapearing too early (called from chat window component)
+  protected chatWindowLoaded$ = new BehaviorSubject<boolean>(false);
+
   /**
    * @param text 
    * @param send if true then send immediately, otherwise only put it in the chat input
@@ -28,14 +30,26 @@ export class CxaiAssistantRootService {
   }
   
   openChat() {
-    this.chatOpened$.next(true);
+    this.chatOpenRequest$.next(true);
   }
 
   closeChat() {
-    this.chatOpened$.next(false);
+    this.chatOpenRequest$.next(false);
   }
 
+  /**
+   * True if 1) chatOpenRequest = true and 2) chatWindowLoaded = true meaning that window component
+   * is visible & js chunk is loaded
+   */
   getChatOpenedStatus(): Observable<boolean> {
-    return this.chatOpened$.asObservable().pipe(distinctUntilChanged());
+    return combineLatest([this.chatOpenRequest$, this.chatWindowLoaded$]).pipe(
+      map(([opened, loaded]) => opened && loaded),
+      distinctUntilChanged(),
+    )
+  }
+
+  /** should be called from ngOnInit of lazy-loaded component */
+  chatWindowLoaded() {
+    this.chatWindowLoaded$.next(true);
   }
 }

@@ -1,30 +1,39 @@
+@use '../common-styles' as common;
+
 :host {
   z-index: 10000;
-  --_border-radius--small: 5px;
-  --_border--light: 1px solid #ffffff4c;
 }
 
 .chat-btn {
+  background-color: var(--cxai-primary);
+  color: var(--cxai-primary-text);
+  @include common.background-glow;
   position: fixed;
+  display: grid;
+  place-content: center;
   right: 0;
   bottom: 20%;
   width: 60px;
   aspect-ratio: 4/3;
   font-size: 20px;
-  border-radius: var(--_border-radius--small) 0 0 var(--_border-radius--small);
-  background-color: var(--cx-color-primary);
+  border-radius: var(--cxai-border-radius--small) 0 0 var(--cxai-border-radius--small);
   overflow: clip;
-  border-top: var(--_border--light);
-  border-left: var(--_border--light);
-  border-bottom: var(--_border--light);
+  border: var(--cxai-border--light);
+  border-right: unset;
+
   &:hover,
-  &:focus {
+  &:focus,
+  &:active {
     pointer-events: auto;
     cursor: pointer;
-    filter: unset;
-    border-top: var(--_border--light);
-    border-left: var(--_border--light);
-    border-bottom: var(--_border--light);
+    filter: brightness(1.1);
+    background-color: var(--cxai-primary);
+    border-color: var(--cxai-border-color);
+    color: var(--cxai-primary-text);
+    // Lighten the glow effect when active
+    &:after {
+      opacity: 0.35;
+    }
   }
 }
 

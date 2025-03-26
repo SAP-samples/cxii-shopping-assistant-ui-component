@@ -5,7 +5,7 @@
 
 .product {
   font-weight: bold;
-  
+
   &.valid {
     cursor: pointer;
   }
@@ -20,33 +20,52 @@
 
 .close-chat {
   position: absolute;
-  top: 0;
-  right: 5px;
+  top: var(--cxai-spacer--extra-small);
+  right: var(--cxai-spacer--extra-small);
   cursor: pointer;
   z-index: 1;
 }
+::ng-deep lib-product-card {
+  text-align: center;
+  cx-star-rating {
+    .star {
+      font-size: var(--cxai-font-size);
+    }
+  }
+}
 
 .buttons {
-  margin-top: 5px;
+  margin-top: var(--cxai-spacer--extra-small);
 
   .btn {
     width: 100%;
-    padding: 7px;
     min-height: 0;
+    font-size: var(--cxai-font-size);
+    padding: unset;
+    background-color: unset;
+    color: var(--cx-color-text);
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
 :host .product-popup {
+  --_popup-width: 200px;
   position: absolute;
-  width: 150px;
+  width: var(--_popup-width);
   background-color: var(--cx-color-background);
-  border: 1px solid var(--cx-color-medium);
-  box-shadow: 0 1px 6px lightgrey, 0 2px 32px lightgrey;
+  border: var(--cxai-border--light);
+  box-shadow: var(--cxai-shadow--big);
   z-index: 11;
-  margin-top: -3px;
   left: 0;
+  padding: var(--cxai-spacer--small);
 
   ::ng-deep lib-product-card .info {
-    padding: 0 5px;
+    padding: 0 var(--cxai-spacer--extra-small);
+    margin-bottom: var(--cxai-spacer);
+    .cx-product-name {
+      margin: unset;
+    }
   }
 }

@@ -1,10 +1,6 @@
 :host {
   display: block;
-}
-
-:host:not(.square) cx-media {
-  border-radius: var(--_border-radius--big);
-  overflow: hidden;
+  width: 100%;
 }
 
 .info {
@@ -12,21 +8,29 @@
 }
 
 cx-media {
-  box-shadow: var(--_shadow--small);
-  margin-bottom: var(--_spacer--small);
-  height: auto;
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: var(--cxai-spacer--small);
+  display: flex;
+  align-items: center;
+  ::ng-deep img {
+    width: 100%;
+    object-fit: contain;
+  }
 }
 
 .cx-product-name {
-  font-size: var(--machines-font-size--base);
+  font-size: var(--cxai-font-size);
 }
 
 cx-star-rating {
+  font-size: var(--cxai-font-size);
   display: block;
   white-space: nowrap;
-  margin: 0 0 var(--_spacer--small);
+  margin: 0 0 var(--cxai-spacer--small);
 }
 
 .price {
+  font-size: var(--cxai-font-size);
   font-weight: 700;
 }

@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatMessage, AssistantChatSession, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatMessage, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
 import { BaseSiteService, LoggerService, TranslationService, WindowRef } from '@spartacus/core';
 import { CurrentProductService } from '@spartacus/storefront';
@@ -129,9 +129,9 @@ export class CxaiAssistantService {
         if(sessionId) {
           return this.apiService.getChatSession(sessionId).pipe(
             map(session => {
-              this.parseChatSession(session, welcomeMessageOverwrite);
-              session.session_id = sessionId;
-              return session;
+              let adaptedSession = this.adaptInternalChatSession(session, welcomeMessageOverwrite);
+              adaptedSession.session_id = sessionId;
+              return adaptedSession;
             }),
             catchError((e) => {
               this.loggerService.error(ASSISTANT_LOG_MARKER, `Error loading chat session ${sessionId}`, e);
@@ -210,7 +210,10 @@ export class CxaiAssistantService {
     });
   }
 
-  protected parseChatSession(session: AssistantChatSession, welcomeMessageOverwrite) {
+  /**
+   * Convert session as returned via API into visible externally AssistantChatSession
+   */
+  protected adaptInternalChatSession(session: AssistantChatSessionInternal, welcomeMessageOverwrite): AssistantChatSession {
     if(welcomeMessageOverwrite && session.status) {
       if(session.chat_history.length > 0 && session.chat_history[0].role === 'assistant') {
         session.chat_history[0].content = welcomeMessageOverwrite;
@@ -222,10 +225,27 @@ export class CxaiAssistantService {
       }
     }
 
+    const adaptedSession: AssistantChatSession = {
+      chat_history: [],
+      status: session.status,
+    };
+
     session.chat_history.forEach(message => {
-      this.removeContextFromChatMessage(message);
-      this.parseChatMessage(message);
+      const adaptedMessage: AssistantChatMessage = {
+        role: message.role,
+        content: typeof message.content === 'string' ? message.content : message.content.response,
+      };
+
+      if(typeof message.content === 'object') {
+        adaptedMessage.recommendations = message.content.recommendations;
+      }
+
+      this.removeContextFromChatMessage(adaptedMessage);
+      this.parseChatMessage(adaptedMessage);
+      adaptedSession.chat_history.push(adaptedMessage);
     });
+
+    return adaptedSession;
   }
 
   protected parseChatMessage(message: AssistantChatMessage) {

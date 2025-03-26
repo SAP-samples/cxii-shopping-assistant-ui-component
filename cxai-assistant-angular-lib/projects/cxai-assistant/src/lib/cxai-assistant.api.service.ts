@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
   AssistantChatResponse,
-  AssistantChatSession,
+  AssistantChatSessionInternal,
   AssistantUserInput,
 } from '@cx-spartacus/cxai-assistant/root';
 import { OccEndpointsService } from '@spartacus/core';
@@ -22,7 +22,7 @@ export class CxaiAssistantApiService {
 
   getChatSession(sessionId: string) {
     const url = this.buildUrl(`/chat_session/${sessionId}`);
-    return this.http.get<AssistantChatSession>(url);
+    return this.http.get<AssistantChatSessionInternal>(url);
   }
 
   createChatSession(configId: string) {
