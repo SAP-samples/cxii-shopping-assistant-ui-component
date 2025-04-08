@@ -2,7 +2,7 @@
 
 ## Add library to application
 1. Add `@cx-spartacus/cxai-assistant` to package.json
-2. Import `CxaiAskProductFeatureModule` (not MainModule!!!) into app.module 
+2. Import `CxaiAssistantFeatureModule` (not MainModule) into app.module 
 3. Optionally provide `CxaiAssistantConfig` using `provideConfig`
 4. `CxaiAssistantInitializer` will fetch config from backend when main module is loaded, values from this config have priority over locally provided config (fields that are defined will overwrite local values)
 
