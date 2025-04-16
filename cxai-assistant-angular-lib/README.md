@@ -35,12 +35,17 @@ export interface CxaiAssistantConfigInternal {
   //use sap-icon instead of font-awesome, this requires sap-icons font to be loaded
   //https://github.com/SAP/theming-base-content/tree/master/content/Base/baseLib/baseTheme/fonts
   useSapIcons?: boolean;
-  //if product.name doesn't contain entire product name, you can provide a template like "{name} {summary}"
+  /** open session only after first message is sent or immediately when window is opened.
+  if set to true then you must provide cxaiAssistant.welcomeMessage via translations, otherwise you can
+  rely on welcome message provided by the backend */
+  openSessionOnlyAfterFirstMessage?: boolean;
+  //in rare use case where product.name doesn't contain entire product name, you can provide a template like "{name} {summary}"
   //product codes in chat message will be replaced accordingly
   productNameTemplate?: string;
   //returns additional context pasted directly into chat message - see sampleAssistantContextProvider for example
   //context is not visible in the UI, it's appended into each message and stripped before displaying it in the chat
-  //it may allow the user to ask about current product, or cart contents etc (this is temporary solution before API is extended)
+  //however it may allow the user to ask about current product, or cart contents etc
+  //this is temporary solution until API is extended
   chatMessageContextProvider?: ((context: AssistantContext) => string) | null;
 }
 

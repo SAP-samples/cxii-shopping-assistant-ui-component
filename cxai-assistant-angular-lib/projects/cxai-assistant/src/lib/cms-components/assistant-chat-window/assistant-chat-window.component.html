@@ -39,7 +39,7 @@
   <div class="chat cxai-chat" #chat (click)="closeAllProductRefences()">
     @if(messages) {
       @for (message of messages.chat_history; track $index) {
-        <div class="message {{ message.role }}" [class.error]="!!message.error">
+        <div *ngIf="message.content" class="message {{ message.role }}" [class.error]="!!message.error">
           @if (message.role === 'assistant') {
           <div class="message-content">
             @for (token of message | chatMessage; track $index) { 

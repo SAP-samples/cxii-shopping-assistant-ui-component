@@ -4,7 +4,12 @@
   z-index: 10000;
 }
 
-.chat-btn {
+.chat-btn-wrapper {
+  //it's just a wrapper to allow swapping button html via outlet
+  display: contents;
+}
+
+:host ::ng-deep .chat-btn {
   background-color: var(--cxai-primary);
   color: var(--cxai-primary-text);
   @include common.background-glow;
@@ -37,7 +42,7 @@
   }
 }
 
-.chat-opened > button {
+.chat-opened > .chat-btn-wrapper {
   display: none;
 }
 

@@ -1,7 +1,7 @@
 import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, inject, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ASSISTANT_LOG_MARKER, AssistantChatSession, CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
+import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatSession, CxaiAssistantConfig, CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
 import { LoggerService } from '@spartacus/core';
 import { ICON_TYPE } from '@spartacus/storefront';
 import { distinctUntilChanged, finalize, Subscription, take } from 'rxjs';
@@ -20,6 +20,7 @@ import { AssistantProductReferenceComponent } from '../assistant-product-referen
 export class AssistantChatWindowComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChildren(AssistantProductReferenceComponent) children!: QueryList<AssistantProductReferenceComponent>;
 
+  private config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
   private cxaiAssistantService = inject(CxaiAssistantService);
@@ -47,11 +48,25 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   });
 
   constructor() {
-    this.cxaiAssistantService.getChatSession().pipe(
+    this.cxaiAssistantService.getChatSession(!this.config?.openSessionOnlyAfterFirstMessage).pipe(
       distinctUntilChanged(),
       takeUntilDestroyed(),
     ).subscribe((session) => {
-      this.messages = session;
+      //delayed session opening - after 1st user message
+      if(this.cxaiAssistantService.isDummySession(this.messages)) {
+        //clear "wait for response" marker
+        this.sendQuestionSubscription = undefined;
+        if(session.chat_history.length == 1) {
+          //some error happened, just append last message to current local session stack
+          //normally we expect exactly 3 messages in new session - welcome, user, response
+          this.messages!.chat_history.push(session.chat_history[0]);
+        } else {
+          this.messages = session;
+        }
+      } else {
+        this.messages = session;
+      }
+
       this.focusInput();
       this.changeDetectorRef.markForCheck();
     });
@@ -106,23 +121,31 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     });
     this.form.reset();
 
-    this.sendQuestionSubscription = this.cxaiAssistantService
-      .sendQuestion(message)
-      .pipe(
-        take(1),
-        finalize(() => {
-          this.sendQuestionSubscription = undefined;
-          this.changeDetectorRef.detectChanges();
-        })
-      )
-      .subscribe((response) => {
-        if(this.messages) {
-          this.messages.chat_history.push(Object.assign({}, response));
-          this.changeDetectorRef.markForCheck();
-        } else {
-          this.loggerService.error(ASSISTANT_LOG_MARKER, 'sendMessage response: No chat session available, orphaned response?', response);
-        }
-      });
+    if(this.messages.session_id) {
+      this.sendQuestionSubscription = this.cxaiAssistantService
+        .sendQuestion(message)
+        .pipe(
+          take(1),
+          finalize(() => {
+            this.sendQuestionSubscription = undefined;
+            this.changeDetectorRef.detectChanges();
+          })
+        )
+        .subscribe((response) => {
+          if(this.messages) {
+            this.messages.chat_history.push(Object.assign({}, response));
+            this.changeDetectorRef.markForCheck();
+          } else {
+            this.loggerService.error(ASSISTANT_LOG_MARKER, 'sendMessage response: No chat session available, orphaned response?', response);
+          }
+        });
+    } else if (this.config?.openSessionOnlyAfterFirstMessage) {
+      //a "waiting for response" marker that will be cleaned when new session is received
+      this.sendQuestionSubscription = new Subscription();
+      this.cxaiAssistantService.startNewChatSession(message);
+    } else {
+      this.loggerService.error(ASSISTANT_LOG_MARKER, 'sendMessage: invaid session_id state', this.messages, this.config);
+    }
   }
 
   onKeyPress(e: KeyboardEvent) {
