@@ -28,7 +28,7 @@ See [README](cxai-assistant-angular-lib/README.md) for details.
 4. Run your app `ng s`
 
 ## Known Issues
-This implementation opens chat session as soon as chat window is opened. It can be changed to open session only after user sends first message.
+This implementation assumes one chat config per site. Currently backend configs do not take into account language parameter, also language is not passed when opening a new session. To support welcome message in different languages it is required to use translations - see `lib.i18n.ts` for translation keys.
 
 ## How to obtain support
 [Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.
