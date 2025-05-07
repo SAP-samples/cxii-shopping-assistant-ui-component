@@ -1,0 +1,50 @@
+# Binaries
+**/hmc/bin/
+**/testclasses/
+classes/
+eclipsebin/
+
+# Cockpits
+**/web/webroot/btgcockpit/
+**/web/webroot/cmscockpit/
+**/web/webroot/cockpit/
+**/web/webroot/cscockpit/
+**/web/webroot/productcockpit/
+**/resources/backoffice/*_bof.jar
+
+# Addons
+**/web/addonsrc/
+**/web/commonwebsrc/
+**/web/webroot/**/addons/
+addon-*.jar
+
+# Generated
+*.xsd
+*testclasses.xml
+build.xml
+generated/
+genresources/
+gensrc/
+platformhome.properties
+ruleset.xml
+**/resources/wro_addons.xml
+*.css.map
+
+# Compiled styles
+**/_ui/responsive/theme-*/css/style.css
+# Copied fonts from _ui-src directory
+**/_ui/responsive/theme-*/fonts/
+
+# Project files
+*.iml
+.idea/
+.settings/
+.vscode/
+
+# Others
+**/backup/
+/orbeon/
+hycloudext/
+node_modules/
+*.DS_Store
+*.log

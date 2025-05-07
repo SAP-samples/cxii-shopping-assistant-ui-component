@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved.
+--><extensioninfo xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="extensioninfo.xsd">
+        	
+    
+    <extension abstractclassprefix="Generated" classprefix="Cxaiaskproductocc" description="cxaiaskproductocc extension" jaloLogicFree="true" managername="CxaiaskproductoccManager" managersuperclass="de.hybris.platform.jalo.extension.Extension" name="cxaiaskproductocc">
+        
+        <!-- you should add all required extensions to this list, except platform extensions which are automatically required -->
+        <requires-extension name="commercewebservices"/>
+        <requires-extension name="cxaiocc"/>
+        <requires-extension name="backoffice"/>
+        <requires-extension name="cms2"/>
+                		
+        <!-- because of gson -->
+        <requires-extension name="odata2services"/>
+        
+        <coremodule generated="true" manager="com.sap.cxaiaskproductocc.jalo.CxaiaskproductoccManager" packageroot="com.sap.cxaiaskproductocc"/>
+        <meta key="backoffice-module" value="true"/>
+    
+    </extension>
+</extensioninfo>
