@@ -9,7 +9,7 @@ import { CxaiAssistantApiService } from './cxai-assistant.api.service';
 
 export const SESSION_STORAGE_KEY_PREFIX = 'cxai-assistant.sessionId';
 export const ERROR_SESSION_ID = '';
-
+const WELCOME_MESSAGE_TRANSLATION_KEY = 'cxaiAssistant.welcomeMessage';
 @Injectable({
   providedIn: 'root'
 })
@@ -17,7 +17,7 @@ export class CxaiAssistantService {
   protected sessionStorageKey: string | undefined;
   protected sessionId$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);
   protected chatWindowSize$ = new BehaviorSubject<{x: number, y: number} | undefined>(undefined);
-  protected sessionIsBeaingCreated = false;
+  protected sessionIsBeingCreated = false;
 
   protected winRef = inject(WindowRef);
   protected config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
@@ -106,10 +106,10 @@ export class CxaiAssistantService {
   }
 
   /**
-   * @param openIfNoSession if there is no session_id, open a new one
-   * @param openIfErrorLoading if there is error loading the session (e.g. invalid session_id), open a new one
+   * @param openIfNoSession if there is no session_id, or error loading session_id, open a new one, otherwise
+   * it will return empty session with initial welcome message taken from translations
    */
-  getChatSession(openIfNoSession = true, openIfErrorLoading = true): Observable<AssistantChatSession> {
+  getChatSession(openIfNoSession = true): Observable<AssistantChatSession> {
     if(openIfNoSession && !this.sessionId$.value) {
       this.startNewChatSession();
     }
@@ -119,7 +119,7 @@ export class CxaiAssistantService {
 
     return combineLatest([
       this.getCurrentSessionId$(),
-      this.translationService.translate(`cxaiAssistant.welcomeMessage`, { context: this.currentBaseSite, siteName: this.currentBaseSiteName }, false).pipe(
+      this.translationService.translate(WELCOME_MESSAGE_TRANSLATION_KEY, { context: this.currentBaseSite, siteName: this.currentBaseSiteName }, false).pipe(
         //in dev mode missing translation looks like [cxAiAssistant:cxAiAssistant.welcomeMessage], otherwise it is usually single character &nbsp;
         map(translation => translation?.length < 2 || translation?.startsWith('[') ? '' : translation),
         distinctUntilChanged(),
@@ -142,10 +142,13 @@ export class CxaiAssistantService {
               this.sessionId$.next(null);
 
               //if we can't load this session, try creating a new one
-              if(openIfErrorLoading && createAttempts < 2) {
+              if(createAttempts < 2) {
                 createAttempts += 1;
-                this.startNewChatSession();
-                return of(EMPTY_CHAT_SESSION);
+                if(openIfNoSession) {
+                  this.startNewChatSession();
+                }
+
+                return of(this.getEmptyChatSession(openIfNoSession, welcomeMessageOverwrite));
               } else {
                 const result = Object.assign({}, EMPTY_CHAT_SESSION);
                 result.chat_history = [
@@ -160,10 +163,30 @@ export class CxaiAssistantService {
           result.chat_history = [assistantErrorMessage('Error creating chat session')];
           return of(result);
         } else {
-          return of(EMPTY_CHAT_SESSION);
+          return of(this.getEmptyChatSession(openIfNoSession, welcomeMessageOverwrite));
         }
       }),
     );
+  }
+
+  protected getEmptyChatSession(loading: boolean, welcomeMessage: string): AssistantChatSession {
+    if(!loading) {
+      const result = Object.assign({}, EMPTY_CHAT_SESSION);
+      result.chat_history = [
+        {
+          content: welcomeMessage, //|| `[${WELCOME_MESSAGE_TRANSLATION_KEY}]`,
+          role: 'assistant',
+        }
+      ];
+      result.status = 'unopened';
+      return result;
+    }
+
+    return EMPTY_CHAT_SESSION;
+  }
+
+  isDummySession(session?: AssistantChatSession): boolean {
+    return session?.status === 'unopened';
   }
 
   protected deleteChatSession(sessionId: string | null): void {
@@ -177,22 +200,40 @@ export class CxaiAssistantService {
     }
   }
 
-  startNewChatSession(): void {
+  /**
+   * Open new chat session
+   * @param initialUserMessage if provided it will use combined_chat_session endpoint and also validate
+   * that sessonId is not already set, otherwise it will create a new session and if it already exists will
+   * delete previous session after success
+   */
+  startNewChatSession(initialUserMessage?: string): void {
     if(!this.config?.assistantConfigId) {
       const errorMessage = 'Assistant configuration not specified';
       this.loggerService.error(ASSISTANT_LOG_MARKER, errorMessage, this.config);
       throw new Error(errorMessage);
     }
 
-    if(this.sessionIsBeaingCreated) {
+    if(initialUserMessage && this.sessionId$.value) {
+      const errorMessage = 'startNewChatSession: initialUserMessage provided but session already exists';
+      throw new Error(errorMessage);
+    }
+
+    if(this.sessionIsBeingCreated) {
       this.loggerService.warn(ASSISTANT_LOG_MARKER, 'startNewChatSession: already in progress');
       return;
     }
 
-    this.sessionIsBeaingCreated = true;
+    this.sessionIsBeingCreated = true;
 
-    this.apiService.createChatSession(this.config?.assistantConfigId).pipe(
-      finalize(() => this.sessionIsBeaingCreated = false),
+    const request = initialUserMessage ?
+      this.apiService.postMessageAndCreateSession({
+        user_input: initialUserMessage,
+        config_id: this.config.assistantConfigId,
+      }) :
+      this.apiService.createChatSession(this.config.assistantConfigId);
+
+    request.pipe(
+      finalize(() => this.sessionIsBeingCreated = false),
       catchError((e) => {
         this.loggerService.error(ASSISTANT_LOG_MARKER, 'Error starting Assistant chat session', e);
         return of({ session_id: ERROR_SESSION_ID });

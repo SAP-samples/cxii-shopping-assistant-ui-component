@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import {
   AssistantChatResponse,
   AssistantChatSessionInternal,
+  AssistantNoSessionYetUserInput,
   AssistantUserInput,
 } from '@cx-spartacus/cxai-assistant/root';
 import { OccEndpointsService } from '@spartacus/core';
@@ -30,6 +31,13 @@ export class CxaiAssistantApiService {
     return this.http.post<{ session_id: string }>(url, {
       config_id: configId,
     });
+  }
+
+  postMessageAndCreateSession(payload: AssistantNoSessionYetUserInput) {
+    const url = this.buildUrl('/combined_chat_session');
+    // it actually returns a response as well but not always contain recommendations
+    // so we just return the session_id and require getSession call to obtain the conversation
+    return this.http.post<{ session_id: string }>(url, payload);
   }
 
   deleteChatSession(sessionId: string) {

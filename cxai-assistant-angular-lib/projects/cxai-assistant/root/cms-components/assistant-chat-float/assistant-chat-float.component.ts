@@ -15,6 +15,7 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
+import { CxaiAssistantOutlets } from '../../models/outlets';
 
 @Component({
   selector: 'lib-assistant-chat-float',
@@ -49,6 +50,7 @@ export class AssistantChatFloatComponent implements OnInit {
   loadChat$ = new ReplaySubject<boolean>(1);
   useSapIcons = this.cxaiAssistantRootService.useSapIcons;
   chatOpened$ = this.cxaiAssistantRootService.getChatOpenedStatus();
+  outlets = CxaiAssistantOutlets;
   private cdr = inject(ChangeDetectorRef);
 
   constructor() {

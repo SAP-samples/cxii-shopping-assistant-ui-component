@@ -28,6 +28,12 @@ export interface AssistantUserInput {
   user_input: string;
 }
 
+//for send first message & open session endpoint
+export interface AssistantNoSessionYetUserInput {
+  config_id: string;
+  user_input: string;
+}
+
 export interface AssistantChatMessageInternal {
   content: string | AssistantChatContentInternal;
   role: 'assistant' | 'user';

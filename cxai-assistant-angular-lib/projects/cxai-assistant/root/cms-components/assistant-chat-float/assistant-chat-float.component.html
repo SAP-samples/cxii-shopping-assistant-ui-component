@@ -1,8 +1,13 @@
 <div [class.chat-opened]="chatOpened$ | async" class="cxai-chat-wrapper">
-  <button class="chat-btn" (click)="openChat()" [@showHide]="buttonState">
-    <i *ngIf="!useSapIcons" class="fa-regular fa-message"></i>
-    <i *ngIf="useSapIcons" class="sap-icon post"></i>
-  </button>
+
+  <span class="chat-btn-wrapper" (click)="openChat()">
+    <ng-template [cxOutlet]="outlets.START_BUTTON">
+      <button class="chat-btn" [@showHide]="buttonState">
+        <i *ngIf="!useSapIcons" class="fa-regular fa-message"></i>
+        <i *ngIf="useSapIcons" class="sap-icon post"></i>
+      </button>
+    </ng-template>
+  </span>
 
   @if(loadChat$ | async) {
   <ng-container

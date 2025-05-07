@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { CmsConfig, I18nModule, provideConfig, provideDefaultConfigFactory } from '@spartacus/core';
-import { OutletPosition, PageComponentModule, provideOutlet, SearchBoxOutlets } from '@spartacus/storefront';
+import { OutletModule, OutletPosition, PageComponentModule, provideOutlet, SearchBoxOutlets } from '@spartacus/storefront';
 import { libTranslations, libTranslationsChunksConfig } from './assets/translations/lib-translations';
 import { AssistantChatFloatComponent } from './cms-components/assistant-chat-float/assistant-chat-float.component';
 import { SearchBoxChatOutletComponent } from './cms-components/search-box-chat-outlet/search-box-chat-outlet.component';
@@ -31,6 +31,7 @@ function defaultModuleConfigFactory(): CmsConfig {
     PageComponentModule,
     BrowserAnimationsModule,
     I18nModule,
+    OutletModule,
   ],
   providers: [
     provideDefaultConfigFactory(defaultModuleConfigFactory),

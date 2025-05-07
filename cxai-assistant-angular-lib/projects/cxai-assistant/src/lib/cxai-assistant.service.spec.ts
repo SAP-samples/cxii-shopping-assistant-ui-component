@@ -101,6 +101,64 @@ describe('CxaiAssistantService', () => {
     expect(loggerServiceSpy.error).toHaveBeenCalled();
   }));
 
+  it('start session with initialMessage', fakeAsync(() => {
+    let sessionSeen = 0;
+    service.getChatSession(false).subscribe(session => {
+      sessionSeen += 1;
+      if(sessionSeen === 1) {
+        //dummy session with welcome message that is used before user sends first message
+        expect(session.status).toBeTruthy();
+        expect(session.session_id).toBeUndefined();
+        expect(service.isDummySession(session)).toBeTrue();
+      } else {
+        //after sending message session is created
+        expect(session.status).toBeTruthy();
+        expect(session.session_id).toBe(mockCreateSessionResponse.session_id);
+        expect(service.isDummySession(session)).toBeFalse();
+        //user's message + response
+        expect(session.chat_history.length).withContext("New session loaded").toBe(mockOldChatSessionResponse.chat_history.length);
+      }
+    });
+
+    tick();
+
+    const userInput = <string>mockOldChatSessionResponse.chat_history[1].content;
+    service.startNewChatSession(userInput);
+    //second should be ignored while session creation is in progress
+    service.startNewChatSession(userInput);
+    tick();
+
+    const req = expectSendMessageAndCreateSessionRequest({...mockCreateSessionResponse, response: mockPostMessageResponse.response });
+    tick();
+
+    expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockOldChatSessionResponse);
+    tick();
+
+    expect(() => service.startNewChatSession(userInput)).withContext("Cant provide initialMessage is session already exists").toThrow();
+    tick();
+    expect(sessionSeen).toBe(2);
+  }));
+
+  it('getChatSession return dummy if not already opened', fakeAsync(() => {
+    let sessionSeen = 0;
+    const welcomeMessageOverwrite = 'cxaiAssistant.welcomeMessage';
+    translateServiceSpy.translate.and.returnValue(of(welcomeMessageOverwrite));
+
+    service.getChatSession(false).subscribe(session => {
+      sessionSeen += 1;
+      //some status must be returned to mark that this is final (i.e. not loading) session
+      expect(session.status).toBeTruthy();
+      expect(session.chat_history[0].content).withContext("should return local welcome message").toBe(welcomeMessageOverwrite);
+      expect(session.session_id).toBeUndefined();
+    });
+
+    httpMock.expectNone(apiService.buildUrl(`/chat_session`));
+    tick();
+    expect(sessionSeen).toBe(1);
+    tick();
+    expect(sessionSeen).toBe(1);
+  }));
+
   it('getChatSession open a new session if not already opened', fakeAsync(() => {
     let sessionSeen = 0;
     const welcomeMessageOverwrite = 'cxaiAssistant.welcomeMessage';
@@ -156,7 +214,7 @@ describe('CxaiAssistantService', () => {
     service.getChatSession().pipe(distinctUntilChanged()).subscribe(session => {
       sessionSeen += 1;
       if(sessionSeen === 1) {
-        expect(session).toEqual(EMPTY_CHAT_SESSION);
+        expect(session).withContext("Empty session during loading").toEqual(EMPTY_CHAT_SESSION);
         //expect to remove invalid session from storage
         expect(windowRefSpy.sessionStorage?.removeItem).toHaveBeenCalled();
       } else {
@@ -252,6 +310,12 @@ describe('CxaiAssistantService', () => {
 
   function expectCreateSessionRequest(payload: any = mockCreateSessionResponse) {
     const req = httpMock.expectOne(apiService.buildUrl(`/chat_session`));
+    expect(req.request.method).toBe('POST');
+    flushErrorOrPayload(req, payload);
+  }
+
+  function expectSendMessageAndCreateSessionRequest(payload: any = mockCreateSessionResponse) {
+    const req = httpMock.expectOne(apiService.buildUrl(`/combined_chat_session`));
     expect(req.request.method).toBe('POST');
     flushErrorOrPayload(req, payload);
   }
