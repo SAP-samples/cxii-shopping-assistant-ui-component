@@ -16,7 +16,13 @@ Run database update / migration
 4. Adds CX AI Assistant Config section subnode, which allows to manage remote chat configs
 
 ## Proxy authorization
-By default `/cxai/assistant/*` proxy requires user to be logged in commerce, meaning that Assistant won't work for anonymous user - you can attach "LoggedInUser" restriction to hide AssistantChatFloatComponent for anonymous users.
+By default `/cxai/assistant/*` proxy requires user to be logged in commerce, meaning that Assistant won't work for anonymous user - you can attach `loggedInUser` restriction to hide AssistantChatFloatComponent for anonymous users.
+
+```
+UPDATE AbstractCMSComponent; uid[unique = true]          ; onlyOneRestrictionMustApply; restrictions(uid,$contentCV); $contentCV[unique = true];
+                           ; AssistantChatFloatComponent ; false                      ; (-)loggedInUser,(+)loggedInUser
+
+```
 
 Alternatively you can remove `@Secured` from OCC Controller class, in this case OCC proxy will be fully open which is not recommended.
 
