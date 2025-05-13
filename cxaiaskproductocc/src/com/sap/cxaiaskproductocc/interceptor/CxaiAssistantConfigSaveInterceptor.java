@@ -14,10 +14,10 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -41,7 +41,7 @@ public class CxaiAssistantConfigSaveInterceptor implements PrepareInterceptor<Cx
 
 	//except agent_id / config_id which is synced only on creation
 	private final Map<String, String> synchAttributes = new HashMap<>();
-	private final Set<PK> currentlyLoading = new HashSet<>();
+	private final Set<PK> currentlyLoading = ConcurrentHashMap.newKeySet();
 
 	public static final String CATALOG_ID = "catalog_id";
 

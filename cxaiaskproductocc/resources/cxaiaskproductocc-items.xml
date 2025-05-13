@@ -12,7 +12,7 @@
 	<itemtypes>
 		
 		<typegroup name="assistant">
-	 			<itemtype code="CxaiConfig" autocreate="false" generate="false">
+				<itemtype code="CxaiConfig" autocreate="false" generate="false">
 				<attributes>
 					<attribute type="ConsumedDestination" qualifier="assistantDestination">
 						<description>If not provided VS destination will be used</description>
@@ -39,8 +39,8 @@
 											</attribute>
 									</attributes>
 					</itemtype>
-	 			<itemtype code="CxaiAssistantConfig" autocreate="true" generate="false">
-	 				<deployment table="CxaiAssistantConfig" typecode="24055"/>
+				<itemtype code="CxaiAssistantConfig" autocreate="true" generate="false">
+					<deployment table="CxaiAssistantConfig" typecode="24055"/>
 				<attributes>
 					<attribute type="java.lang.String" qualifier="configId">
 						<persistence type="property"/>

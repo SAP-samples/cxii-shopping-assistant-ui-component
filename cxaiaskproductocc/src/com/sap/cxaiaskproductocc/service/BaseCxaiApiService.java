@@ -100,7 +100,6 @@ public class BaseCxaiApiService
 				token = new ExpirableToken(tokenValue, tokenExpiresIn == null ? -1 : tokenExpiresIn.longValue());
 				this.tokenMap.put(urlId, token);
 				LOGGER.info("Fetched token for " + urlId + " expires in " + tokenExpiresIn);
-				LOGGER.debug(token.getValue());
 				return token.getValue();
 			}
 			catch (final HttpStatusCodeException ex)

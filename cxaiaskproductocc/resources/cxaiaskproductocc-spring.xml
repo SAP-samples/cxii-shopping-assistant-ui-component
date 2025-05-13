@@ -28,7 +28,7 @@
 		</property>
 	</bean>
 	
-	<!--	assistant -->
+	<!--  assistant -->
 	<bean id="cxaiConfigAssistantPopulator"
 		class="com.sap.cxaiaskproductocc.populator.CxaiConfigAssistantPopulator">
 		<constructor-arg ref="cxaiAskProductConsumedDestinationConverter"></constructor-arg>
@@ -53,7 +53,7 @@
 		
 		<bean id="caiAssistantApiService" class="com.sap.cxaiaskproductocc.service.CxaiAssistantApiService"></bean>
 		
-	 	<bean id="cxaiAssistantConfigSaveInterceptor"
+		<bean id="cxaiAssistantConfigSaveInterceptor"
 		class="com.sap.cxaiaskproductocc.interceptor.CxaiAssistantConfigSaveInterceptor">
 	</bean>
 

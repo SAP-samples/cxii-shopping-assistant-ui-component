@@ -9,7 +9,7 @@
 ## Backend assumptions
 This library uses cxai backend, which contains:
 1. `/cxai/config` endpoint to fetch configuration - can be configured or turned off via local config `configInitializerEndpoint`
-2. `/cxai/assistant/*` proxy which forwards requests to assistant API and handles authorization, this library does not send any credentials and doesn't manage tokens. If you implement this kind of proxy be sure to whitelist allowed API calls and not forward all requests. See `CxaiAssistantApiService` to check which endpoints / methods are required. Other calls to the API should be blocked.
+2. `/cxai/assistant/*` proxy which forwards requests to assistant API and handles authorization, this library does not send any credentials and doesn't manage tokens. If you implement this kind of proxy be sure to filter (allowlist) allowed API calls and not forward all requests. See `CxaiAssistantApiService` to check which endpoints / methods are required. Other calls to the API should be blocked.
 
 ## Config
 Config is fetched from backend, but can be also provided locally. Backend values (if defined) will overwrite local.
