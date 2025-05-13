@@ -7,9 +7,9 @@ CXAI Assistant library for use with CXAI assistant API
 
 ## Requirements
 1. Node version specified in `cxai-assistant-angular-lib/.npmrc`
-2. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL.
-3. valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it.
-See [README](cxai-assistant-angular-lib/README.md) for details.
+2. Valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it, or use provided sample backend extension.
+3. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL. Sample backend extension is provided: [README](cxaiaskproductocc/README.md)
+
 
 ## Download and Installation
 ### Build library
