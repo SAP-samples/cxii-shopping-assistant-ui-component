@@ -1,12 +1,13 @@
-# SAP CX Assistant Chat UI Component
-Spartacus library to use CXII Assistant API.
+# SAP CX Assistant Chat and Ask Product UI Component
+Spartacus library to use CXII Assistant and Ask Product API.
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/cxii-shopping-assistant-ui-component)](https://api.reuse.software/info/github.com/SAP-samples/cxii-shopping-assistant-ui-component)
 
 ## Description
 CXAI Assistant library for use with CXAI assistant API
+CXAI Ask Product library for use with CXAI Ask Product API
 
 ## Requirements
-1. Node version specified in `cxai-assistant-angular-lib/.npmrc`
+1. Node version specified in `.npmrc` files
 2. Valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it, or use provided sample backend extension.
 3. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL. Sample backend extension is provided: [README](cxaiaskproductocc/README.md)
 
@@ -20,14 +21,16 @@ CXAI Assistant library for use with CXAI assistant API
     > You must define environment variables with your npm repository credentials - see `.npmrc` file to see which variables are required
 6. To connect the library with your application add it to `package.json` and follow [README](cxai-assistant-angular-lib/README.md)
 
+For ask product library, do the same steps in `cxai-ask-product-angular-lib` and follow [README](cxai-ask-product-angular-lib/README.md)
+
 ### Run in development mode
 1. Run `npm link` in dist folder
-2. `npm link @cx-spartacus/cxai-assistant` in your application
+2. `npm link @cx-spartacus/cxai-assistant` or/and `npm link @cx-spartacus/cxai-ask-product` in your application
     > You need to have `"preserveSymlinks": true,` in app's `angular.json` projects/<project_name>/architect/build
 3. Run the library using `npm run watch`
 4. Run your app `ng s`
 
-## Known Issues
+## Known Issues (Assistant)
 This implementation assumes one chat config per site. Currently backend configs do not take into account language parameter, also language is not passed when opening a new session. To support welcome message in different languages it is required to use translations - see `lib.i18n.ts` for translation keys.
 
 ## How to obtain support
