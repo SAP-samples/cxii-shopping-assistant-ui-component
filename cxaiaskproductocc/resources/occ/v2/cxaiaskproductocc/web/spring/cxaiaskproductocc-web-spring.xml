@@ -17,6 +17,18 @@
 		<property name="levelMapping">
 			<map>
 				<entry key="BASIC"
+					value="askProductContextMessageWindow,askProductContextCharacterLimit,askProductDestination(url,authUrl,clientId)" />
+				<entry key="FULL"
+					value="askProductContextMessageWindow,askProductContextCharacterLimit,askProductDestination(url,authUrl,clientId)" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass" value="com.sap.cxai.CxaiConfigData" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC"
 					value="assistantConfigId,assistantDestination(url,authUrl,clientId)" />
 				<entry key="FULL"
 					value="assistantConfigId,assistantDestination(url,authUrl,clientId)" />

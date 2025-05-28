@@ -4,6 +4,50 @@
 -->
 <config xmlns="http://www.hybris.com/cockpit/config">
 
+	<!-- ask-product -->
+	<context component="listview" type="CxaiConfig" merge-by="type">
+		<lv:list-view xmlns:lv="http://www.hybris.com/cockpitng/component/listView">
+			<lv:column qualifier="askProductDestination" />
+		</lv:list-view>
+	</context>
+
+	<context component="editor-area" type="CxaiConfig" merge-by="type">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+			<ea:tab name="cxai.cxaiConfig.editorArea.tab.askProduct">
+				<ea:section name="cxai.cxaiConfig.editorArea.tab.askProduct">
+					<ea:attribute qualifier="askProductDestination" />
+					<ea:attribute qualifier="askProductContextMessageWindow" />
+					<ea:attribute qualifier="askProductContextCharacterLimit" />
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+
+	<context component="create-wizard" type="CxaiConfig" merge-by="type">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="askProductCxAiConfigWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="askProductPrepare">
+				<wz:initialize property="newItem" type="CxaiConfig"/>
+			</wz:prepare>
+			<wz:step id="askProduct" label="cxai.cxaiConfig.editorArea.tab.askProduct">
+				<wz:content id="askProduct.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="askProductDestination" />
+						<wz:property qualifier="askProductContextMessageWindow" />
+						<wz:property qualifier="askProductContextCharacterLimit" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="askProduct.navigation">
+					<wz:cancel/>
+					<wz:back/>
+					<wz:next/>
+					<wz:done visible="!#empty(newItem.code)">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+	
 	<!-- assistant -->
 	<context component="editor-area" type="CxaiConfig" merge-by="type">
 		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">

@@ -16,6 +16,10 @@
 	</bean>
 
 	<bean class="com.sap.cxai.CxaiConfigData">
+		<property name="askProductDestination" type="com.sap.cxai.askproduct.ConsumedDestinationData"/>
+		<property name="askProductContextMessageWindow" type="Integer"/>
+		<property name="askProductContextCharacterLimit" type="Integer"/>
+		
 		<property name="assistantDestination" type="com.sap.cxai.askproduct.ConsumedDestinationData"/>
 		<property name="assistantConfigId" type="String"/>
 		

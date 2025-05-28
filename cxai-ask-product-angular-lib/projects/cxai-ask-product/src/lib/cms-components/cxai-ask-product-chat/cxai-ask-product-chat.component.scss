@@ -1,0 +1,56 @@
+// Styles specific to ask-product
+
+.chat {
+  max-height: 600px;
+  overflow-y: auto;
+
+  .sources {
+    margin-top: var(--cxai-spacer--small);
+    padding-top: var(--cxai-spacer--extra-small);
+    border-top: var(--cxai-message-assistant-border);
+
+    .source > * {
+      font-size: 85%;
+    }
+
+    cx-icon {
+      color: var(--cx-color-primary);
+      margin-right: var(--cxai-spacer--extra-small);
+    }
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: var(--cxai-spacer);
+  width: 100%;
+  .btn-primary {
+    flex-grow: 1;
+    display: flex;
+    gap: var(--cxai-spacer--extra-small);
+    align-items: center;
+    aspect-ratio: unset;
+    min-height: var(--cxai-button-height);
+  }
+
+  &.messages-false .cxai-btn-clear {
+    display: none;
+  }
+
+  &.messages-false.valid-false .cxai-btn-send {
+    display: none;
+  }
+}
+
+.ai-icon {
+  display: inline-block;
+  width: var(--cxai-font-size);
+  height: var(--cxai-font-size);
+  fill: currentColor;
+  vertical-align: middle;
+
+  svg {
+    display: grid;
+    place-content: center;
+  }
+}

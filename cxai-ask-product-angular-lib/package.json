@@ -1,0 +1,38 @@
+{
+  "name": "cxai-ask-product-angular-lib",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build --configuration production",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/common": "^19.2.5",
+    "@angular/compiler": "^19.2.5",
+    "@angular/core": "^19.2.5",
+    "@angular/forms": "^19.2.5",
+    "@spartacus/core": "~2211.37.0",
+    "@spartacus/storefront": "~2211.37.0",
+    "rxjs": "~7.8.1",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^19.2.5",
+    "@angular/cli": "^19.2.5",
+    "@angular/compiler-cli": "^19.2.5",
+    "@spartacus/schematics": "~2211.37.0",
+    "@types/jasmine": "~5.1.0",
+    "jasmine-core": "~5.1.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "ng-packagr": "^19.0.0",
+    "ng-samurai": "^3.0.0",
+    "typescript": "~5.8.3"
+  }
+}
