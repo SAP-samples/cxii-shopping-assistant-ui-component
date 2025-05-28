@@ -10,6 +10,35 @@
 			xsi:noNamespaceSchemaLocation="items.xsd">
 
 	<itemtypes>
+		<typegroup name="ask-product">
+			<itemtype code="CxaiConfig" autocreate="false" generate="false">
+				<attributes>
+					<attribute type="ConsumedDestination" qualifier="askProductDestination">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.Integer" qualifier="askProductContextMessageWindow">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.Integer" qualifier="askProductContextCharacterLimit">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+					<itemtype code="AskProductRestriction"
+										extends="AbstractRestriction"
+										jaloclass="com.sap.cxaiaskproductocc.jalo.restrictions.AskProductRestriction"
+										autocreate="true" generate="false">
+							<attributes>
+									<attribute qualifier="description" redeclare="true" type="java.lang.String">
+											<persistence type="dynamic" attributeHandler="AbstractRestriction_descriptionAttributeHandler"/>
+											<modifiers write="false"/>
+									</attribute>
+							</attributes>
+					</itemtype>
+		</typegroup>
 		
 		<typegroup name="assistant">
 				<itemtype code="CxaiConfig" autocreate="false" generate="false">

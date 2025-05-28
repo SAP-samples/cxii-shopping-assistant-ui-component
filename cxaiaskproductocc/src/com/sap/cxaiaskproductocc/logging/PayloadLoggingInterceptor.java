@@ -54,7 +54,9 @@ public class PayloadLoggingInterceptor implements ClientHttpRequestInterceptor
 
 	private void logBody(final ClientHttpResponse response) throws IOException
 	{
-		LOGGER.debug("Body: " + StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8));
+		String bodyString = StreamUtils.copyToString(response.getBody(), StandardCharsets.UTF_8);
+		bodyString = "Body: " + bodyString.replaceFirst("\":\"ey[A-Za-z0-9_.-]+\"", "\":\"<token>\"");
+		LOGGER.debug(bodyString);
 	}
 
 	private boolean isLoggableBody(final HttpHeaders headers)

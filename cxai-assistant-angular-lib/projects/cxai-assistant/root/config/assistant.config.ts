@@ -26,7 +26,7 @@ export interface CxaiAssistantConfigInternal {
   if set to true then you must provide cxaiAssistant.welcomeMessage via translations, otherwise you can
   rely on welcome message provided by the backend */
   openSessionOnlyAfterFirstMessage?: boolean;
-  //in rare use case where product.name doesn't contain entire product name, you can provide a template like "{name} {summary}"
+  //in rare use case where product.name doesn't contain full product name, you can provide a template like "{name} {summary}"
   //product codes in chat message will be replaced accordingly
   productNameTemplate?: string;
   //returns additional context pasted directly into chat message - see sampleAssistantContextProvider for example

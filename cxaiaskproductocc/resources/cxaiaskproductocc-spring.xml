@@ -17,6 +17,11 @@
 		class="com.sap.cxaiaskproductocc.populator.ConsumedDestinationPopulator">
 	</bean>
 
+	<bean id="cxaiConfigAskProductPopulator"
+		class="com.sap.cxaiaskproductocc.populator.CxaiConfigAskProductPopulator">
+		<constructor-arg ref="cxaiAskProductConsumedDestinationConverter"></constructor-arg>
+	</bean>
+
 	<bean id="cxaiAskProductConsumedDestinationConverter"
 		parent="abstractPopulatingConverter">
 		<property name="targetClass"
@@ -28,7 +33,23 @@
 		</property>
 	</bean>
 	
-	<!--  assistant -->
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cxaiConfigConverter" />
+		<property name="add" ref="cxaiConfigAskProductPopulator" />
+	</bean>
+	
+		<bean id="askProductRestrictionEvaluator"
+					class="com.sap.cxaiaskproductocc.restriction.AskProductRestrictionEvaluator" scope="tenant">
+				<constructor-arg name="cxaiConfigService" ref="cxaiConfigService"/>
+		</bean>
+
+		<bean id="askProductRestrictionEvaluatorMapping"
+					class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" scope="tenant">
+				<property name="restrictionTypeCode" value="AskProductRestriction"/>
+				<property name="restrictionEvaluator" ref="askProductRestrictionEvaluator"/>
+		</bean>
+		
+	<!--	assistant -->
 	<bean id="cxaiConfigAssistantPopulator"
 		class="com.sap.cxaiaskproductocc.populator.CxaiConfigAssistantPopulator">
 		<constructor-arg ref="cxaiAskProductConsumedDestinationConverter"></constructor-arg>
@@ -52,6 +73,7 @@
 	 	<bean id="cxaiConfigAssistantConfigAttributeHandler" class="com.sap.cxaiaskproductocc.attribute.CxaiConfigAssistantConfigAttributeHandler"></bean>
 		
 		<bean id="caiAssistantApiService" class="com.sap.cxaiaskproductocc.service.CxaiAssistantApiService"></bean>
+		<bean id="cxaiAskProductApiService" class="com.sap.cxaiaskproductocc.service.CxaiAskProductApiService"></bean>
 		
 		<bean id="cxaiAssistantConfigSaveInterceptor"
 		class="com.sap.cxaiaskproductocc.interceptor.CxaiAssistantConfigSaveInterceptor">
