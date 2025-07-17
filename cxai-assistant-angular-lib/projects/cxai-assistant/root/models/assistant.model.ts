@@ -42,11 +42,18 @@ export interface AssistantChatMessageInternal {
 export interface AssistantChatSessionInternal {
   chat_history: AssistantChatMessageInternal[];
   status: string;
+  user_id?: string | null;
+}
+
+export interface AssistantAction {
+  action: string;
 }
 
 export interface AssistantChatContentInternal {
   response: string;
   recommendations?: AssistantRecommendation[];
+  //any actions performed, e.g. add_to_cart, some of them may require refreshing data
+  actions?: AssistantAction[];
 }
 export interface AssistantChatResponse extends AssistantChatContentInternal {
   session_id: string;

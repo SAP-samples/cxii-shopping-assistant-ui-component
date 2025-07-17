@@ -4,9 +4,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatSession, CxaiAssistantConfig, CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
 import { LoggerService } from '@spartacus/core';
 import { ICON_TYPE } from '@spartacus/storefront';
-import { distinctUntilChanged, finalize, Subscription, take } from 'rxjs';
+import { distinctUntilChanged, filter, finalize, iif, map, of, pipe, Subscription, switchMap, take } from 'rxjs';
 import { CxaiAssistantService } from '../../cxai-assistant.service';
 import { AssistantProductReferenceComponent } from '../assistant-product-reference/assistant-product-reference.component';
+import { ActiveCartFacade } from '@spartacus/cart/base/root';
 @Component({
   selector: 'lib-assistant-chat-window',
   templateUrl: './assistant-chat-window.component.html',
@@ -20,6 +21,7 @@ import { AssistantProductReferenceComponent } from '../assistant-product-referen
 export class AssistantChatWindowComponent implements OnInit, AfterViewInit, AfterViewChecked {
   @ViewChildren(AssistantProductReferenceComponent) children!: QueryList<AssistantProductReferenceComponent>;
 
+  private activeCartService = inject(ActiveCartFacade);;
   private config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
@@ -224,4 +226,60 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     this.maximized = !this.maximized;
     this.cxaiAssistantService.notifyResize(window.innerWidth, window.innerHeight);
   }
+
+  // Drag logic
+  dragging = false;
+  dragOffset = { x: 0, y: 0 };
+
+  onTitleBarMouseDown(event: MouseEvent) {
+    if (this.maximized) return;
+    this.dragging = true;
+    const boxRect = this.box?.nativeElement.getBoundingClientRect();
+    this.dragOffset = {
+      x: event.clientX - (boxRect?.left ?? 0),
+      y: event.clientY - (boxRect?.top ?? 0),
+    };
+    document.addEventListener('mousemove', this.onDragMove);
+    document.addEventListener('mouseup', this.onDragEnd);
+  }
+
+  onDragMove = (event: MouseEvent) => {
+    if (!this.dragging || this.maximized || !this.box?.nativeElement) return;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const boxRect = this.box.nativeElement.getBoundingClientRect();
+    const boxWidth = boxRect.width || 0;
+    const boxHeight = boxRect.height || 0;
+    // Calculate new right and bottom
+    let right = viewportWidth - (event.clientX - this.dragOffset.x + boxWidth);
+    let bottom = viewportHeight - (event.clientY - this.dragOffset.y + boxHeight);
+    const snapDistance = 10;
+
+    // Snap to right
+    if (right < snapDistance) right = 0;
+    // Snap to left
+    if (viewportWidth - right - boxWidth < snapDistance) right = viewportWidth - boxWidth;
+    // Snap to bottom
+    if (bottom < snapDistance) bottom = 0;
+    // Snap to top
+    if (viewportHeight - bottom - boxHeight < snapDistance) bottom = viewportHeight - boxHeight;
+
+    if(right) {
+      this.box.nativeElement.style.right = `${right}px`;
+    } else {
+      this.box.nativeElement.style.removeProperty('right');
+    }
+
+    if(bottom) {
+      this.box.nativeElement.style.bottom = `${bottom}px`;
+    } else {
+      this.box.nativeElement.style.removeProperty('bottom');
+    }
+  };
+
+  onDragEnd = () => {
+    this.dragging = false;
+    document.removeEventListener('mousemove', this.onDragMove);
+    document.removeEventListener('mouseup', this.onDragEnd);
+  };
 }

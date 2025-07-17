@@ -32,6 +32,8 @@
   &.maximized {
     height: 100%;
     width: 50vw;
+    bottom: 0 !important;
+    right: 0 !important;
 
     //on mobile full width
     @media (max-width: 767px) {

@@ -27,10 +27,9 @@ export class CxaiAssistantApiService {
   }
 
   createChatSession(configId: string) {
+    const body = { config_id: configId };
     const url = this.buildUrl('/chat_session');
-    return this.http.post<{ session_id: string }>(url, {
-      config_id: configId,
-    });
+    return this.http.post<{ session_id: string }>(url, body);
   }
 
   postMessageAndCreateSession(payload: AssistantNoSessionYetUserInput) {

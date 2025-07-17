@@ -1,13 +1,15 @@
-import { HttpClientTestingModule, HttpTestingController, TestRequest } from '@angular/common/http/testing';
+import { HttpClientTestingModule, HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
-import { BaseSiteService, LoggerService, OccEndpointsService, TranslationService, WindowRef } from "@spartacus/core";
+import { AssistantChatResponse, AssistantChatSessionInternal, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { ActiveCartFacade } from '@spartacus/cart/base/root';
+import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, OccEndpointsService, TranslationService, UserIdService, WindowRef } from "@spartacus/core";
 import { CurrentProductService } from '@spartacus/storefront';
-import { distinctUntilChanged, EMPTY, of, skip, take } from 'rxjs';
+import { UserAccountFacade } from '@spartacus/user/account/root';
+import { EMPTY, of, skip, take } from 'rxjs';
 import { CxaiAssistantApiService } from "./cxai-assistant.api.service";
 import { CxaiAssistantService, ERROR_SESSION_ID } from './cxai-assistant.service';
-import { mockCreateSessionResponse, mockFreshChatSessionResponse, mockPostMessageResponse, mockOldChatSessionResponse } from './testing/mocks/mock-responses';
-import { ActiveCartFacade } from '@spartacus/cart/base/root';
+import { mockCreateSessionResponse, mockFreshChatSessionResponse, mockOldChatSessionResponse, mockPostMessageResponse } from './testing/mocks/mock-responses';
+import { provideHttpClient } from '@angular/common/http';
 
 describe('CxaiAssistantService', () => {
   const debug = false;
@@ -20,6 +22,8 @@ describe('CxaiAssistantService', () => {
   let translateServiceSpy: jasmine.SpyObj<TranslationService>;
   let occEndpointsServiceSpy: jasmine.SpyObj<OccEndpointsService>;
   let windowRefSpy: jasmine.SpyObj<WindowRef>;
+  let userIdServiceSpy: jasmine.SpyObj<UserIdService>;
+  let userAccountFacadeSpy: jasmine.SpyObj<UserAccountFacade>;
   let httpMock: HttpTestingController;
   beforeEach(() => {
     const storageSpy = jasmine.createSpyObj('Storage', ['setItem', 'removeItem', 'getItem']);
@@ -31,6 +35,8 @@ describe('CxaiAssistantService', () => {
     occEndpointsServiceSpy = jasmine.createSpyObj('OccEndpointsService', ['buildUrl']);
     activeCartFacadeSpy = jasmine.createSpyObj('ActiveCartFacade', ['getActive']);
     windowRefSpy = jasmine.createSpyObj('WindowRef', [], {'sessionStorage': storageSpy, 'localStorage': storageSpy});
+    userIdServiceSpy = jasmine.createSpyObj('UserIdService', ['getUserId']);
+    userAccountFacadeSpy = jasmine.createSpyObj('UserAccountFacade', ['get']);
 
     baseServiceSpy.getActive.and.returnValue(of('mock-spa'));
     baseServiceSpy.getAll.and.returnValue(of([]));
@@ -45,9 +51,12 @@ describe('CxaiAssistantService', () => {
     currentProductServiceSpy.getProduct.and.returnValue(EMPTY);
     activeCartFacadeSpy.getActive.and.returnValue(of({}));
 
+    userIdServiceSpy.getUserId.and.returnValue(of(OCC_USER_ID_ANONYMOUS));
+    userAccountFacadeSpy.get.and.returnValue(of({ customerId: 'test-customer-id' }));
+
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [],
       providers: [
         CxaiAssistantService,
         { provide: LoggerService, useValue: loggerServiceSpy },
@@ -57,6 +66,10 @@ describe('CxaiAssistantService', () => {
         { provide: OccEndpointsService, useValue: occEndpointsServiceSpy },
         { provide: WindowRef, useValue: windowRefSpy },
         { provide: ActiveCartFacade, useValue: activeCartFacadeSpy },
+        { provide: UserIdService, useValue: userIdServiceSpy },
+        { provide: UserAccountFacade, useValue: userAccountFacadeSpy },
+        provideHttpClient(),
+        provideHttpClientTesting(),
       ]
     });
 
@@ -134,7 +147,7 @@ describe('CxaiAssistantService', () => {
     expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockOldChatSessionResponse);
     tick();
 
-    expect(() => service.startNewChatSession(userInput)).withContext("Cant provide initialMessage is session already exists").toThrow();
+    expect(() => service.startNewChatSession(userInput)).withContext("Cant provide initialMessage if session already exists").toThrow();
     tick();
     expect(sessionSeen).toBe(2);
   }));
@@ -206,12 +219,46 @@ describe('CxaiAssistantService', () => {
     expect(sessionSeen).toBe(1);
   }));
 
+  it('getChatSession discard current session if its personalized and user_id doesnt match', fakeAsync(() => {
+    const otherUserSessionId = 'other-user-session-id';
+    service['sessionId$'].next(otherUserSessionId);
+    let sessionSeen = 0;
+    service.getChatSession().subscribe(session => {
+      sessionSeen += 1;
+      if(sessionSeen === 1) {
+        expect(session).withContext("Empty session during loading").toEqual(EMPTY_CHAT_SESSION);
+        //expect to remove invalid session from storage
+        expect(windowRefSpy.sessionStorage?.removeItem).toHaveBeenCalled();
+      } else {
+        expect(session.session_id).toEqual(mockCreateSessionResponse.session_id);
+        expect(service['sessionId$'].value).toBe(session.session_id!);
+      }
+    });
+
+    tick();
+    //should load personalized session
+    const personalizedSession = Object.assign({}, mockOldChatSessionResponse, { user_id: 'other-customer-id' });
+    expectGetChatSessionRequest(otherUserSessionId, personalizedSession);
+    tick();
+
+    //session belongs to another user, don't delete it just create new one
+    httpMock.expectNone(apiService.buildUrl(`/sessions`));
+    expectCreateSessionRequest(mockCreateSessionResponse);
+    tick();
+
+    //and load new session
+    expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockFreshChatSessionResponse);
+    tick();
+
+    expect(sessionSeen).toBe(2);
+  }));
+
   it('getChatSession discard invalid session and open a new one', fakeAsync(() => {
     const invalidSessionId = 'invalid-session-id';
     service['sessionId$'].next(invalidSessionId);
 
     let sessionSeen = 0;
-    service.getChatSession().pipe(distinctUntilChanged()).subscribe(session => {
+    service.getChatSession().subscribe(session => {
       sessionSeen += 1;
       if(sessionSeen === 1) {
         expect(session).withContext("Empty session during loading").toEqual(EMPTY_CHAT_SESSION);
@@ -244,7 +291,7 @@ describe('CxaiAssistantService', () => {
     service['sessionId$'].next(invalidSessionId);
 
     let sessionSeen = 0;
-    service.getChatSession().pipe(distinctUntilChanged()).subscribe(session => {
+    service.getChatSession().subscribe(session => {
       sessionSeen += 1;
       if(sessionSeen === 1) {
         expect(session).toEqual(EMPTY_CHAT_SESSION);

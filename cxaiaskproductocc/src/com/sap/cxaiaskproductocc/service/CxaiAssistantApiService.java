@@ -8,6 +8,7 @@ import de.hybris.platform.servicelayer.config.ConfigurationService;
 import java.net.URI;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -68,6 +69,7 @@ public class CxaiAssistantApiService extends BaseCxaiApiService implements CxaiA
 		try
 		{
 			final String fetchedToken = this.getAuthToken(tokenUrl, clientId, clientSecret);
+			this.addOccUserAuthTokenIfNeeded(requestSubpath, headers);
 			headers.setBearerAuth(fetchedToken);
 
 			final URI uri = UriComponentsBuilder.fromUriString(targetSystemUrl) //
@@ -84,6 +86,18 @@ public class CxaiAssistantApiService extends BaseCxaiApiService implements CxaiA
 		catch (final HttpStatusCodeException e)
 		{
 			return handleErrorResponse(e, clientId);
+		}
+	}
+
+	protected void addOccUserAuthTokenIfNeeded(final String requestSubpath, final HttpHeaders headers)
+	{
+		if (requestSubpath.equals("/chat_session") || requestSubpath.equals("/combined_chat_session"))
+		{
+			final String userAuthToken = headers.getFirst(HttpHeaders.AUTHORIZATION);
+			if (StringUtils.isNotEmpty(userAuthToken))
+			{
+				headers.set("User-Authorization-Token", userAuthToken);
+			}
 		}
 	}
 }

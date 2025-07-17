@@ -1,9 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatMessage, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatMessage, AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
-import { BaseSiteService, LoggerService, TranslationService, WindowRef } from '@spartacus/core';
+import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, TranslationService, UserIdService, WindowRef } from '@spartacus/core';
 import { CurrentProductService } from '@spartacus/storefront';
-import { asyncScheduler, BehaviorSubject, catchError, combineLatest, defaultIfEmpty, distinctUntilChanged, EMPTY, filter, finalize, map, Observable, observeOn, of, skip, switchMap, take, tap, timeout } from 'rxjs';
+import { UserAccountFacade } from '@spartacus/user/account/root';
+import { asyncScheduler, BehaviorSubject, catchError, combineLatest, defaultIfEmpty, distinctUntilChanged, EMPTY, filter, finalize, forkJoin, map, Observable, observeOn, of, skip, switchMap, take, tap, timeout } from 'rxjs';
 import { ChatMessagePipe } from './cms-components/chat-message.pipe';
 import { CxaiAssistantApiService } from './cxai-assistant.api.service';
 
@@ -28,20 +29,32 @@ export class CxaiAssistantService {
   protected baseSiteService = inject(BaseSiteService);
   protected translationService = inject(TranslationService);
   protected apiService = inject(CxaiAssistantApiService);
+  protected userAccountFacade = inject(UserAccountFacade);
+  protected userIdService = inject(UserIdService);
   protected currentBaseSite;
   currentBaseSiteName;
+  customerId$ = this.userAccountFacade.get().pipe(
+    distinctUntilChanged((prev, curr) => prev?.uid === curr?.uid),
+    map((user) => user?.customerId || user?.uid || null), 
+    distinctUntilChanged(),
+  );
 
   constructor() {
-    this.baseSiteService.getActive().pipe(
-      filter(Boolean),
-      distinctUntilChanged(),
-      tap(site => {
+    combineLatest([
+      this.userAccountFacade.get().pipe(
+        distinctUntilChanged((prev, curr) => prev?.uid === curr?.uid),
+        map(user => user?.uid || OCC_USER_ID_ANONYMOUS),
+      ),
+      this.baseSiteService.getActive().pipe(filter(Boolean), distinctUntilChanged()),
+    ]).pipe(
+      tap(([userId, site]) => {
         this.currentBaseSite = site;
-        this.sessionStorageKey = SESSION_STORAGE_KEY_PREFIX + '_' + site;
+        this.sessionStorageKey = SESSION_STORAGE_KEY_PREFIX + '_' + site + '_' + userId;
         const sessionId = this.winRef.sessionStorage?.getItem(this.sessionStorageKey) || null;
         this.sessionId$.next(sessionId);
       }),
-      switchMap((site) => {
+      distinctUntilChanged((prev, curr) => prev[1] === curr[1]),
+      switchMap(([_, site]) => {
         return this.baseSiteService.getAll().pipe(
           filter(Boolean),
           map((sites) => sites.find((s) => s.uid === site)),
@@ -95,6 +108,7 @@ export class CxaiAssistantService {
             } satisfies AssistantChatMessage;
 
             this.parseChatMessage(adaptedMessage);
+            this.processActions(response);
             return adaptedMessage;
           }),
           catchError((e) => {
@@ -127,8 +141,15 @@ export class CxaiAssistantService {
     ]).pipe(
       switchMap(([sessionId, welcomeMessageOverwrite]) => {
         if(sessionId) {
-          return this.apiService.getChatSession(sessionId).pipe(
-            map(session => {
+          return forkJoin([
+            this.customerId$.pipe(take(1)),
+            this.apiService.getChatSession(sessionId),
+          ]).pipe(
+            map(([customerId, session]) => {
+              if(!this.validateSessionOwnership(session, customerId)) {
+                throw new Error(`Session user_id ${session} does not belong to current customer`);
+              }
+
               let adaptedSession = this.adaptInternalChatSession(session, welcomeMessageOverwrite);
               adaptedSession.session_id = sessionId;
               return adaptedSession;
@@ -139,23 +160,20 @@ export class CxaiAssistantService {
                 this.winRef.sessionStorage?.removeItem(this.sessionStorageKey);
               }
 
-              this.sessionId$.next(null);
-
               //if we can't load this session, try creating a new one
-              if(createAttempts < 2) {
+              if(createAttempts < 2 && openIfNoSession) {
+                this.sessionId$.next(null);
                 createAttempts += 1;
                 if(openIfNoSession) {
                   this.startNewChatSession();
                 }
-
-                return of(this.getEmptyChatSession(openIfNoSession, welcomeMessageOverwrite));
               } else {
-                const result = Object.assign({}, EMPTY_CHAT_SESSION);
-                result.chat_history = [
-                  assistantErrorMessage('Error loading chat session: ' + (e.status || e.message))
-                ];
-                return of(result);
+                this.sessionId$.next(ERROR_SESSION_ID);
               }
+
+              //we emitted new sessionId, so here we return EMPTY observable
+              //because it will be soon overwritten by new sessionId result
+              return EMPTY;
             }),
           )
         } else if(sessionId === ERROR_SESSION_ID) {
@@ -167,6 +185,16 @@ export class CxaiAssistantService {
         }
       }),
     );
+  }
+
+  protected validateSessionOwnership(session: AssistantChatSessionInternal, customerId: string | null): boolean {
+    if(customerId) {
+      //user is logged in, we accept both anonymous and sessions belonging to the user
+      return session.user_id === customerId || !session.user_id;
+    } else {
+      //anonymous user, we accept only anonymous sessions
+      return !session.user_id;
+    }
   }
 
   protected getEmptyChatSession(loading: boolean, welcomeMessage: string): AssistantChatSession {
@@ -287,6 +315,46 @@ export class CxaiAssistantService {
     });
 
     return adaptedSession;
+  }
+
+  /**
+   * if chatbot did some backend modifications that require refreshing data 
+   */
+  protected processActions(message: AssistantChatResponse) {
+    if(!message.actions) {
+      return;
+    }
+
+    const processedActions = new Set<string>();
+    message.actions.filter(action => 
+      !processedActions.has(action.action) && processedActions.add(action.action)
+    ).forEach(action => {
+      switch (action.action) {
+        case 'add_to_cart':
+          this.reloadCart();
+          break;
+      }
+    });
+  }
+
+  protected reloadCart() {
+    this.activeCartFacade.getActiveCartId().pipe(
+      switchMap(cartId => {
+        if(cartId) {
+          this.activeCartFacade.reloadActiveCart();
+          return of(cartId);
+        } else {
+          return this.activeCartFacade.requireLoadedCart().pipe(
+            filter(cart => !!cart?.code || !!cart?.guid),
+            take(1),
+            map(cart => cart.code || cart.guid || ''),
+          )
+        }
+      }),
+      take(1),
+    ).subscribe(cartId => {
+      this.loggerService.info(ASSISTANT_LOG_MARKER, 'Reloaded cart', cartId);
+    });
   }
 
   protected parseChatMessage(message: AssistantChatMessage) {

@@ -42,15 +42,26 @@ Example payload for use when creating a config from backoffice (JSON field). Thi
   "catalog_version": "Online",
   "classification": "<what kind of products are recommended, e.g. automotive/fashion, optional>",
   "sub_agents": [
-      {
-         "name": "PriceRecommendationAgent",
-         "is_active": true
-      }
-   ],
+    {
+      "name": "PriceRecommendationAgent",
+      "is_active": true
+    },
+    {
+      "name": "SelfServiceAgent",
+      "is_active": true
+    },
+    {
+      "name": "OrderStatusAgent",
+      "is_active": true
+    },
+    {
+      "name": "AddToCartAgent",
+      "is_active": true
+    }
+  ],
   "global_settings": {
     "default_language": "en-US",
     "tone": "Neutral",
-    "voice": "",
     "brand": "<brand>"
   }
 }

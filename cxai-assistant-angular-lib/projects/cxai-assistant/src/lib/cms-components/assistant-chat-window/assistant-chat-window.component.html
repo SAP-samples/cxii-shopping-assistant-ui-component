@@ -11,12 +11,12 @@
       *ngIf="!maximized"
       class="resize-handle"
       [class.resize-nw-icon-gradient]="!useSapIcons"
-      (mousedown)="setResizeStatus(true, $event)"
+      (mousedown)="setResizeStatus(true, $event); $event.stopPropagation();"
       (window:mouseup)="setResizeStatus(false, $event)"
     >
       <lib-chat-icon [faIcon]="'resize-corner'"></lib-chat-icon>
     </div>
-    <div class="assistant-title">{{ 'cxaiAssistant.title' | cxTranslate : { siteName: currentSiteName } }}</div>
+    <div class="assistant-title" (mousedown)="onTitleBarMouseDown($event)">{{ 'cxaiAssistant.title' | cxTranslate : { siteName: currentSiteName } }}</div>
     <button
       class="action new-session"
       [title]="'cxaiAssistant.newSession' | cxTranslate"
