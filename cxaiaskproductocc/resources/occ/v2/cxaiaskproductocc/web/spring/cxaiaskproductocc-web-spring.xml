@@ -13,25 +13,36 @@
     <context:component-scan base-package="com.sap.cxaiaskproductocc.controllers"/>
 
 	<bean parent="fieldSetLevelMapping">
-		<property name="dtoClass" value="com.sap.cxai.CxaiConfigData" />
+		<property name="dtoClass" value="com.sap.cxai.CxaiConfigWsDTO" />
 		<property name="levelMapping">
 			<map>
 				<entry key="BASIC"
-					value="askProductContextMessageWindow,askProductContextCharacterLimit,askProductDestination(url,authUrl,clientId)" />
+					value="askProductContextMessageWindow,askProductContextCharacterLimit,askProductDestination(url)" />
 				<entry key="FULL"
-					value="askProductContextMessageWindow,askProductContextCharacterLimit,askProductDestination(url,authUrl,clientId)" />
+					value="askProductContextMessageWindow,askProductContextCharacterLimit,askProductDestination(url)" />
 			</map>
 		</property>
 	</bean>
 	
 	<bean parent="fieldSetLevelMapping">
-		<property name="dtoClass" value="com.sap.cxai.CxaiConfigData" />
+		<property name="dtoClass" value="com.sap.cxai.CxaiConfigWsDTO" />
 		<property name="levelMapping">
 			<map>
 				<entry key="BASIC"
-					value="assistantConfigId,assistantDestination(url,authUrl,clientId)" />
+					value="assistantConfigId,assistantDestination(url)" />
 				<entry key="FULL"
-					value="assistantConfigId,assistantDestination(url,authUrl,clientId)" />
+					value="assistantConfigId,assistantDestination(url)" />
+			</map>
+		</property>
+	</bean>
+	
+	<bean parent="fieldSetLevelMapping">
+		<property name="dtoClass" value="com.sap.cxai.askproduct.ConsumedDestinationWsDTO" />
+		<property name="levelMapping">
+			<map>
+				<entry key="BASIC" value="url" />
+				<entry key="DEFAULT" value="url" />
+				<entry key="FULL" value="DEFAULT,authUrl,clientId" />
 			</map>
 		</property>
 	</bean>

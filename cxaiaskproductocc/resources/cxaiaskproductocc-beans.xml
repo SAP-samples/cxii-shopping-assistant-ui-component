@@ -24,4 +24,20 @@
 		<property name="assistantConfigId" type="String"/>
 		
 	</bean>
+	
+	<bean class="com.sap.cxai.askproduct.ConsumedDestinationWsDTO">
+		<property name="url" type="String"/>
+		<property name="authUrl" type="String"/>
+		<property name="clientId" type="String"/>
+	</bean>
+
+	<bean class="com.sap.cxai.CxaiConfigWsDTO">
+		<property name="askProductDestination" type="com.sap.cxai.askproduct.ConsumedDestinationWsDTO"/>
+		<property name="askProductContextMessageWindow" type="Integer"/>
+		<property name="askProductContextCharacterLimit" type="Integer"/>
+		
+		<property name="assistantDestination" type="com.sap.cxai.askproduct.ConsumedDestinationWsDTO"/>
+		<property name="assistantConfigId" type="String"/>
+		
+	</bean>
 </beans>
