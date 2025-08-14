@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { CxaiAssistantInitializer, defaultAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantComponents, CxaiAssistantInitializer, defaultAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
 import {
   CmsConfig,
   ConfigInitializerService,
@@ -11,7 +11,7 @@ import {
   provideDefaultConfig,
   UrlModule,
 } from '@spartacus/core';
-import { IconModule, MediaModule, StarRatingModule } from '@spartacus/storefront';
+import { IconModule, MediaModule, OutletModule, PageComponentModule, StarRatingModule } from '@spartacus/storefront';
 import { ChatIconComponent } from './cms-components/chat-icon/chat-icon.component';
 import { ChatProductCarouselComponent } from './cms-components/chat-product-carousel/chat-product-carousel.component';
 import { AssistantChatWindowComponent } from './cms-components/assistant-chat-window/assistant-chat-window.component';
@@ -19,9 +19,10 @@ import { AssistantProductReferenceComponent } from './cms-components/assistant-p
 import { ChatMessagePipe } from './cms-components/chat-message.pipe';
 import { ProductCardComponent } from './cms-components/product-card/product-card.component';
 import { AssistantProductNamePipe } from './cms-components/product-name.pipe';
+import { AssistantTokenComponent } from './cms-components/assistant-token/assistant-token.component';
 
 /**
- * @deprecated Please use lazy CxaiAskProductFeatureModule
+ * @deprecated Please import lazy CxaiAskProductFeatureModule
  */
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { AssistantProductNamePipe } from './cms-components/product-name.pipe';
     ChatIconComponent,
     AssistantProductReferenceComponent,
     ProductCardComponent,
+    AssistantTokenComponent,
     ChatMessagePipe,
     AssistantProductNamePipe,
   ],
@@ -42,13 +44,19 @@ import { AssistantProductNamePipe } from './cms-components/product-name.pipe';
     StarRatingModule,
     RouterModule,
     UrlModule,
+    PageComponentModule,
+    OutletModule,
   ],
   providers: [
     provideDefaultConfig(defaultAssistantConfig),
     provideDefaultConfig(<CmsConfig>{
       cmsComponents: {
-        AssistantChatWindowComponent: {
+        [AssistantComponents.AssistantChatWindowComponent]: {
           component: AssistantChatWindowComponent,
+        },
+        //components for chat-token (returned by ChatMessagePipe)
+        [AssistantComponents.AssistantToken_product]: {
+          component: AssistantProductReferenceComponent,
         },
       },
     }),

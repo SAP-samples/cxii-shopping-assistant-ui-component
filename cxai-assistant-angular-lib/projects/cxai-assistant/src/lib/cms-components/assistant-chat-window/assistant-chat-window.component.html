@@ -16,25 +16,31 @@
     >
       <lib-chat-icon [faIcon]="'resize-corner'"></lib-chat-icon>
     </div>
+
     <div class="assistant-title" (mousedown)="onTitleBarMouseDown($event)">{{ 'cxaiAssistant.title' | cxTranslate : { siteName: currentSiteName } }}</div>
-    <button
-      class="action new-session"
-      [title]="'cxaiAssistant.newSession' | cxTranslate"
-      [disabled]="!messages || (messages.chat_history.length < 2 && !messages.chat_history[0]?.error)"
-      (click)="newSession()"
-    >
-      <lib-chat-icon faIcon="fas fa-redo"></lib-chat-icon>
-    </button>
-    <button
-      class="action maximize"
-      (click)="toggleMaximize()"
-      [title]="'cxaiAssistant.' + (maximized ? 'restore' : 'maximize') | cxTranslate"
-    >
-      <lib-chat-icon [faIcon]="'fas ' + (maximized ? 'fa-compress' : 'fa-expand')"></lib-chat-icon>
-    </button>
-    <button class="action close-chat" (click)="closeChat()" [title]="'cxaiAssistant.close' | cxTranslate">
-      <lib-chat-icon faIcon="fas fa-times"></lib-chat-icon>
-    </button>
+    
+    <div class="title-bar-actions">
+      <ng-template [cxOutlet]="outlets.TITLEBAR_ACTIONS" [cxOutletContext]="outletContext">
+        <button
+          class="action new-session"
+          [title]="'cxaiAssistant.newSession' | cxTranslate"
+          [disabled]="!messages || (messages.chat_history.length < 2 && !messages.chat_history[0]?.error)"
+          (click)="newSession()"
+        >
+          <lib-chat-icon faIcon="fas fa-redo"></lib-chat-icon>
+        </button>
+        <button
+          class="action maximize"
+          (click)="toggleMaximize()"
+          [title]="'cxaiAssistant.' + (maximized ? 'restore' : 'maximize') | cxTranslate"
+        >
+          <lib-chat-icon [faIcon]="'fas ' + (maximized ? 'fa-compress' : 'fa-expand')"></lib-chat-icon>
+        </button>
+      </ng-template>
+      <button class="action close-chat" (click)="closeChat()" [title]="'cxaiAssistant.close' | cxTranslate">
+        <lib-chat-icon faIcon="fas fa-times"></lib-chat-icon>
+      </button>
+    </div>
   </div>
   <div class="chat cxai-chat" #chat (click)="closeAllProductRefences()">
     @if(messages) {
@@ -44,12 +50,10 @@
           <div class="message-content">
             @for (token of message | chatMessage; track $index) { 
               @if(token.type === 'html') {
-              <span [innerHTML]="token.content"></span>
+                <span [innerHTML]="token.content"></span>
               } @else {
-              <lib-assistant-product-reference
-                [productCode]="token.content"
-                (productCopied)="focusInput()"
-              ></lib-assistant-product-reference>
+                <lib-assistant-token [context]="{ token, chatWindowComponent: this }">
+                </lib-assistant-token>
               }
             }
           </div>
@@ -63,7 +67,7 @@
         } 
       } 
     }
-    <div *ngIf="sendQuestionSubscription || !(messages?.status || messages?.chat_history?.length)" class="message assistant waiting">
+    <div *ngIf="sendQuestionSubscription() || !(hasValidSession() || messages?.chat_history?.length)" class="message assistant waiting">
       <div class="message-content">
         <div class="dot-loader"></div>
       </div>
@@ -73,7 +77,7 @@
     <textarea
       #chatInputField
       [maxlength]="1000"
-      [readonly]="sendQuestionSubscription || !messages?.status"
+      [readonly]="inputTextDisabled()"
       (keypress)="onKeyPress($event)"
       class="form-control cxai-chat-input"
       name="message"
@@ -81,8 +85,11 @@
       [class.ng-invalid]="false"
       placeholder="{{ 'cxaiAssistant.inputPlaceholder' | cxTranslate }}"
     ></textarea>
-    <button class="cxai-btn-send" [disabled]="sendQuestionSubscription || !form.valid || !messages?.status">
-      <lib-chat-icon faIcon="far fa-paper-plane"></lib-chat-icon>
-    </button>
+
+    <ng-template [cxOutlet]="outlets.CHAT_BUTTONS" [cxOutletContext]="outletContext">
+      <button class="cxai-btn-send" [disabled]="sendDisabled()">
+        <lib-chat-icon faIcon="far fa-paper-plane"></lib-chat-icon>
+      </button>
+    </ng-template>
   </form>
 </div>

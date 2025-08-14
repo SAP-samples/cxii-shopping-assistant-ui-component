@@ -1,10 +1,5 @@
 import { Injectable, Pipe, PipeTransform } from "@angular/core";
-import { AssistantChatMessage } from "@cx-spartacus/cxai-assistant/root";
-
-export declare type ChatMessageToken = {
-  type: 'html' | 'product';
-  content: string;
-};
+import { AssistantChatMessage, ChatMessageToken } from "@cx-spartacus/cxai-assistant/root";
 
 @Injectable({
   providedIn: 'root'

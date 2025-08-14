@@ -1,13 +1,12 @@
-import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, ElementRef, HostListener, inject, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, ElementRef, HostListener, inject, OnInit, QueryList, Renderer2, signal, ViewChild, ViewChildren } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatSession, CxaiAssistantConfig, CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
+import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatSession, AssistantChatWindowComponentInterface, AssistantChatWindowOutletContext, CxaiAssistantConfig, CxaiAssistantOutlets, CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
 import { LoggerService } from '@spartacus/core';
 import { ICON_TYPE } from '@spartacus/storefront';
-import { distinctUntilChanged, filter, finalize, iif, map, of, pipe, Subscription, switchMap, take } from 'rxjs';
+import { distinctUntilChanged, finalize, map, Subscription, take } from 'rxjs';
 import { CxaiAssistantService } from '../../cxai-assistant.service';
 import { AssistantProductReferenceComponent } from '../assistant-product-reference/assistant-product-reference.component';
-import { ActiveCartFacade } from '@spartacus/cart/base/root';
 @Component({
   selector: 'lib-assistant-chat-window',
   templateUrl: './assistant-chat-window.component.html',
@@ -18,10 +17,9 @@ import { ActiveCartFacade } from '@spartacus/cart/base/root';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class AssistantChatWindowComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class AssistantChatWindowComponent implements OnInit, AfterViewInit, AfterViewChecked, AssistantChatWindowComponentInterface {
   @ViewChildren(AssistantProductReferenceComponent) children!: QueryList<AssistantProductReferenceComponent>;
 
-  private activeCartService = inject(ActiveCartFacade);;
   private config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
   private destroyRef = inject(DestroyRef);
   private fb = inject(FormBuilder);
@@ -30,6 +28,8 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   private changeDetectorRef = inject(ChangeDetectorRef);
   private renderer = inject(Renderer2);
   protected loggerService = inject(LoggerService);
+
+  protected outlets = CxaiAssistantOutlets;
   protected chatOpened$ = this.cxaiAssistantRootService.getChatOpenedStatus();
   protected currentSiteName = this.cxaiAssistantService.currentBaseSiteName;
   useSapIcons = this.cxaiAssistantRootService.useSapIcons;
@@ -39,7 +39,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   @ViewChild('chatInputField') chatInputField!: ElementRef;
   @ViewChild('chat') chatNode!: ElementRef;
 
-  sendQuestionSubscription: Subscription | undefined;
+  sendQuestionSubscription = signal<Subscription | undefined>(undefined);
   messages: AssistantChatSession | undefined;
   
   //to keep scroll-to-bottom on new message
@@ -49,6 +49,13 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     message: ['', Validators.required],
   });
 
+  //external interface state
+  formValid = toSignal(this.form.statusChanges.pipe(map(status => status === 'VALID')), { initialValue: false });
+  hasValidSession = signal<boolean>(false); // until messages are signal, this must be manually updated
+  inputTextDisabled = computed(() => !this.hasValidSession() || !!this.sendQuestionSubscription());
+  sendDisabled = computed(() => !!this.sendQuestionSubscription() || !this.formValid() || !this.hasValidSession());
+  outletContext: AssistantChatWindowOutletContext = { chatWindowComponent: this };
+
   constructor() {
     this.cxaiAssistantService.getChatSession(!this.config?.openSessionOnlyAfterFirstMessage).pipe(
       distinctUntilChanged(),
@@ -57,20 +64,29 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
       //delayed session opening - after 1st user message
       if(this.cxaiAssistantService.isDummySession(this.messages)) {
         //clear "wait for response" marker
-        this.sendQuestionSubscription = undefined;
+        this.sendQuestionSubscription.set(undefined);
         if(session.chat_history.length == 1) {
           //some error happened, just append last message to current local session stack
           //normally we expect exactly 3 messages in new session - welcome, user, response
           this.messages!.chat_history.push(session.chat_history[0]);
         } else {
-          this.messages = session;
+          this.setChatSession(session);
         }
       } else {
-        this.messages = session;
+        this.setChatSession(session);
       }
 
       this.focusInput();
       this.changeDetectorRef.markForCheck();
+    });
+
+    this.cxaiAssistantService.currentUserChange$.pipe(
+      takeUntilDestroyed(),
+    ).subscribe(newSession => {
+      //user logged in/out, or site changed etc. if we don't have cached session need to create new one
+      if(!newSession.new_session_id && !this.config?.openSessionOnlyAfterFirstMessage) {
+        this.newSession(true);
+      }
     });
   }
 
@@ -79,18 +95,54 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   }
 
   ngOnDestroy() {
-    this.sendQuestionSubscription?.unsubscribe();
+    this.sendQuestionSubscription()?.unsubscribe();
   }
 
   ngAfterViewInit() {
-    this.focusInput();
+    this.focusInputAndSelectAll();
 
     this.cxaiAssistantRootService.chatTextToSend$.pipe(
       takeUntilDestroyed(this.destroyRef),
     ).subscribe((data) => {
-      this.form.setValue({ message: data.text });
-      this.focusInput();
+      this.setInputText(data.text);
     });
+  }
+
+  setInputText(text: string, select = true) {
+    this.form.setValue({ message: text || '' });
+    if (select) {
+      this.focusInputAndSelectAll();
+    } else {
+      this.focusInput();
+    }
+  }
+
+  appendInputText(text: string, select = true) {
+    //append text at the end of current input, and focus
+    const input = this.chatInputField.nativeElement;
+    const currentText = this.form.value.message || '';
+    this.form.setValue({ message: currentText + text });
+    this.focusInput();
+
+    if (select) {
+      input.setSelectionRange(currentText.length, currentText.length + text.length);
+    }
+  }
+
+  insertInputText(text: string, select = true) {
+    //insert text at the end of current selection, and select newly added text
+    const input = this.chatInputField.nativeElement;
+    const start = input.selectionStart;
+    const end = input.selectionEnd;
+    const currentText = this.form.value.message || '';
+    const newText = currentText.slice(0, start) + text + currentText.slice(end);
+    this.form.setValue({ message: newText });
+    this.focusInput();
+
+    if (select) {
+      //select newly added text
+      input.setSelectionRange(start, start + text.length);
+    }
   }
 
   ngAfterViewChecked(): void {
@@ -104,7 +156,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   }
 
   sendMessage() {
-    if(!this.messages?.status) {
+    if(!this.messages || !this.hasValidSession()) {
       this.loggerService.warn(ASSISTANT_LOG_MARKER, 'sendMessage: No valid chat session available');
       return;
     }
@@ -124,12 +176,12 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     this.form.reset();
 
     if(this.messages.session_id) {
-      this.sendQuestionSubscription = this.cxaiAssistantService
+      const sub = this.cxaiAssistantService
         .sendQuestion(message)
         .pipe(
           take(1),
           finalize(() => {
-            this.sendQuestionSubscription = undefined;
+            this.sendQuestionSubscription.set(undefined);
             this.changeDetectorRef.detectChanges();
           })
         )
@@ -141,9 +193,10 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
             this.loggerService.error(ASSISTANT_LOG_MARKER, 'sendMessage response: No chat session available, orphaned response?', response);
           }
         });
+      this.sendQuestionSubscription.set(sub);
     } else if (this.config?.openSessionOnlyAfterFirstMessage) {
       //a "waiting for response" marker that will be cleaned when new session is received
-      this.sendQuestionSubscription = new Subscription();
+      this.sendQuestionSubscription.set(new Subscription());
       this.cxaiAssistantService.startNewChatSession(message);
     } else {
       this.loggerService.error(ASSISTANT_LOG_MARKER, 'sendMessage: invaid session_id state', this.messages, this.config);
@@ -157,13 +210,18 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     }
   }
 
-  newSession() {
-    if(this.messages && (this.messages.chat_history.length > 1 || this.messages.chat_history[0]?.error)) {
-      this.messages = undefined;
-      this.sendQuestionSubscription?.unsubscribe();
-      this.sendQuestionSubscription = undefined;
+  newSession(force = false) {
+    if(force || (this.messages && (this.messages.chat_history.length > 1 || this.messages.chat_history[0]?.error))) {
+      this.setChatSession(undefined);
+      this.sendQuestionSubscription()?.unsubscribe();
+      this.sendQuestionSubscription.set(undefined);
       this.cxaiAssistantService.startNewChatSession();
     }
+  }
+
+  protected setChatSession(session: AssistantChatSession | undefined) {
+    this.messages = session;
+    this.hasValidSession.set(!!this.messages?.status);
   }
 
   closeChat() {
@@ -172,6 +230,10 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   }
 
   focusInput() {
+    this.chatInputField?.nativeElement?.focus();
+  }
+
+  focusInputAndSelectAll() {
     if(this.chatInputField) {
       setTimeout(
         () => this.renderer.selectRootElement(this.chatInputField.nativeElement).select(),

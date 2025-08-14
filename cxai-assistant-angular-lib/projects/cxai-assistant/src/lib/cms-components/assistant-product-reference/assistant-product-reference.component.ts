@@ -1,8 +1,8 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { Product, ProductService } from '@spartacus/core';
 import { Observable, tap } from 'rxjs';
 import { AssistantProductNamePipe } from '../product-name.pipe';
-
+import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
 @Component({
   selector: 'lib-assistant-product-reference',
   templateUrl: './assistant-product-reference.component.html',
@@ -11,9 +11,8 @@ import { AssistantProductNamePipe } from '../product-name.pipe';
   standalone: false,
 })
 export class AssistantProductReferenceComponent implements OnInit {
-  @Input({required: true}) productCode!: string;
-  @Output() productCopied = new EventEmitter<string>();
-
+  tokenContext: AssistantTokenContext = inject(AssistantTokenContext);
+  token = this.tokenContext.token;
   productService = inject(ProductService);
   changeDetectorRef = inject(ChangeDetectorRef);
   assistantProductNamePipe = inject(AssistantProductNamePipe);
@@ -31,7 +30,7 @@ export class AssistantProductReferenceComponent implements OnInit {
       this.changeDetectorRef.markForCheck();
     }, 2000);
 
-    this.product$ = this.productService.get(this.productCode).pipe(
+    this.product$ = this.productService.get(this.token.content).pipe(
       tap((product) => {
         if(product?.code) {
           clearTimeout(loadTimeout);
@@ -44,7 +43,7 @@ export class AssistantProductReferenceComponent implements OnInit {
   copyToClipboard(product: Product) {
     const text = '"' + this.assistantProductNamePipe.transform(product) + '"';
     navigator.clipboard.writeText(text).then(() => {
-      this.productCopied.emit(text);
+      this.tokenContext.chatWindowComponent.focusInput();
     });
   }
 

@@ -42,7 +42,7 @@
   }
 }
 
-.title-bar {
+:host .title-bar {
   --_title-bar-height: 50px;
   background-color: var(--cxai-primary);
   color: var(--cxai-primary-text);
@@ -60,6 +60,11 @@
   .assistant-title {
     flex-grow: 1;
     font-weight: 700;
+  }
+
+  .title-bar-actions {
+    display: flex;
+    gap: var(--cxai-spacer--extra-small);
   }
 
   .resize-handle {
@@ -99,7 +104,8 @@
     }
   }
 
-  .action {
+  //make outlets inherit this styles (break out of encapsulation)
+  ::ng-deep .action {
     width: var(--cxai-icon-size);
     height: var(--cxai-icon-size);
     background-color: unset;

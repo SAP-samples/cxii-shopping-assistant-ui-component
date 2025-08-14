@@ -1,5 +1,5 @@
-import { AssistantChatMessage } from "@cx-spartacus/cxai-assistant/root";
-import { ChatMessagePipe, ChatMessageToken } from "./chat-message.pipe";
+import { AssistantChatMessage, ChatMessageToken } from "@cx-spartacus/cxai-assistant/root";
+import { ChatMessagePipe } from "./chat-message.pipe";
 import { TestBed } from "@angular/core/testing";
 
 const testAssistantMessage: AssistantChatMessage = {

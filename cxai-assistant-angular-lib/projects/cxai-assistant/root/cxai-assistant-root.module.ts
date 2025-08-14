@@ -7,13 +7,16 @@ import { AssistantChatFloatComponent } from './cms-components/assistant-chat-flo
 import { SearchBoxChatOutletComponent } from './cms-components/search-box-chat-outlet/search-box-chat-outlet.component';
 import { CXAI_ASSISTANT_FEATURE } from './feature-name';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AssistantComponents } from './models';
 
 
 function defaultModuleConfigFactory(): CmsConfig {
   const config: CmsConfig = {
     featureModules: {
       [CXAI_ASSISTANT_FEATURE]: {
-        cmsComponents: ['AssistantChatWindowComponent'],
+        cmsComponents: [
+          ...Object.values(AssistantComponents),
+        ],
       },
     },
   };

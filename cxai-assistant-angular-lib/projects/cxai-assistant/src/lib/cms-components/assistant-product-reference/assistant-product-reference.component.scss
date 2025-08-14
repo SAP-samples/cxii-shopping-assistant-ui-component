@@ -25,7 +25,7 @@
   cursor: pointer;
   z-index: 1;
 }
-::ng-deep lib-product-card {
+:host ::ng-deep lib-product-card {
   text-align: center;
   cx-star-rating {
     .star {

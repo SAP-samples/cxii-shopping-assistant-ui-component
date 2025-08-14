@@ -1,5 +1,5 @@
-# CxaiAssistantAngularLib
 
+# Cxai Assistant Angular Lib
 ## Add library to application
 1. Add `@cx-spartacus/cxai-assistant` to package.json
 2. Import `CxaiAssistantFeatureModule` (not MainModule) into app.module 
@@ -11,7 +11,7 @@ This library uses cxai backend, which contains:
 1. `/cxai/config` endpoint to fetch configuration - can be configured or turned off via local config `configInitializerEndpoint`
 2. `/cxai/assistant/*` proxy which forwards requests to assistant API and handles authorization, this library does not send any credentials and doesn't manage tokens. If you implement this kind of proxy be sure to filter (allowlist) allowed API calls and not forward all requests. See `CxaiAssistantApiService` to check which endpoints / methods are required. Other calls to the API should be blocked.
 
-## Config
+## Spartacus config
 Config is fetched from backend, but can be also provided locally. Backend values (if defined) will overwrite local.
 
 ```js
@@ -54,7 +54,7 @@ export const defaultAssistantConfigInternal: CxaiAssistantConfigInternal = {
   configInitializerEndpoint: '/cxai/config',
 };
 ```
-## Add component
+## Adding component via impex
 Restriction (last line) hides component if no valid assistant config is present for current site (e.g. empty config id). Ignore it if you don't use backend extensions.
 
 ```
@@ -74,7 +74,8 @@ https://api.sap.com/api/sap-cxai-apiResource-ShoppingAssistant-v1/resource/creat
 
 This will return configId which must be provided via local spartacus config, or backend config.
 
-## Modify styles
+## Customize library
+### Modify styles
 By default default OOTB spa colors are used (e.g. `--cx-color-primary`) so library should look good on OOTB spartacus. See `_common-variables.scss` for details. Example of changing some colors:
 ```scss
 .cxai-chat-wrapper {
@@ -88,6 +89,58 @@ By default default OOTB spa colors are used (e.g. `--cx-color-primary`) so libra
   --cxai-message-assistant-border: 1px solid black;
   --cxai-message-error-background: (--xy-danger);
 }
+```
+### Override token components
+Chat may return tokens inside a message, e.g. product code, order code etc. These tokens may be handled by custom components. Usually default implementation is provided but you may swap it with your own.
+See `ChatMessagePipe` for available token types. 
+
+```ts
+    provideConfig(<CmsConfig>{
+      cmsComponents: {
+       AssistantToken_product: { //AssistantToken_<tokenType>
+         component: MyComponent, //overwrite with custom component or undefined to display tokens as-is (e.g. just raw product code)
+       }
+      },
+    }),
+```
+Inside component inject `AssistantTokenContext` - see `AssistantProductReference` component for an example.
+
+### Extend via outlets
+You can change float button appearance or add custom titlebar actions, buttons next to "send" etc. via Spartacus outlets.
+
+```ts
+    provideOutlet({
+      id: CxaiAssistantOutlets.CHAT_BUTTONS,
+      component: SampleoutletComponent,
+      position: OutletPosition.AFTER,
+    }),
+    provideOutlet({
+      id: CxaiAssistantOutlets.TITLEBAR_ACTIONS,
+      component: SampleoutletComponent,
+      position: OutletPosition.AFTER,
+    })
+```
+```ts
+@Component({
+  selector: 'app-sampleoutlet',
+  templateUrl: './sampleoutlet.component.html',
+  standalone: false,
+})
+export class SampleoutletComponent {
+  readonly outletContext$: Observable<AssistantChatWindowOutletContext> = inject(OutletContextData<AssistantChatWindowOutletContext>).context$;
+
+  sendHello(context: AssistantChatWindowOutletContext): void {
+    context.chatWindowComponent.insertInputText('Hello');
+  }
+}
+```
+```html
+<button *ngIf="outletContext$ | async as context" type="button" 
+ class="cxai-btn action" 
+ [disabled]="context.chatWindowComponent.inputTextDisabled()" 
+ (click)="sendHello(context)">
+  <i class="fa-solid fa-microphone"></i>
+</button>
 ```
 
 ## Backend extensions

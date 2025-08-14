@@ -1,10 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatMessage, AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
-import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, TranslationService, UserIdService, WindowRef } from '@spartacus/core';
+import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, TranslationService, WindowRef } from '@spartacus/core';
 import { CurrentProductService } from '@spartacus/storefront';
 import { UserAccountFacade } from '@spartacus/user/account/root';
-import { asyncScheduler, BehaviorSubject, catchError, combineLatest, defaultIfEmpty, distinctUntilChanged, EMPTY, filter, finalize, forkJoin, map, Observable, observeOn, of, skip, switchMap, take, tap, timeout } from 'rxjs';
+import { asyncScheduler, BehaviorSubject, catchError, combineLatest, defaultIfEmpty, distinctUntilChanged, EMPTY, filter, finalize, forkJoin, map, Observable, observeOn, of, skip, Subject, switchMap, take, tap, timeout } from 'rxjs';
 import { ChatMessagePipe } from './cms-components/chat-message.pipe';
 import { CxaiAssistantApiService } from './cxai-assistant.api.service';
 
@@ -30,19 +30,23 @@ export class CxaiAssistantService {
   protected translationService = inject(TranslationService);
   protected apiService = inject(CxaiAssistantApiService);
   protected userAccountFacade = inject(UserAccountFacade);
-  protected userIdService = inject(UserIdService);
   protected currentBaseSite;
   currentBaseSiteName;
-  customerId$ = this.userAccountFacade.get().pipe(
+  protected currentUser$ = this.userAccountFacade.get().pipe(
     distinctUntilChanged((prev, curr) => prev?.uid === curr?.uid),
+  );
+
+  protected customerId$ = this.currentUser$.pipe(
     map((user) => user?.customerId || user?.uid || null), 
     distinctUntilChanged(),
   );
 
+  //notification with new sesssion id, when it changes
+  readonly currentUserChange$ = new Subject<{ new_session_id: string | null }>();
+
   constructor() {
     combineLatest([
-      this.userAccountFacade.get().pipe(
-        distinctUntilChanged((prev, curr) => prev?.uid === curr?.uid),
+      this.currentUser$.pipe(
         map(user => user?.uid || OCC_USER_ID_ANONYMOUS),
       ),
       this.baseSiteService.getActive().pipe(filter(Boolean), distinctUntilChanged()),
@@ -52,8 +56,12 @@ export class CxaiAssistantService {
         this.sessionStorageKey = SESSION_STORAGE_KEY_PREFIX + '_' + site + '_' + userId;
         const sessionId = this.winRef.sessionStorage?.getItem(this.sessionStorageKey) || null;
         this.sessionId$.next(sessionId);
+
+        //component can listen for this to create new session if conversation was in progress but user logged in/out
+        //and have no session
+        this.currentUserChange$.next({ new_session_id: sessionId });
       }),
-      distinctUntilChanged((prev, curr) => prev[1] === curr[1]),
+      distinctUntilChanged((prev, curr) => prev[1] === curr[1]), //when site changes
       switchMap(([_, site]) => {
         return this.baseSiteService.getAll().pipe(
           filter(Boolean),

@@ -16,6 +16,7 @@ import {
   trigger,
 } from '@angular/animations';
 import { CxaiAssistantOutlets } from '../../models/outlets';
+import { AssistantComponents } from '../../models';
 
 @Component({
   selector: 'lib-assistant-chat-float',
@@ -52,7 +53,8 @@ export class AssistantChatFloatComponent implements OnInit {
   chatOpened$ = this.cxaiAssistantRootService.getChatOpenedStatus();
   outlets = CxaiAssistantOutlets;
   private cdr = inject(ChangeDetectorRef);
-
+  readonly mainComponent = AssistantComponents.AssistantChatWindowComponent;
+  
   constructor() {
     //trigger loading of lazy chunk once somebody requests to open chat window (see template @if)
     this.cxaiAssistantRootService.chatOpenRequest$

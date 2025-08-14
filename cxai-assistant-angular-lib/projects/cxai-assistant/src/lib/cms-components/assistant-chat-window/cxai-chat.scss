@@ -85,9 +85,8 @@
   }
 }
 
-form {
+:host form {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   padding: var(--cxai-spacer);
   height: min(auto, var(--cxai-spacer--big));
@@ -117,32 +116,37 @@ form {
       color: var(--cxai-placeholder-color);
     }
   }
-  .cxai-btn-send {
-    background-color: var(--cxai-primary);
-    border-color: var(--cxai-primary);
-    border-style: solid;
-    color: var(--cxai-primary-text);
-    min-width: var(--cxai-spacer--big);
-    aspect-ratio: 1;
-    display: grid;
-    place-content: center;
-    padding: unset;
-    border-radius: var(--cxai-border-radius--small);
-    min-height: unset;
 
-    &:hover,
-    &:focus,
-    &:active {
-      filter: brightness(1.1);
+  //break out of encapsulation to allow outlets to use these classes
+  ::ng-deep {
+    .cxai-btn, .cxai-btn-send {
       background-color: var(--cxai-primary);
-      border-color: var(--cxai-border-color);
+      border-color: var(--cxai-primary);
+      border-style: solid;
+      color: var(--cxai-primary-text);
+      min-width: var(--cxai-spacer--big);
+      aspect-ratio: 1;
+      display: grid;
+      place-content: center;
+      padding: unset;
+      border-radius: var(--cxai-border-radius--small);
+      min-height: unset;
+
+      &:hover,
+      &:focus,
+      &:active {
+        filter: brightness(1.1);
+        background-color: var(--cxai-primary);
+        border-color: var(--cxai-border-color);
+      }
+      &:disabled {
+        pointer-events: none;
+        opacity: 0.5;
+      }
     }
-    &:disabled {
-      pointer-events: none;
-      opacity: 0.5;
+    .cxai-btn-clear {
+      border-radius: var(--cxai-border-radius--small);
     }
   }
-  .cxai-btn-clear {
-    border-radius: var(--cxai-border-radius--small);
-  }
+  
 }
