@@ -1,6 +1,6 @@
 {
   "name": "@cx-spartacus/cxai-assistant",
-  "version": "2211.41.0",
+  "version": "2211.42.0",
   "peerDependencies": {
     "@angular/animations": "^19.0.0",
     "@angular/common": "^19.0.0",
@@ -10,6 +10,7 @@
     "@spartacus/cart": "^2211.35.0",
     "@spartacus/core": "^2211.35.0",
     "@spartacus/storefront": "^2211.35.0",
+    "@spartacus/order": "^2211.35.0",
     "rxjs": "^7.8.1"
   },
   "dependencies": {

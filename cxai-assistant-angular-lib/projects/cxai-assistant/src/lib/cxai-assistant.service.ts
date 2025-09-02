@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatMessage, AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantAction, AssistantChatMessage, AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION, mapActionToTokenType } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
 import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, TranslationService, WindowRef } from '@spartacus/core';
 import { CurrentProductService } from '@spartacus/storefront';
@@ -115,6 +115,7 @@ export class CxaiAssistantService {
               recommendations: response.recommendations,
             } satisfies AssistantChatMessage;
 
+            this.fillTokens(adaptedMessage, response.actions);
             this.parseChatMessage(adaptedMessage);
             this.processActions(response);
             return adaptedMessage;
@@ -315,6 +316,7 @@ export class CxaiAssistantService {
 
       if(typeof message.content === 'object') {
         adaptedMessage.recommendations = message.content.recommendations;
+        this.fillTokens(adaptedMessage, message.content.actions);
       }
 
       this.removeContextFromChatMessage(adaptedMessage);
@@ -323,6 +325,18 @@ export class CxaiAssistantService {
     });
 
     return adaptedSession;
+  }
+
+  private fillTokens(message: AssistantChatMessage, actions: AssistantAction[] | undefined) {
+    if(actions) {
+      message.tokens = message.tokens || {};
+      actions
+        .filter(action => action.codes?.length)
+        .forEach(action => {
+          const tokenType = mapActionToTokenType(action.action);
+          message.tokens![tokenType] = (message.tokens![tokenType] || []).concat(action.codes!);
+        });
+    }
   }
 
   /**

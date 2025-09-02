@@ -15,7 +15,7 @@ export interface AssistantChatWindowComponentInterface {
   inputTextDisabled: Signal<boolean>;
 }
 
-export declare type AssistantTokenType = 'html' | 'product';
+export declare type AssistantTokenType = 'html' | 'product' | 'order' | 'tracking_id' | 'unknown';
 
 export declare type ChatMessageToken = {
   type: AssistantTokenType;
@@ -36,4 +36,6 @@ export enum AssistantComponents {
 
   //this is needed here, otherwise components won't be visible in CmsComponentsService (it's declared in MainModule)
   AssistantToken_product = 'AssistantToken_product',
+  AssistantToken_order = 'AssistantToken_order',
+  AssistantToken_tracking_id = 'AssistantToken_tracking_id',
 }

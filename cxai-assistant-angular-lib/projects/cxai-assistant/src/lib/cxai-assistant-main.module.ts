@@ -20,6 +20,8 @@ import { ChatMessagePipe } from './cms-components/chat-message.pipe';
 import { ProductCardComponent } from './cms-components/product-card/product-card.component';
 import { AssistantProductNamePipe } from './cms-components/product-name.pipe';
 import { AssistantTokenComponent } from './cms-components/assistant-token/assistant-token.component';
+import { AssistantOrderReferenceComponent } from './cms-components/assistant-order-reference/assistant-order-reference.component';
+import { AssistantTrackingIdReferenceComponent } from './cms-components/assistant-tracking-id-reference/assistant-tracking-id-reference.component';
 
 /**
  * @deprecated Please import lazy CxaiAskProductFeatureModule
@@ -30,6 +32,8 @@ import { AssistantTokenComponent } from './cms-components/assistant-token/assist
     ChatProductCarouselComponent,
     ChatIconComponent,
     AssistantProductReferenceComponent,
+    AssistantOrderReferenceComponent,
+    AssistantTrackingIdReferenceComponent,
     ProductCardComponent,
     AssistantTokenComponent,
     ChatMessagePipe,
@@ -57,6 +61,12 @@ import { AssistantTokenComponent } from './cms-components/assistant-token/assist
         //components for chat-token (returned by ChatMessagePipe)
         [AssistantComponents.AssistantToken_product]: {
           component: AssistantProductReferenceComponent,
+        },
+        [AssistantComponents.AssistantToken_order]: {
+          component: AssistantOrderReferenceComponent,
+        },
+        [AssistantComponents.AssistantToken_tracking_id]: {
+          component: AssistantTrackingIdReferenceComponent,
         },
       },
     }),

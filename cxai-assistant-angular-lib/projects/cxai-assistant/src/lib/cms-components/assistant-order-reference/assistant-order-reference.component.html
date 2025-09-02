@@ -1,0 +1,6 @@
+<a class="assistant-chat-token token-type-{{token.type}}" [routerLink]="
+  {
+    cxRoute: 'orderDetails',
+    params: { code: token.content },
+  } | cxUrl
+">{{token.content}}</a>

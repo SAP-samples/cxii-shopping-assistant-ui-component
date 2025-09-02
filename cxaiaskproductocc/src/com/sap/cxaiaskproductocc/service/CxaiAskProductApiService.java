@@ -62,15 +62,8 @@ public class CxaiAskProductApiService extends BaseCxaiApiService implements Cxai
 					.path(askProductPath) //
 					.build(true).toUri();
 
-			//TODO: remove when variants are supported by backend
 			final String productCode = (String) body.get("productCode");
-			ProductModel product = productService.getProductForCode(productCode);
-			while (product instanceof VariantProductModel)
-			{
-				product = ((VariantProductModel) product).getBaseProduct();
-			}
-
-			body.put("productCode", product.getCode());
+			body.put("productCode", productCode);
 			body.put("catalogVersion", config.getCatalogVersion());
 			body.put("catalogID", config.getCatalogId());
 

@@ -1,6 +1,6 @@
 @if(product$ | async; as product) {
 <span
-  class="product valid"
+  class="assistant-chat-token token-type-{{token.type}} product valid"
   [class.active]="popupVisible"
   [title]="product.code"
   (click)="togglePopup($event)"
@@ -31,5 +31,5 @@
   </div>
 </div>
 } @else {
-<span class="product" [class.invalid]="invalidProduct">{{ token.content }}</span>
+<span class="assistant-chat-token token-type-{{token.type}} product" [class.invalid]="invalidProduct">{{ token.content }}</span>
 }

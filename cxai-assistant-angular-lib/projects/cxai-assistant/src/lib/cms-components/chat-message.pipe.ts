@@ -1,5 +1,5 @@
 import { Injectable, Pipe, PipeTransform } from "@angular/core";
-import { AssistantChatMessage, ChatMessageToken } from "@cx-spartacus/cxai-assistant/root";
+import { AssistantChatMessage, AssistantTokenType, ChatMessageToken } from "@cx-spartacus/cxai-assistant/root";
 
 @Injectable({
   providedIn: 'root'
@@ -34,7 +34,7 @@ export class ChatMessagePipe implements PipeTransform {
       if (match.index > lastIndex) {
         result.push({type: 'html', content: content.substring(lastIndex, match.index)});
       }
-      result.push({ type: 'product', content: match[1] });
+      result.push(this.getChatToken(message, match[1]));
       lastIndex = regex.lastIndex;
     }
 
@@ -43,6 +43,17 @@ export class ChatMessagePipe implements PipeTransform {
     }
 
     return result;
+  }
+
+  private getChatToken(message: AssistantChatMessage, tokenValue: string): ChatMessageToken {
+    if(message.tokens) {
+      for(const [tokenType, tokens] of Object.entries(message.tokens)) {
+        if(tokens.includes(tokenValue)) {
+          return { type: tokenType as AssistantTokenType, content: tokenValue };
+        }
+      }
+    }
+    return { type: 'product', content: tokenValue };
   }
 
   private escapeHtml(text: string): string {
