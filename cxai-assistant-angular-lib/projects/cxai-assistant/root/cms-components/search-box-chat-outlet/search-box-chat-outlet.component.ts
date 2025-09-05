@@ -1,4 +1,4 @@
-import { Component, inject, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
 import { OutletContextData } from '@spartacus/storefront';
 import { CxaiAssistantRootService } from '../../cxai-assistant.root.service';
 
@@ -14,11 +14,12 @@ interface SearchBoxOutlet {
   styleUrl: './search-box-chat-outlet.scss',
   encapsulation: ViewEncapsulation.None,
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SearchBoxChatOutletComponent {
-  cxaiAssistantRootService = inject(CxaiAssistantRootService);
-  useSapIcons = this.cxaiAssistantRootService.useSapIcons;
+  private readonly cxaiAssistantRootService = inject(CxaiAssistantRootService);
   outletContext$ = inject(OutletContextData<SearchBoxOutlet>, { optional: true });
+  useSapIcons = this.cxaiAssistantRootService.useSapIcons;
   moduleEnabled$ = this.cxaiAssistantRootService.moduleEnabled$;
 
   startChat(text: string) {

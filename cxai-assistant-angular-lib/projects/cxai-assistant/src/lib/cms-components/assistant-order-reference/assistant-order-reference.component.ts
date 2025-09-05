@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
 
 @Component({
@@ -6,6 +6,7 @@ import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
   templateUrl: './assistant-order-reference.component.html',
   styleUrl: './assistant-order-reference.component.scss',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssistantOrderReferenceComponent {
   tokenContext: AssistantTokenContext = inject(AssistantTokenContext);

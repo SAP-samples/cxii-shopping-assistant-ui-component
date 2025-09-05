@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, OnDestroy } from '@angular/core';
 import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
 import { Consignment, OrderHistoryFacade } from '@spartacus/order/root';
 import { LAUNCH_CALLER, LaunchDialogService } from '@spartacus/storefront';
@@ -9,12 +9,13 @@ import { CxaiAssistantTrackingService } from '../../cxai-assistant.tracking.serv
   templateUrl: './assistant-tracking-id-reference.component.html',
   styleUrl: './assistant-tracking-id-reference.component.scss',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AssistantTrackingIdReferenceComponent implements OnDestroy{
-  assistantTrackingService = inject(CxaiAssistantTrackingService);
+  private readonly assistantTrackingService = inject(CxaiAssistantTrackingService);
+  private readonly orderHistoryFacade = inject(OrderHistoryFacade);
+  private readonly launchDialogService = inject(LaunchDialogService);
   tokenContext: AssistantTokenContext = inject(AssistantTokenContext);
-  orderHistoryFacade = inject(OrderHistoryFacade);
-  launchDialogService = inject(LaunchDialogService);
   
   token = this.tokenContext.token;
   consignment$ = this.assistantTrackingService.getConsignmentByTrackingId(this.token.content);
