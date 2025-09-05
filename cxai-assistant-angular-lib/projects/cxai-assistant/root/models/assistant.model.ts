@@ -82,7 +82,7 @@ export function mapActionToTokenType(action: string): AssistantTokenType {
   if(action.startsWith('order_')) {
     return 'order';
   }
-  if(action == 'tracking_id') {
+  if(action === 'tracking_id') {
     return 'tracking_id';
   }
 
