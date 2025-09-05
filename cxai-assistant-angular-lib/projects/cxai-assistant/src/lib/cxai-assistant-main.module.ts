@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AssistantComponents, CxaiAssistantInitializer, defaultAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantComponents, CxaiAssistantInitializer, defaultAssistantConfig, defaultOccAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
 import {
   CmsConfig,
   ConfigInitializerService,
@@ -53,6 +53,7 @@ import { AssistantTrackingIdReferenceComponent } from './cms-components/assistan
   ],
   providers: [
     provideDefaultConfig(defaultAssistantConfig),
+    provideDefaultConfig(defaultOccAssistantConfig),
     provideDefaultConfig(<CmsConfig>{
       cmsComponents: {
         [AssistantComponents.AssistantChatWindowComponent]: {
