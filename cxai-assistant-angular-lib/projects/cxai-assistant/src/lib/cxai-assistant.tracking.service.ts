@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { AssistantEndpointKey, CXAI_ASSISTANT_FEATURE } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantEndpointKey } from '@cx-spartacus/cxai-assistant/root';
 import { OccEndpointsService } from '@spartacus/core';
 import { Consignment } from '@spartacus/order/root';
 import { Observable } from 'rxjs';
@@ -13,8 +13,7 @@ export class CxaiAssistantTrackingService {
   private readonly http = inject(HttpClient);
 
   getConsignmentByTrackingId(trackingId: string): Observable<Consignment | null> {
-    const url = this.endpointsService.buildUrl(CXAI_ASSISTANT_FEATURE, {
-      scope: 'trackingIdToConsignment' satisfies AssistantEndpointKey,
+    const url = this.endpointsService.buildUrl(`cxaiAssistant_trackingIdToConsignment` satisfies AssistantEndpointKey, {
       urlParams: { trackingId },
     });
 
