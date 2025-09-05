@@ -11,6 +11,10 @@ This library uses cxai backend, which contains:
 1. `/cxai/config` endpoint to fetch configuration
 2. `/cxai/ask-product/*` proxy which forwards requests to API and handles authorization, this library does not send any credentials and doesn't manage tokens.
 
+## Variant products
+When using variant products, the ask product service receives only the currently viewed variant's product code. This means you can ask questions specific to that variant, but **only that variant's datasheets** are used to generate the response. The backend service does not use variant hierarchy (does not include the base product). 
+To get answers to general questions that span multiple variants (such as available sizes etc.), you need to provide common datasheets for each variant product.
+
 ## Config
 Config is fetched from backend, but can be also provided locally. Backend values (if defined) will overwrite local.
 
