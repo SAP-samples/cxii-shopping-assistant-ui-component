@@ -4,7 +4,12 @@ import { TestBed } from "@angular/core/testing";
 
 const testAssistantMessage: AssistantChatMessage = {
   role: 'assistant',
-  content: 'Here are some **fantastic** white sneakers Product Code: {BR3089}, <script>{BR1021WHI} that will elevate your style and comfort:',
+  content: 'Here are some **fantastic** white sneakers Product Code: {BR3089}, <script>{BR1021WHI} that will elevate your style and comfort! ' +
+  'Order {order_id}, you can track using {tracking_id1} or {tracking_id2} or {tracking_id3}',
+  tokens: {
+    order: ['order_id'],
+    tracking_id: ['tracking_id1', 'tracking_id2'],
+  }
 }
 
 const testUserMessage: AssistantChatMessage = {
@@ -17,17 +22,34 @@ const expectedAssistantTokens: ChatMessageToken[] = [
   { type: 'product', content: 'BR3089' },
   { type: 'html', content: ', &lt;script&gt;' },
   { type: 'product', content: 'BR1021WHI' },
-  { type: 'html', content: ' that will elevate your style and comfort:' },
+  { type: 'html', content: ' that will elevate your style and comfort! Order ' },
+  { type: 'order', content: testAssistantMessage.tokens!.order![0] },
+  { type: 'html', content: ', you can track using ' },
+  { type: 'tracking_id', content: testAssistantMessage.tokens!.tracking_id![0] },
+  { type: 'html', content: ' or ' },
+  { type: 'tracking_id', content: testAssistantMessage.tokens!.tracking_id![1] },
+  { type: 'html', content: ' or ' },
+  //fallback for product for unknown tokens
+  { type: 'product', content: 'tracking_id3' },
 ];
 
-//for user we don't escape html because [innerHtml] should not be used
 const expectedUserTokens: ChatMessageToken[] = [
+  //ignore markdown
   { type: 'html', content: 'Here are some **fantastic** white sneakers ' },
   { type: 'product', content: 'BR3089' },
+  //for user we don't escape html because [innerHtml] should not be used
   { type: 'html', content: ', <script>' },
   { type: 'product', content: 'BR1021WHI' },
-  { type: 'html', content: ' that will elevate your style and comfort:' },
-]
+  { type: 'html', content: ' that will elevate your style and comfort! Order ' },
+  { type: 'order', content: testAssistantMessage.tokens!.order![0] },
+  { type: 'html', content: ', you can track using ' },
+  { type: 'tracking_id', content: testAssistantMessage.tokens!.tracking_id![0] },
+  { type: 'html', content: ' or ' },
+  { type: 'tracking_id', content: testAssistantMessage.tokens!.tracking_id![1] },
+  { type: 'html', content: ' or ' },
+  //fallback for product for unknown tokens
+  { type: 'product', content: 'tracking_id3' },
+];
 
 //test for chat-message.pipe.ts
 describe('ChatMessagePipe', () => {

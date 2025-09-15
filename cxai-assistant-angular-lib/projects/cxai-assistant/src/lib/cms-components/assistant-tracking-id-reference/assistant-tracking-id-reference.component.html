@@ -1,0 +1,5 @@
+@if(consignment$ | async; as consignment) {
+  <a href="#" (click)="openTrackingDialog($event, consignment)">{{token.content}}</a>
+} @else {
+  <span>{{token.content}}</span>
+}

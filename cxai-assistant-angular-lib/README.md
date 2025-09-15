@@ -92,7 +92,7 @@ By default default OOTB spa colors are used (e.g. `--cx-color-primary`) so libra
 ```
 ### Override token components
 Chat may return tokens inside a message, e.g. product code, order code etc. These tokens may be handled by custom components. Usually default implementation is provided but you may swap it with your own.
-See `ChatMessagePipe` for available token types. 
+See `AssistantTokenType` for available token types (`product`, `order`, `tracking_id` etc). 
 
 ```ts
     provideConfig(<CmsConfig>{
@@ -103,7 +103,7 @@ See `ChatMessagePipe` for available token types.
       },
     }),
 ```
-Inside component inject `AssistantTokenContext` - see `AssistantProductReference` component for an example.
+Inside component inject `AssistantTokenContext` - see `AssistantProductReference` or `AssistantOrderReferenceComponent` for an example.
 
 ### Extend via outlets
 You can change float button appearance or add custom titlebar actions, buttons next to "send" etc. via Spartacus outlets.

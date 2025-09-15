@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Product } from '@spartacus/core';
 
 @Component({
@@ -6,6 +6,7 @@ import { Product } from '@spartacus/core';
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss',
   standalone: false,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductCardComponent {
   @Input({required: true}) product: Product | null | undefined;

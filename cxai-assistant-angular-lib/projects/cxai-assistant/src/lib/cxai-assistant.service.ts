@@ -1,11 +1,10 @@
 import { inject, Injectable } from '@angular/core';
-import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatMessage, AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantAction, AssistantChatMessage, AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION, mapActionToTokenType } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
 import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, TranslationService, WindowRef } from '@spartacus/core';
 import { CurrentProductService } from '@spartacus/storefront';
 import { UserAccountFacade } from '@spartacus/user/account/root';
 import { asyncScheduler, BehaviorSubject, catchError, combineLatest, defaultIfEmpty, distinctUntilChanged, EMPTY, filter, finalize, forkJoin, map, Observable, observeOn, of, skip, Subject, switchMap, take, tap, timeout } from 'rxjs';
-import { ChatMessagePipe } from './cms-components/chat-message.pipe';
 import { CxaiAssistantApiService } from './cxai-assistant.api.service';
 
 export const SESSION_STORAGE_KEY_PREFIX = 'cxai-assistant.sessionId';
@@ -20,16 +19,16 @@ export class CxaiAssistantService {
   protected chatWindowSize$ = new BehaviorSubject<{x: number, y: number} | undefined>(undefined);
   protected sessionIsBeingCreated = false;
 
-  protected winRef = inject(WindowRef);
+  // reassigned in test cases
   protected config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
-  protected loggerService = inject(LoggerService);
-  protected activeCartFacade = inject(ActiveCartFacade);
-  protected currentProductService = inject(CurrentProductService);
-  protected chatMessagePipe = inject(ChatMessagePipe);
-  protected baseSiteService = inject(BaseSiteService);
-  protected translationService = inject(TranslationService);
-  protected apiService = inject(CxaiAssistantApiService);
-  protected userAccountFacade = inject(UserAccountFacade);
+  private readonly winRef = inject(WindowRef);
+  private readonly loggerService = inject(LoggerService);
+  private readonly activeCartFacade = inject(ActiveCartFacade);
+  private readonly currentProductService = inject(CurrentProductService);
+  private readonly baseSiteService = inject(BaseSiteService);
+  private readonly translationService = inject(TranslationService);
+  private readonly apiService = inject(CxaiAssistantApiService);
+  private readonly userAccountFacade = inject(UserAccountFacade);
   protected currentBaseSite;
   currentBaseSiteName;
   protected currentUser$ = this.userAccountFacade.get().pipe(
@@ -115,6 +114,7 @@ export class CxaiAssistantService {
               recommendations: response.recommendations,
             } satisfies AssistantChatMessage;
 
+            this.fillTokens(adaptedMessage, response.actions);
             this.parseChatMessage(adaptedMessage);
             this.processActions(response);
             return adaptedMessage;
@@ -158,7 +158,7 @@ export class CxaiAssistantService {
                 throw new Error(`Session user_id ${session} does not belong to current customer`);
               }
 
-              let adaptedSession = this.adaptInternalChatSession(session, welcomeMessageOverwrite);
+              const adaptedSession = this.adaptInternalChatSession(session, welcomeMessageOverwrite);
               adaptedSession.session_id = sessionId;
               return adaptedSession;
             }),
@@ -315,6 +315,7 @@ export class CxaiAssistantService {
 
       if(typeof message.content === 'object') {
         adaptedMessage.recommendations = message.content.recommendations;
+        this.fillTokens(adaptedMessage, message.content.actions);
       }
 
       this.removeContextFromChatMessage(adaptedMessage);
@@ -323,6 +324,18 @@ export class CxaiAssistantService {
     });
 
     return adaptedSession;
+  }
+
+  private fillTokens(message: AssistantChatMessage, actions: AssistantAction[] | undefined) {
+    if (!actions?.length) return;
+    
+    message.tokens ??= {};
+    actions
+      .filter(action => action.codes?.length)
+      .forEach(action => {
+        const tokenType = mapActionToTokenType(action.action);
+        message.tokens![tokenType] = (message.tokens![tokenType] ?? []).concat(action.codes!);
+      });
   }
 
   /**

@@ -1,3 +1,4 @@
+import { AssistantTokenType } from "./lib.model";
 
 export interface AssistantRecommendation {
   codes: string[];
@@ -9,6 +10,7 @@ export interface AssistantChatMessage {
   contextString?: string;
   //here it is always flattened to zero-size array
   recommendations?: AssistantRecommendation[];
+  tokens?: { [tokenType in AssistantTokenType]?: string[] };
   role: 'assistant' | 'user';
   error?: boolean;
 }
@@ -47,6 +49,7 @@ export interface AssistantChatSessionInternal {
 
 export interface AssistantAction {
   action: string;
+  codes?: string[];
 }
 
 export interface AssistantChatContentInternal {
@@ -74,3 +77,14 @@ export const EMPTY_CHAT_SESSION: AssistantChatSession = {
   chat_history: [],
   session_id: undefined,
 };
+
+export function mapActionToTokenType(action: string): AssistantTokenType {
+  if(action.startsWith('order_')) {
+    return 'order';
+  }
+  if(action === 'tracking_id') {
+    return 'tracking_id';
+  }
+
+  return 'unknown';
+}
