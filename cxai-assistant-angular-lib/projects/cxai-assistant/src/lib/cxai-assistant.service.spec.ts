@@ -1,4 +1,4 @@
-import { HttpClientTestingModule, HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { AssistantChatResponse, AssistantChatSessionInternal, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
@@ -141,7 +141,7 @@ describe('CxaiAssistantService', () => {
     service.startNewChatSession(userInput);
     tick();
 
-    const req = expectSendMessageAndCreateSessionRequest({...mockCreateSessionResponse, response: mockPostMessageResponse.response });
+    expectSendMessageAndCreateSessionRequest({...mockCreateSessionResponse, response: mockPostMessageResponse.response });
     tick();
 
     expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockOldChatSessionResponse);

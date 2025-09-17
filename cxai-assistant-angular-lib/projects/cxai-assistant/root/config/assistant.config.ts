@@ -37,5 +37,6 @@ export interface CxaiAssistantConfigInternal {
 }
 
 declare module '@spartacus/core' {
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
   interface Config extends CxaiAssistantConfig {}
 }

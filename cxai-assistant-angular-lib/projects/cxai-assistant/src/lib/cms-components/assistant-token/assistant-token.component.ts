@@ -19,14 +19,14 @@ class AssistantTokenContextImpl extends AssistantTokenContext {
 })
 export class AssistantTokenComponent implements OnInit {
   childContext = inject(AssistantTokenContextImpl);
-  config = inject(CmsConfig).cmsComponents!;
+  private readonly config = inject(CmsConfig).cmsComponents!;
 
   @Input({ required: true }) context!: AssistantTokenContext;
   componentId!: string;
   hasCustomComponent!: boolean;
 
   //logic to hide component tag 
-  viewContainerRef = inject(ViewContainerRef);
+  private readonly viewContainerRef = inject(ViewContainerRef);
   @ViewChild('template', { static: true }) 
   template: any;
 

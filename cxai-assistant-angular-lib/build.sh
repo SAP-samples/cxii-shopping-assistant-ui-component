@@ -1,4 +1,5 @@
 set -e
+npm run lint
 npm run test -- --watch=false --no-progress
 npm run build
 lib_name=cxai-assistant

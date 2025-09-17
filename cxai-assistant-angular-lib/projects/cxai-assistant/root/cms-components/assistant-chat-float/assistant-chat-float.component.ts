@@ -47,12 +47,12 @@ import { AssistantComponents } from '../../models';
 })
 export class AssistantChatFloatComponent implements OnInit {
   buttonState = 'hidden';
-  cxaiAssistantRootService = inject(CxaiAssistantRootService);
+  private readonly cxaiAssistantRootService = inject(CxaiAssistantRootService);
+  private readonly cdr = inject(ChangeDetectorRef);
   loadChat$ = new ReplaySubject<boolean>(1);
   useSapIcons = this.cxaiAssistantRootService.useSapIcons;
   chatOpened$ = this.cxaiAssistantRootService.getChatOpenedStatus();
   outlets = CxaiAssistantOutlets;
-  private cdr = inject(ChangeDetectorRef);
   readonly mainComponent = AssistantComponents.AssistantChatWindowComponent;
   
   constructor() {
