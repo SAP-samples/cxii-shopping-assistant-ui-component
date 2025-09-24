@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, ElementRef, HostListener, inject, OnInit, QueryList, Renderer2, signal, ViewChild, ViewChildren } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, ElementRef, HostListener, inject, OnInit, QueryList, Renderer2, signal, ViewChild, ViewChildren, OnDestroy } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatSession, AssistantChatWindowComponentInterface, AssistantChatWindowOutletContext, CxaiAssistantConfig, CxaiAssistantOutlets, CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
@@ -17,17 +17,17 @@ import { AssistantProductReferenceComponent } from '../assistant-product-referen
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class AssistantChatWindowComponent implements OnInit, AfterViewInit, AfterViewChecked, AssistantChatWindowComponentInterface {
+export class AssistantChatWindowComponent implements OnInit, AfterViewInit, AfterViewChecked, AssistantChatWindowComponentInterface, OnDestroy {
   @ViewChildren(AssistantProductReferenceComponent) children!: QueryList<AssistantProductReferenceComponent>;
 
-  private config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
-  private destroyRef = inject(DestroyRef);
-  private fb = inject(FormBuilder);
-  private cxaiAssistantService = inject(CxaiAssistantService);
-  private cxaiAssistantRootService = inject(CxaiAssistantRootService);
-  private changeDetectorRef = inject(ChangeDetectorRef);
-  private renderer = inject(Renderer2);
-  protected loggerService = inject(LoggerService);
+  private readonly config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly cxaiAssistantService = inject(CxaiAssistantService);
+  private readonly cxaiAssistantRootService = inject(CxaiAssistantRootService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly renderer = inject(Renderer2);
+  private readonly loggerService = inject(LoggerService);
 
   protected outlets = CxaiAssistantOutlets;
   protected chatOpened$ = this.cxaiAssistantRootService.getChatOpenedStatus();
@@ -65,7 +65,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
       if(this.cxaiAssistantService.isDummySession(this.messages)) {
         //clear "wait for response" marker
         this.sendQuestionSubscription.set(undefined);
-        if(session.chat_history.length == 1) {
+        if(session.chat_history.length === 1) {
           //some error happened, just append last message to current local session stack
           //normally we expect exactly 3 messages in new session - welcome, user, response
           this.messages!.chat_history.push(session.chat_history[0]);
@@ -148,7 +148,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   ngAfterViewChecked(): void {
     if (
       this.chatNode?.nativeElement &&
-      this.lastMessageHeight != this.chatNode.nativeElement.scrollHeight
+      this.lastMessageHeight !== this.chatNode.nativeElement.scrollHeight
     ) {
       this.lastMessageHeight = this.chatNode.nativeElement.scrollHeight;
       this.chatNode.nativeElement.scrollTop = this.lastMessageHeight;

@@ -3,7 +3,7 @@
     <cx-icon [cxIcon]="iconTypes.CARET_LEFT"></cx-icon>
   </button>
 
-  <div class="chat-product-carousel inline-snap scroll-{{scrollValue}}" [class.scrollMax]="scrollValue == maxScrollValue" #carousel>
+  <div class="chat-product-carousel inline-snap scroll-{{scrollValue}}" [class.scrollMax]="scrollValue === maxScrollValue" #carousel>
     @for (product$ of products$; track $index) {
       @if({ product: product$ | async }; as data) {
         <lib-product-card [product]="data.product" [class.empty]="!data.product"></lib-product-card>

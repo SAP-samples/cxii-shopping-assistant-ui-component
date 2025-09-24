@@ -13,9 +13,9 @@ import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
 export class AssistantProductReferenceComponent implements OnInit {
   tokenContext: AssistantTokenContext = inject(AssistantTokenContext);
   token = this.tokenContext.token;
-  productService = inject(ProductService);
-  changeDetectorRef = inject(ChangeDetectorRef);
-  assistantProductNamePipe = inject(AssistantProductNamePipe);
+  private readonly productService = inject(ProductService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
+  private readonly assistantProductNamePipe = inject(AssistantProductNamePipe);
 
   product$!: Observable<Product | undefined>;
   loadPopup = false;

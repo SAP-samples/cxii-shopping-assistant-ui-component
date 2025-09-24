@@ -5,8 +5,7 @@ import {
   ElementRef,
   inject,
   Input,
-  Renderer2,
-  ViewChild
+  ViewChild, OnInit, AfterViewInit
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Product, ProductService } from '@spartacus/core';
@@ -21,11 +20,10 @@ import { CxaiAssistantService } from '../../cxai-assistant.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   standalone: false,
 })
-export class ChatProductCarouselComponent {
-  productService = inject(ProductService);
-  cxaiAssistantService = inject(CxaiAssistantService);
-  changeDetectorRef = inject(ChangeDetectorRef);
-  renderer = inject(Renderer2);
+export class ChatProductCarouselComponent implements OnInit, AfterViewInit {
+  private readonly productService = inject(ProductService);
+  private readonly cxaiAssistantService = inject(CxaiAssistantService);
+  private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
   @ViewChild('carousel', { static: true }) carousel!: ElementRef;
   @Input() productCodes: string[] = [];

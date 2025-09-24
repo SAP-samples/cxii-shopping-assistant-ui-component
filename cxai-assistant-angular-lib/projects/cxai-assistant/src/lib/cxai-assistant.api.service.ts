@@ -12,8 +12,8 @@ import { OccEndpointsService } from '@spartacus/core';
   providedIn: 'root',
 })
 export class CxaiAssistantApiService {
-  protected endpointsService = inject(OccEndpointsService);
-  protected http = inject(HttpClient);
+  protected readonly endpointsService = inject(OccEndpointsService);
+  protected readonly http = inject(HttpClient);
   protected baseUrl = '/cxai/assistant';
   
   postMessage(payload: AssistantUserInput) {

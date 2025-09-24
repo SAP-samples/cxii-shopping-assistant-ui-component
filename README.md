@@ -7,7 +7,7 @@ CXAI Assistant library for use with CXAI assistant API
 CXAI Ask Product library for use with CXAI Ask Product API
 
 ## Requirements
-1. Node version specified in `.npmrc` files
+1. Node version specified in `.nvmrc` files
 2. Valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it, or use provided sample backend extension.
 3. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL. Sample backend extension is provided: [README](cxaiaskproductocc/README.md)
 
@@ -15,11 +15,16 @@ CXAI Ask Product library for use with CXAI Ask Product API
 ## Download and Installation
 ### Build library
 1. cd into workspace `cxai-assistant-angular-lib`
-3. `nvm use` or use node version specified in `.nvmrc`
+2. `nvm use` or use node version specified in `.nvmrc`
+3. Check / adjust `.npmrc` file
+    - if you use private npm registry (e.g. Verdaccio, GitHub Packages etc.) as a proxy for `@spartacus` and to host your own packages then just set environment variables to your proxy URL and auth token
+    - otherwise replace `@spartacus:registry` with URL and credentials that you use in your spartacus app (e.g. RBSC) and optionally add `@cx-spartacus:registry` to be able to `npm publish`
 4. `npm i`
 5. `npm run build` to build the library. Look into `build.sh` to build and publish to your npm repository
-    > You must define environment variables with your npm repository credentials - see `.npmrc` file to see which variables are required
+    > You must define @cx-spartacus:registry in .npmrc to publish
 6. To connect the library with your application add it to `package.json` and follow [README](cxai-assistant-angular-lib/README.md)
+    - If you don't have npm registry to host the package then copy `.tgz` file (from `dist` dir, after `npm pack`) into your app and add `package.json` dependency as
+    `"@cx-spartacus/cxai-assistant": "file:lib/cx-spartacus-cxai-assistant-<version>.tgz"`
 
 For ask product library, do the same steps in `cxai-ask-product-angular-lib` and follow [README](cxai-ask-product-angular-lib/README.md)
 

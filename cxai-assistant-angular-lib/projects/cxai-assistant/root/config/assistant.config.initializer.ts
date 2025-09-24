@@ -13,16 +13,14 @@ import { defaultAssistantConfigInternal } from './default.assistant.config';
 
 @Injectable({ providedIn: 'root' })
 export class CxaiAssistantInitializer implements ConfigInitializer {
+  private readonly http = inject(HttpClient);
+  private readonly occ = inject(OccEndpointsService);
+  private readonly baseSiteService = inject(BaseSiteService);
+  private readonly loggerService = inject(LoggerService);
+
   readonly scopes = [ASSISTANT_CONFIG_SCOPE];
   readonly clientSideConfig = Object.assign({}, defaultAssistantConfigInternal, inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE]);
   readonly configFactory = () => firstValueFrom(this.resolveConfig());
-
-  constructor(
-    protected http: HttpClient,
-    protected occ: OccEndpointsService,
-    protected baseSiteService: BaseSiteService,
-    protected loggerService: LoggerService,
-  ) {}
 
   protected resolveConfig(): Observable<CxaiAssistantConfig> {
     const configInitializerEndpoint = this.clientSideConfig?.configInitializerEndpoint;
@@ -33,7 +31,7 @@ export class CxaiAssistantInitializer implements ConfigInitializer {
     return this.baseSiteService.getActive().pipe(
       filter((site) => !!site),
       take(1),
-      switchMap((site) => {
+      switchMap((_) => {
         const url = this.occ.buildUrl(configInitializerEndpoint);
         return this.http.get<any>(url).pipe(
           map((config: Partial<CxaiAssistantConfigInternal>) => {
