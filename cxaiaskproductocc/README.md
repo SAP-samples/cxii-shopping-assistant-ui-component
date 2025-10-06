@@ -28,8 +28,8 @@ UPDATE AbstractCMSComponent; uid[unique = true]          ; onlyOneRestrictionMus
 
 Alternatively you can remove `@Secured` from OCC Controllers classes, in this case OCC proxy will be fully open which is not recommended.
 
-## Example Assistant Config JSON 
-Example payload for use when creating a config from backoffice (JSON field). This is subject to change and not all features are currently used, please consult https://api.sap.com/api/sap-cxai-apiResource-ShoppingAssistant-v1/resource/create_config_v2_v2_config_post
+## Sample Assistant Config JSON 
+Sample payload for use when creating a config from backoffice (JSON field). This is subject to change and not all features are currently used, please consult https://api.sap.com/api/sap-cxai-apiResource-ShoppingAssistant-v1/resource/create_config_v2_v2_config_post
 
 
 ```json
@@ -57,6 +57,14 @@ Example payload for use when creating a config from backoffice (JSON field). Thi
     {
       "name": "AddToCartAgent",
       "is_active": true
+    },
+    {
+      "name": "StockAgent",
+      "is_active": true,
+      "features": {
+        "show_out_of_stock_recommendations": true,
+        "allow_specific_quantity_stock_queries": false
+      }
     }
   ],
   "global_settings": {

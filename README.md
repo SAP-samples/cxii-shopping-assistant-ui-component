@@ -8,37 +8,61 @@ CXAI Ask Product library for use with CXAI Ask Product API
 
 ## Requirements
 1. Node version specified in `.nvmrc` files
-2. Valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it, or use provided sample backend extension.
-3. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL. Sample backend extension is provided: [README](cxaiaskproductocc/README.md)
-
+2. Valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it, or use provided sample backend extensions. See section in [Backend README](cxaiaskproductocc/README.md#sample-assistant-config-json).
+3. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL. Sample backend extension is provided: [Backend README](cxaiaskproductocc/README.md)
 
 ## Download and Installation
-### Build library
-1. cd into workspace `cxai-assistant-angular-lib`
+The following instructions are for assistant library. For ask-product you can follow exactly the same steps, just change `assistant` to `ask-product`.
+
+### Build the Library
+1. cd into **workspace** `cxai-assistant-angular-lib`
 2. `nvm use` or use node version specified in `.nvmrc`
-3. Check / adjust `.npmrc` file
+3. Verify and adjust `.npmrc` file
     - if you use private npm registry (e.g. Verdaccio, GitHub Packages etc.) as a proxy for `@spartacus` and to host your own packages then just set environment variables to your proxy URL and auth token
     - otherwise replace `@spartacus:registry` with URL and credentials that you use in your spartacus app (e.g. RBSC) and optionally add `@cx-spartacus:registry` to be able to `npm publish`
 4. `npm i`
-5. `npm run build` to build the library. Look into `build.sh` to build and publish to your npm repository
-    > You must define @cx-spartacus:registry in .npmrc to publish
-6. To connect the library with your application add it to `package.json` and follow [README](cxai-assistant-angular-lib/README.md)
-    - If you don't have npm registry to host the package then copy `.tgz` file (from `dist` dir, after `npm pack`) into your app and add `package.json` dependency as
-    `"@cx-spartacus/cxai-assistant": "file:lib/cx-spartacus-cxai-assistant-<version>.tgz"`
+    - never run `npm install` inside projects/cxai-assistant/, only in workspace root
+5. `npm run build`
 
-For ask product library, do the same steps in `cxai-ask-product-angular-lib` and follow [README](cxai-ask-product-angular-lib/README.md)
+### Publishing to Your Private npm Repository
+If you own a private npm repository:
+1. Update `@cx-spartacus:registry` in `.npmrc` to point to your private repository
+2. Run `build.sh` script
+3. Add library to your application's `package.json`, e.g.
+    - `"@cx-spartacus/cxai-assistant": "~2211.43.0"`
 
-### Run in development mode
-1. Run `npm link` in dist folder
-2. `npm link @cx-spartacus/cxai-assistant` or/and `npm link @cx-spartacus/cxai-ask-product` in your application
-    > You need to have `"preserveSymlinks": true,` in app's `angular.json` projects/<project_name>/architect/build
+### Creating .tgz File (If You Don't Have npm Repository)
+If you don't own a private npm repository:
+1. `cd` into `dist/cxai-assistant` after `npm run build`
+2. Run `npm pack` - this will produce a `.tgz` file
+3. Copy the `.tgz` into your application's codebase, e.g. into `lib/cx-spartacus-cxai-assistant-<version>.tgz`
+4. Add library to your application's `package.json`, e.g.
+    - `"@cx-spartacus/cxai-assistant": "file:lib/cx-spartacus-cxai-assistant-<version>.tgz"`
+
+### Run in Development Mode
+If you want to run the library in watch mode:
+1. Run `npm link` in `dist/cxai-assistant` folder (after `npm run build`)
+2. Run `npm link @cx-spartacus/cxai-assistant` in your application
+    > You need to have `"preserveSymlinks": true,` in app's `angular.json` projects/<project_name>/architect/build/options
 3. Run the library using `npm run watch`
 4. Run your app `ng s`
+5. When you modify library code, the application will reload automatically
+6. `npm link` is temporary and will be removed after each `npm install` in your application
+
+### Importing Assistant Library Module
+After you've successfully added library as a dependency in your application's `package.json`, and either run `npm install` or `npm link` you can now use it.
+1. Add import `CxaiAssistantFeatureModule` from `@cx-spartacus/cxai-assistant/feature` into `app.module`
+2. Build your application - it must build without errors.
+
+Next follow [Assistant README](cxai-assistant-angular-lib/README.md) for instructions about backend, configuration options and how to add the cms component.
+
+### Ask Product Library
+For ask product library, do the same steps in `cxai-ask-product-angular-lib` workspace and follow [Ask Product README](cxai-ask-product-angular-lib/README.md)
 
 ## Known Issues (Assistant)
 This implementation assumes one chat config per site. Currently backend configs do not take into account language parameter, also language is not passed when opening a new session. To support welcome message in different languages it is required to use translations - see `lib.i18n.ts` for translation keys.
 
-## How to obtain support
+## How to Obtain Support
 [Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.
  
 For additional support, [ask a question in SAP Community](https://answers.sap.com/questions/ask.html).
@@ -47,4 +71,4 @@ For additional support, [ask a question in SAP Community](https://answers.sap.co
 If you wish to contribute code, offer fixes or improvements, please send a pull request. Due to legal reasons, contributors will be asked to accept a DCO when they create the first pull request to this project. This happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
 
 ## License
-Copyright (c) 2024 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
+Copyright (c) 2025 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
