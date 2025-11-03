@@ -3,7 +3,6 @@ package com.sap.cxaiaskproductocc.controllers;
 import static de.hybris.platform.webservicescommons.mapping.FieldSetLevelHelper.DEFAULT_LEVEL;
 
 import de.hybris.platform.commercefacades.order.data.ConsignmentData;
-import de.hybris.platform.commercewebservicescommons.dto.order.ConsignmentWsDTO;
 import de.hybris.platform.ordersplitting.model.ConsignmentModel;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 import de.hybris.platform.servicelayer.search.FlexibleSearchService;
@@ -18,6 +17,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.sap.cxaiaskproductocc.model.CxaiExtendedConsignmentWsDTO;
 
 
 @RestController
@@ -43,7 +44,7 @@ public class AssistantToolsController
 	@GetMapping("/find-consignment/{trackingId}")
 	@Secured(
 	{ "ROLE_CUSTOMERGROUP" })
-	public ConsignmentWsDTO getConsignmentByTrackingId(@PathVariable final String trackingId, @ApiFieldsParam
+	public CxaiExtendedConsignmentWsDTO getConsignmentByTrackingId(@PathVariable final String trackingId, @ApiFieldsParam
 	@RequestParam(defaultValue = DEFAULT_LEVEL) final String fields)
 	{
 		final ConsignmentModel example = new ConsignmentModel();
@@ -66,9 +67,10 @@ public class AssistantToolsController
 			}
 
 			final ConsignmentData consignmentData = consignmentConverter.convert(consignment);
-			consignmentData.setOrderCode(consignment.getOrder().getCode());
 
-			return dataMapper.map(consignmentData, ConsignmentWsDTO.class, fields);
+			final CxaiExtendedConsignmentWsDTO result = dataMapper.map(consignmentData, CxaiExtendedConsignmentWsDTO.class, fields);
+			result.setOrderCode(consignment.getOrder().getCode());
+			return result;
 		}
 	}
 

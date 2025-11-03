@@ -80,9 +80,9 @@ public class PayloadLoggingInterceptor implements ClientHttpRequestInterceptor
 		ClientHttpResponse returnResponse = response;
 		if (LOGGER.isDebugEnabled())
 		{
-
+			final int responseStatus = response.getRawStatusCode();
 			LOGGER.debug("-- Response --");
-			LOGGER.debug("Status: " + response.getRawStatusCode());
+			LOGGER.debug("Status: " + responseStatus);
 			logHeaders(response.getHeaders());
 
 			try

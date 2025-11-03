@@ -49,7 +49,7 @@
 				<property name="restrictionEvaluator" ref="askProductRestrictionEvaluator"/>
 		</bean>
 		
-	<!--	assistant -->
+	<!-- assistant -->
 	<bean id="cxaiConfigAssistantPopulator"
 		class="com.sap.cxaiaskproductocc.populator.CxaiConfigAssistantPopulator">
 		<constructor-arg ref="cxaiAskProductConsumedDestinationConverter"></constructor-arg>

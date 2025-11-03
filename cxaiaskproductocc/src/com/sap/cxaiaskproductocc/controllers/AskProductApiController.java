@@ -65,7 +65,8 @@ public class AskProductApiController
 	final Map<String, Object> body, final HttpMethod method, @RequestHeader
 	final HttpHeaders headers, final HttpServletRequest request)
 	{
-		final String requestSubpath = request.getRequestURI().replaceFirst("/occ/v2/[^/]+/cxai/ask-product", "");
+		final String occPrefix = this.cxaiAskProductApiService.getOccPrefix();
+		final String requestSubpath = request.getRequestURI().replaceFirst(occPrefix + "/[^/]+/cxai/ask-product", "");
 
 		if (!checkApiPath(requestSubpath, method))
 		{

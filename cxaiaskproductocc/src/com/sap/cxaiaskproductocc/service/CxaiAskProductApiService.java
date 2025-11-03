@@ -3,10 +3,8 @@
  */
 package com.sap.cxaiaskproductocc.service;
 
-import de.hybris.platform.core.model.product.ProductModel;
 import de.hybris.platform.product.ProductService;
 import de.hybris.platform.servicelayer.config.ConfigurationService;
-import de.hybris.platform.variants.model.VariantProductModel;
 
 import java.net.URI;
 import java.util.Map;
@@ -17,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.sap.cxai.CxaiConfigData;
@@ -26,7 +25,7 @@ import com.sap.cxaiaskproductocc.exception.MissingCxaiConfigException;
 /**
  *
  */
-public class CxaiAskProductApiService extends BaseCxaiApiService implements CxaiApiService
+public class CxaiAskProductApiService extends BaseCxaiApiService
 {
 	private static final Logger LOGGER = Logger.getLogger(CxaiAskProductApiService.class);
 	private final ProductService productService;
@@ -47,14 +46,12 @@ public class CxaiAskProductApiService extends BaseCxaiApiService implements Cxai
 		}
 
 		final String targetSystemUrl = config.getAskProductDestination().getUrl();
-		final String tokenUrl = config.getAskProductDestination().getAuthUrl();
-		final String clientId = config.getAskProductDestination().getClientId();
-		final String clientSecret = config.getAskProductDestination().getClientSecret();
+		final long startTime = System.currentTimeMillis();
 
 		try
 		{
-			final String fetchedToken = this.getAuthToken(tokenUrl, clientId, clientSecret);
-			headers.setBearerAuth(fetchedToken);
+			final RestTemplate restTemplate = this.getRestClient(config.getAskProductDestination());
+			final HttpHeaders filteredHeaders = cleanRequestHeaders(headers);
 
 			final String askProductPath = configurationService.getConfiguration().getString("cxai.ask-product.api.path",
 					"/products/v1/about/ask");
@@ -67,15 +64,21 @@ public class CxaiAskProductApiService extends BaseCxaiApiService implements Cxai
 			body.put("catalogVersion", config.getCatalogVersion());
 			body.put("catalogID", config.getCatalogId());
 
-			LOGGER.info("Forwarding request to " + uri);
+			LOGGER.info("Forwarding " + method + " request to " + uri);
 			//Copy headers from incoming request to new HttpEntity
-			final HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(body, headers);
+			final HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(body, filteredHeaders);
 
-			return restTemplate.exchange(uri, HttpMethod.POST, httpEntity, String.class);
+			final var result = restTemplate.exchange(uri, method, httpEntity, String.class);
+
+			return new ResponseEntity<>(result.getBody(), cleanResponseHeaders(result.getHeaders()), result.getStatusCode());
 		}
 		catch (final HttpStatusCodeException e)
 		{
-			return handleErrorResponse(e, clientId);
+			return handleErrorResponse(e);
+		}
+		finally
+		{
+			logResponseTime(startTime, method, requestSubpath);
 		}
 	}
 }
