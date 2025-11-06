@@ -7,38 +7,52 @@ package com.sap.cxaiaskproductocc.service;
 
 import de.hybris.platform.servicelayer.config.ConfigurationService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.log4j.Logger;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.security.oauth2.client.OAuth2RestTemplate;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.hash.Hashing;
+import com.sap.cxai.askproduct.ConsumedDestinationData;
 import com.sap.cxaiaskproductocc.logging.PayloadLoggingInterceptor;
-import com.sap.cxaiaskproductocc.model.ExpirableToken;
 
 
 /**
  *
  */
-public class BaseCxaiApiService
+public abstract class BaseCxaiApiService implements CxaiApiService
 {
-	private static final Logger LOGGER = Logger.getLogger(CxaiAssistantApiService.class);
+	private static final Logger LOGGER = Logger.getLogger(BaseCxaiApiService.class);
+	private static final Logger PAYLOAD_INTERCEPTOR_LOGGER = Logger.getLogger(PayloadLoggingInterceptor.class);
 
-	protected final Map<String, ExpirableToken> tokenMap = new ConcurrentHashMap<>();
-	protected final RestTemplate restTemplate;
 	protected final ConfigurationService configurationService;
+
+	private final String occPrefix;
+	private final long longResponseWarningThresholdMs;
+	private final ClientHttpRequestFactory requestFactory;
+
+	// in practice this can only be evicted if credentials / logging level are changed during runtime
+	private final Cache<String, RestTemplate> restTemplateCache = CacheBuilder.newBuilder() //
+			.maximumSize(10) //
+			.expireAfterAccess(24, TimeUnit.HOURS) //
+			.build();
 
 	/**
 	 *
@@ -46,88 +60,124 @@ public class BaseCxaiApiService
 	public BaseCxaiApiService(final ConfigurationService configurationService)
 	{
 		super();
-		this.restTemplate = new RestTemplate(getClientHttpRequestFactory());
 		this.configurationService = configurationService;
-		this.restTemplate.setInterceptors(Collections.singletonList(new PayloadLoggingInterceptor()));
 
+		this.occPrefix = configurationService.getConfiguration().getString("ext.commercewebservices.extension.webmodule.webroot",
+				"/occ/v2");
+
+		this.longResponseWarningThresholdMs = configurationService.getConfiguration()
+				.getInt("cxai.long-response-warning-threshold-ms", 45000);
+
+		this.requestFactory = createClientHttpRequestFactory();
 	}
 
-	protected ClientHttpRequestFactory getClientHttpRequestFactory()
+	@Override
+	public String getOccPrefix()
 	{
-		//avoid "retry in streaming mode" error due to PayloadLoggingInterceptor
-		final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
-		requestFactory.setOutputStreaming(false);
+		return occPrefix;
+	}
+
+	protected void logResponseTime(final long startTime, final HttpMethod method, final String requestSubpath)
+	{
+		final long duration = System.currentTimeMillis() - startTime;
+
+		if (duration > this.longResponseWarningThresholdMs)
+		{
+			LOGGER.warn("Long CXAI response time: " + duration + "ms: " + method + " " + requestSubpath);
+		}
+		else if (LOGGER.isDebugEnabled())
+		{
+			LOGGER.debug("CXAI response time: " + duration + "ms: " + method + " " + requestSubpath);
+		}
+	}
+
+	protected RestTemplate getRestClient(final ConsumedDestinationData data)
+	{
+		final boolean payloadInterceptorEnabled = PAYLOAD_INTERCEPTOR_LOGGER.isDebugEnabled();
+		final long clientSecretHash = Hashing.murmur3_128().hashString(data.getClientSecret(), StandardCharsets.UTF_8).asLong();
+
+		final String cacheKey = data.getClientId() + (payloadInterceptorEnabled ? "_logged_" : "_") + clientSecretHash;
+
+		try
+		{
+			return restTemplateCache.get(cacheKey, () -> {
+				LOGGER.debug("Creating new OAuth2RestTemplate for: " + data.getClientId() + " logging: " + payloadInterceptorEnabled);
+
+				final ClientCredentialsResourceDetails resourceDetails = new ClientCredentialsResourceDetails();
+				resourceDetails.setAccessTokenUri(data.getAuthUrl());
+				resourceDetails.setClientId(data.getClientId());
+				resourceDetails.setClientSecret(data.getClientSecret());
+
+				final OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(resourceDetails);
+				oAuth2RestTemplate.setRequestFactory(getClientHttpRequestFactory());
+
+				if (payloadInterceptorEnabled)
+				{
+					oAuth2RestTemplate.setInterceptors(Collections.singletonList(new PayloadLoggingInterceptor()));
+				}
+
+				return oAuth2RestTemplate;
+			});
+		}
+		catch (final ExecutionException e)
+		{
+			throw new RuntimeException("Could not create OAuth2RestTemplate", e);
+		}
+	}
+
+	private ClientHttpRequestFactory getClientHttpRequestFactory()
+	{
+		return this.requestFactory;
+	}
+
+	protected ClientHttpRequestFactory createClientHttpRequestFactory()
+	{
+		final var config = configurationService.getConfiguration();
+		final int readTimeout = config.getInt("cxai.httpclient.read-timeout-ms", 3 * 60 * 1000);
+		final int connectTimeout = config.getInt("cxai.httpclient.connect-timeout-ms", 5000);
+		final int maxTotalConnections = config.getInt("cxai.httpclient.max-total-connections", 50);
+		final int maxPerRouteConnections = config.getInt("cxai.httpclient.max-per-route-connections", maxTotalConnections);
+		final int evictIdleConnectionsSec = config.getInt("cxai.httpclient.evict-idle-connections-seconds", 300);
+
+		final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(5, TimeUnit.MINUTES);
+		connectionManager.setMaxTotal(maxTotalConnections);
+		connectionManager.setDefaultMaxPerRoute(maxPerRouteConnections);
+		connectionManager.setValidateAfterInactivity(60_000);
+
+		final RequestConfig requestConfig = RequestConfig.custom() //
+				.setConnectTimeout(connectTimeout) //
+				.setSocketTimeout(readTimeout) //
+				.setConnectionRequestTimeout(1000) //
+				.build();
+
+		final HttpClient httpClient = HttpClients.custom() //
+				.setConnectionManager(connectionManager) //
+				.setDefaultRequestConfig(requestConfig) //
+				.evictExpiredConnections() //
+				.evictIdleConnections(evictIdleConnectionsSec, TimeUnit.SECONDS) //
+				.build();
+
+		final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
 		return requestFactory;
 	}
 
-	protected String getAuthToken(final String tokenUrl, final String clientId, final String clientSecret)
+	protected ResponseEntity<String> handleErrorResponse(final HttpStatusCodeException e)
 	{
-		final long currentTime = System.currentTimeMillis();
-		final String urlId = clientId;
-		ExpirableToken token = this.tokenMap.get(urlId);
-
-		if (token != null && !token.isExpired())
-		{
-			LOGGER.debug("Reusing token for " + urlId);
-			return token.getValue();
-		}
-
-		synchronized (this.tokenMap)
-		{
-			token = this.tokenMap.get(urlId);
-
-			if (token != null && !token.isExpired())
-			{
-				return token.getValue();
-			}
-
-			this.tokenMap.remove(urlId);
-			final HttpHeaders authTokenHeaders = new HttpHeaders();
-			authTokenHeaders.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-			authTokenHeaders.setBasicAuth(clientId, clientSecret);
-
-			final MultiValueMap<String, String> tokenRequest = new LinkedMultiValueMap<>();
-			tokenRequest.add("grant_type", "client_credentials");
-
-			try
-			{
-				final HttpEntity<MultiValueMap<String, String>> authTokenEntity = new HttpEntity<>(tokenRequest, authTokenHeaders);
-				final ResponseEntity<Map> authTokenResponse = restTemplate.exchange(tokenUrl, HttpMethod.POST, authTokenEntity,
-						Map.class);
-
-				final String tokenValue = (String) authTokenResponse.getBody().get("access_token");
-				final Integer tokenExpiresIn = (Integer) authTokenResponse.getBody().get("expires_in");
-				token = new ExpirableToken(tokenValue, tokenExpiresIn == null ? -1 : tokenExpiresIn.longValue());
-				this.tokenMap.put(urlId, token);
-				LOGGER.info("Fetched token for " + urlId + " expires in " + tokenExpiresIn);
-				return token.getValue();
-			}
-			catch (final HttpStatusCodeException ex)
-			{
-				LOGGER.error("Cannot fetch token for " + urlId + " from " + tokenUrl);
-				throw ex;
-			}
-		}
-	}
-
-	protected ResponseEntity<String> handleErrorResponse(final HttpStatusCodeException e, final String clientId)
-	{
-		if (e.getStatusCode() == HttpStatus.UNAUTHORIZED)
-		{
-			synchronized (tokenMap)
-			{
-				this.tokenMap.remove(clientId);
-				LOGGER.info("Invalidated token for " + clientId + " because of 401");
-			}
-		}
-
 		//return external api response without modifications
 		return ResponseEntity.status(e.getStatusCode())//
-				.headers(cleanHeaders(e.getResponseHeaders()))//
+				.headers(cleanResponseHeaders(e.getResponseHeaders()))//
 				.body(e.getResponseBodyAsString());
 	}
 
-	protected HttpHeaders cleanHeaders(final HttpHeaders responseHeaders)
+	protected HttpHeaders cleanRequestHeaders(final HttpHeaders headers)
+	{
+		//handled by oauth resttemplate
+		headers.remove(HttpHeaders.AUTHORIZATION);
+		headers.remove(HttpHeaders.HOST);
+		return headers;
+	}
+
+	protected HttpHeaders cleanResponseHeaders(final HttpHeaders responseHeaders)
 	{
 		//remove cors headers from external service, because cors is handled by commerce
 		final var filteredHeaders = new HttpHeaders();

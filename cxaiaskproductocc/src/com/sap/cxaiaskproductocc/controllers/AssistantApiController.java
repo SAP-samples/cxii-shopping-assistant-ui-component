@@ -45,7 +45,6 @@ public class AssistantApiController
 		apiAllowlist.add(new AllowlistEntry("/sessions$", HttpMethod.DELETE));
 		apiAllowlist.add(new AllowlistEntry("/chat_session$", HttpMethod.POST));
 		//send 1st message and create session
-		apiAllowlist.add(new AllowlistEntry("/combined_chat_session$", HttpMethod.POST));
 		apiAllowlist.add(new AllowlistEntry("/chat$", HttpMethod.POST));
 		apiAllowlist.add(new AllowlistEntry("/chat_session/[^/]+$", HttpMethod.GET));
 	}
@@ -64,11 +63,11 @@ public class AssistantApiController
 	}
 
 	@RequestMapping("/**")
-	public ResponseEntity<?> handleRequest(@RequestBody(required = false)
-	final Map<String, Object> body, final HttpMethod method, @RequestHeader
-	final HttpHeaders headers, final HttpServletRequest request)
+	public ResponseEntity<?> handleRequest(@RequestBody(required = false) final Map<String, Object> body, final HttpMethod method,
+			@RequestHeader final HttpHeaders headers, final HttpServletRequest request)
 	{
-		final String requestSubpath = request.getRequestURI().replaceFirst("/occ/v2/[^/]+/cxai/assistant", "");
+		final String occPrefix = this.cxaiAssistantApiService.getOccPrefix();
+		final String requestSubpath = request.getRequestURI().replaceFirst(occPrefix + "/[^/]+/cxai/assistant", "");
 
 		if (!checkApiPath(requestSubpath, method))
 		{

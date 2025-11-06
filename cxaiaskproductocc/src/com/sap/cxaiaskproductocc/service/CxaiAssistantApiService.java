@@ -15,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.sap.cxai.CxaiConfigData;
@@ -25,7 +26,7 @@ import com.sap.cxaiaskproductocc.exception.MissingCxaiConfigException;
 /**
  *
  */
-public class CxaiAssistantApiService extends BaseCxaiApiService implements CxaiApiService
+public class CxaiAssistantApiService extends BaseCxaiApiService
 {
 	private static final Logger LOGGER = Logger.getLogger(CxaiAssistantApiService.class);
 
@@ -46,12 +47,8 @@ public class CxaiAssistantApiService extends BaseCxaiApiService implements CxaiA
 		final String assistantApiPath = configurationService.getConfiguration().getString("cxai.assistant.api.path",
 				"/shopping-assistant/api/v1");
 
-		//TODO: add optional assistantDestination to config and fallback here if not defined
 		String targetSystemUrl = config.getTenantUrl().replaceAll("/vision/api/v\\d", assistantApiPath);
-		String tokenUrl = config.getAuthUrl();
-		String clientId = config.getClientId();
-		String clientSecret = config.getClientSecret();
-		final ConsumedDestinationData assistantDestination = config.getAssistantDestination();
+		ConsumedDestinationData assistantDestination = config.getAssistantDestination();
 
 		if (assistantDestination != null && assistantDestination.getUrl() != null)
 		{
@@ -60,38 +57,47 @@ public class CxaiAssistantApiService extends BaseCxaiApiService implements CxaiA
 			{
 				targetSystemUrl = targetSystemUrl + assistantApiPath;
 			}
-
-			tokenUrl = assistantDestination.getAuthUrl();
-			clientId = assistantDestination.getClientId();
-			clientSecret = assistantDestination.getClientSecret();
+		}
+		else
+		{
+			//no specific destination configured, use credentials from main (VS) destination
+			assistantDestination = new ConsumedDestinationData();
+			assistantDestination.setAuthUrl(config.getAuthUrl());
+			assistantDestination.setClientId(config.getClientId());
+			assistantDestination.setClientSecret(config.getClientSecret());
 		}
 
+		final long startTime = System.currentTimeMillis();
 		try
 		{
-			final String fetchedToken = this.getAuthToken(tokenUrl, clientId, clientSecret);
+			final RestTemplate restTemplate = this.getRestClient(assistantDestination);
 			this.addOccUserAuthTokenIfNeeded(requestSubpath, headers);
-			headers.setBearerAuth(fetchedToken);
+			final HttpHeaders filteredHeaders = cleanRequestHeaders(headers);
 
 			final URI uri = UriComponentsBuilder.fromUriString(targetSystemUrl) //
 					.path(requestSubpath) //
 					.query(queryString) //
 					.build(true).toUri();
 
-			LOGGER.info("Forwarding request to " + uri);
-			final HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(body, headers);
+			LOGGER.info("Forwarding " + method + " request to " + uri);
+			final HttpEntity<Map<String, Object>> httpEntity = new HttpEntity<>(body, filteredHeaders);
 			final var result = restTemplate.exchange(uri, method, httpEntity, String.class);
 
-			return new ResponseEntity<>(result.getBody(), cleanHeaders(result.getHeaders()), result.getStatusCode());
+			return new ResponseEntity<>(result.getBody(), cleanResponseHeaders(result.getHeaders()), result.getStatusCode());
 		}
 		catch (final HttpStatusCodeException e)
 		{
-			return handleErrorResponse(e, clientId);
+			return handleErrorResponse(e);
+		}
+		finally
+		{
+			this.logResponseTime(startTime, method, requestSubpath);
 		}
 	}
 
 	protected void addOccUserAuthTokenIfNeeded(final String requestSubpath, final HttpHeaders headers)
 	{
-		if (requestSubpath.equals("/chat_session") || requestSubpath.equals("/combined_chat_session"))
+		if (requestSubpath.equals("/chat_session") || requestSubpath.equals("/chat"))
 		{
 			final String userAuthToken = headers.getFirst(HttpHeaders.AUTHORIZATION);
 			if (StringUtils.isNotEmpty(userAuthToken))
