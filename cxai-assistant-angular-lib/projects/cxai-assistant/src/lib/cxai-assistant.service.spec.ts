@@ -141,7 +141,8 @@ describe('CxaiAssistantService', () => {
     service.startNewChatSession(userInput);
     tick();
 
-    expectSendMessageAndCreateSessionRequest({...mockCreateSessionResponse, response: mockPostMessageResponse.response });
+    expectCreateSessionRequest(mockCreateSessionResponse);
+    expectSendMessageRequest(mockPostMessageResponse);
     tick();
 
     expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockOldChatSessionResponse);
@@ -357,12 +358,6 @@ describe('CxaiAssistantService', () => {
 
   function expectCreateSessionRequest(payload: any = mockCreateSessionResponse) {
     const req = httpMock.expectOne(apiService.buildUrl(`/chat_session`));
-    expect(req.request.method).toBe('POST');
-    flushErrorOrPayload(req, payload);
-  }
-
-  function expectSendMessageAndCreateSessionRequest(payload: any = mockCreateSessionResponse) {
-    const req = httpMock.expectOne(apiService.buildUrl(`/combined_chat_session`));
     expect(req.request.method).toBe('POST');
     flushErrorOrPayload(req, payload);
   }
