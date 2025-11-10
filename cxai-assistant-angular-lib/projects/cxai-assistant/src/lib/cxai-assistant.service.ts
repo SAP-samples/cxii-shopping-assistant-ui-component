@@ -238,7 +238,7 @@ export class CxaiAssistantService {
 
   /**
    * Open new chat session
-   * @param initialUserMessage if provided it will use combined_chat_session endpoint and also validate
+   * @param initialUserMessage if provided it will create session and send message + also validate
    * that sessonId is not already set, otherwise it will create a new session and if it already exists will
    * delete previous session after success
    */

@@ -7,6 +7,8 @@ import {
   AssistantUserInput,
 } from '@cx-spartacus/cxai-assistant/root';
 import { OccEndpointsService } from '@spartacus/core';
+import { Observable } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -32,11 +34,19 @@ export class CxaiAssistantApiService {
     return this.http.post<{ session_id: string }>(url, body);
   }
 
-  postMessageAndCreateSession(payload: AssistantNoSessionYetUserInput) {
-    const url = this.buildUrl('/combined_chat_session');
-    // it actually returns a response as well but not always contain recommendations
-    // so we just return the session_id and require getSession call to obtain the conversation
-    return this.http.post<{ session_id: string }>(url, payload);
+  postMessageAndCreateSession(payload: AssistantNoSessionYetUserInput): Observable<{ session_id: string }> {
+    return this.createChatSession(payload.config_id).pipe(
+      switchMap((sessionResponse) => {
+        return this.postMessage({
+          session_id: sessionResponse.session_id,
+          user_input: payload.user_input,
+        }).pipe(
+          map((chatResponse) => {
+            return { session_id: chatResponse.session_id };
+          })
+        );
+      })
+    );
   }
 
   deleteChatSession(sessionId: string) {

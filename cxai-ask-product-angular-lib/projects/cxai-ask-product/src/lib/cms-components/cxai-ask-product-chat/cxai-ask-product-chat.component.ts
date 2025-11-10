@@ -3,17 +3,18 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
-  OnChanges,
   OnInit,
   Optional,
-  QueryList,
   Renderer2,
-  SimpleChanges,
   ViewChild,
-  ViewChildren,
-  inject,
+  inject
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {
+  ASK_PRODUCT_LOG_MARKER,
+  AskProductChatMessage,
+  AskProductSource,
+} from '@cx-spartacus/cxai-ask-product/root';
+import { LoggerService } from '@spartacus/core';
 import {
   CurrentProductService,
   ICON_TYPE,
@@ -29,12 +30,6 @@ import {
   tap,
 } from 'rxjs';
 import { CxaiAskProductService } from '../../cxai-ask-product.service';
-import {
-  AskProductChatMessage,
-  AskProductSource,
-} from '@cx-spartacus/cxai-ask-product/root';
-import { LoggerService } from '@spartacus/core';
-import { ASK_PRODUCT_LOG_MARKER } from '@cx-spartacus/cxai-ask-product/root';
 
 @Component({
   selector: 'lib-cxai-ask-product-chat',
@@ -49,7 +44,6 @@ import { ASK_PRODUCT_LOG_MARKER } from '@cx-spartacus/cxai-ask-product/root';
   standalone: false,
 })
 export class CxaiAskProductChatComponent implements OnInit {
-  private fb = inject(FormBuilder);
   private currentProductService = inject(CurrentProductService);
   private cxaiAskProductService = inject(CxaiAskProductService);
   private changeDetectorRef = inject(ChangeDetectorRef);
@@ -68,9 +62,15 @@ export class CxaiAskProductChatComponent implements OnInit {
   //to keep scroll-to-bottom on new message
   lastMessageHeight = 0;
 
-  form: FormGroup = this.fb.group({
-    message: ['', Validators.required],
-  });
+  //form data
+  message = '';
+  isMessageValid = false;
+
+  onMessageInput(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    this.message = target.value;
+    this.isMessageValid = !!this.message.trim();
+  }
 
   ngOnInit() {
     if (!this.cxaiAskProductService.isConfigured()) {
@@ -106,7 +106,7 @@ export class CxaiAskProductChatComponent implements OnInit {
   }
 
   sendMessage(productCode: string) {
-    const message = this.form.value.message?.trim();
+    const message = this.message?.trim();
     if (!message) {
       this.renderer
         .selectRootElement(this.chatInputField.nativeElement)
@@ -120,7 +120,7 @@ export class CxaiAskProductChatComponent implements OnInit {
       source: 'user',
       timestamp: Date.now(),
     });
-    this.form.reset();
+    this.message = '';
     this.busy = true;
 
     this.cxaiAskProductService

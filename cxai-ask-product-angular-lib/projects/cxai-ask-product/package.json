@@ -1,12 +1,11 @@
 {
   "name": "@cx-spartacus/cxai-ask-product",
-  "version": "2211.37.0",
+  "version": "2211.43.0",
   "peerDependencies": {
     "@angular/common": "^19.0.0",
     "@angular/core": "^19.0.0",
-    "@angular/forms": "^19.0.0",
-    "@spartacus/core": "^2211.35.0",
-    "@spartacus/storefront": "^2211.35.0",
+    "@spartacus/core": "^2211.35.0 || ^221121.1.0",
+    "@spartacus/storefront": "^2211.35.0 || ^221121.1.0",
     "rxjs": "^7.8.1"
   },
   "dependencies": {
