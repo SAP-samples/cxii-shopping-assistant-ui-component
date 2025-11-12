@@ -12,9 +12,18 @@ CXAI Ask Product library for use with CXAI Ask Product API
 3. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL. Sample backend extension is provided: [Backend README](cxaiaskproductocc/README.md)
 
 ## Download and Installation
-The following instructions are for assistant library. For ask-product you can follow exactly the same steps, just change `assistant` to `ask-product`.
+The following instructions are for assistant library. For ask-product you can follow exactly the same steps, just change `assistant` to `ask-product`. You can either use prebuilt release or build the library manually.
 
-### Build the Library
+### Using Prebuilt Release
+1. Open latest [release](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/releases) 
+2. Modify your application's `package.json` by adding entries specified on release page
+    > Optionally you can `npm publish` the tgzs to your private npm registry and use version syntax instead of URLs
+3. Run `npm i`
+4. Skip to [Importing Assistant Library Module](#importing-assistant-library-module)
+
+### Building the Library
+Development guide for building and debugging the library.
+#### Running the Build
 1. cd into **workspace** `cxai-assistant-angular-lib`
 2. `nvm use` or use node version specified in `.nvmrc`
 3. Verify and adjust `.npmrc` file
@@ -24,14 +33,14 @@ The following instructions are for assistant library. For ask-product you can fo
     - never run `npm install` inside projects/cxai-assistant/, only in workspace root
 5. `npm run build`
 
-### Publishing to Your Private npm Repository
+#### Publishing to Your Private npm Repository
 If you own a private npm repository:
 1. Update `@cx-spartacus:registry` in `.npmrc` to point to your private repository
 2. Run `build.sh` script
 3. Add library to your application's `package.json`, e.g.
     - `"@cx-spartacus/cxai-assistant": "~2211.43.0"`
 
-### Creating .tgz File (If You Don't Have npm Repository)
+#### Creating .tgz File (If You Don't Have npm Repository)
 If you don't own a private npm repository:
 1. `cd` into `dist/cxai-assistant` after `npm run build`
 2. Run `npm pack` - this will produce a `.tgz` file
@@ -39,7 +48,7 @@ If you don't own a private npm repository:
 4. Add library to your application's `package.json`, e.g.
     - `"@cx-spartacus/cxai-assistant": "file:lib/cx-spartacus-cxai-assistant-<version>.tgz"`
 
-### Run in Development Mode
+#### Run in Development Mode
 If you want to run the library in watch mode:
 1. Run `npm link` in `dist/cxai-assistant` folder (after `npm run build`)
 2. Run `npm link @cx-spartacus/cxai-assistant` in your application
