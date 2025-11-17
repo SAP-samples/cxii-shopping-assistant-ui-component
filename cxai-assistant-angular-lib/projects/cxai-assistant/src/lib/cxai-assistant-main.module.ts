@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { AssistantComponents, CxaiAssistantInitializer, defaultAssistantConfig, defaultOccAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantComponents, CxaiAssistantApiService, CxaiAssistantInitializer, defaultAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
 import {
   CmsConfig,
   ConfigInitializerService,
@@ -22,6 +22,9 @@ import { AssistantProductNamePipe } from './cms-components/product-name.pipe';
 import { AssistantTokenComponent } from './cms-components/assistant-token/assistant-token.component';
 import { AssistantOrderReferenceComponent } from './cms-components/assistant-order-reference/assistant-order-reference.component';
 import { AssistantTrackingIdReferenceComponent } from './cms-components/assistant-tracking-id-reference/assistant-tracking-id-reference.component';
+import { defaultOccAssistantConfig } from './config/assistant-endpoint.config';
+import { CxaiAssistantService } from './cxai-assistant.service';
+import { CxaiAssistantOccApiService } from './cxai-assistant-occ.api.service';
 
 /**
  * @deprecated Please import lazy CxaiAskProductFeatureModule
@@ -79,6 +82,17 @@ import { AssistantTrackingIdReferenceComponent } from './cms-components/assistan
       deps: [CxaiAssistantInitializer, ConfigInitializerService],
       multi: true,
     },
+    {
+      provide: CxaiAssistantApiService,
+      useFactory: (rootCxaiAssistantApiService) => {
+        return rootCxaiAssistantApiService ?? new CxaiAssistantOccApiService();
+      },
+      //hack to allow overwriting from root
+      deps: [[new Optional(), new SkipSelf(), CxaiAssistantApiService]],
+    },
+    //this can't be providedIn root, because CxaiAssistantApiService won't be resolved
+    //(spartacus lazy loading modules mechanism doesn't set proper injector hierarchy)
+    CxaiAssistantService,
   ],
 })
 export class CxaiAssistantMainModule {}

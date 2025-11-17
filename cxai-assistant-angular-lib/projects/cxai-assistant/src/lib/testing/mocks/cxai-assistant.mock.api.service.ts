@@ -1,11 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
-  AssistantUserInput
+  AssistantUserInput,
+  CxaiAssistantApiService
 } from '@cx-spartacus/cxai-assistant/root';
 import { of, throwError } from 'rxjs';
 import { delay } from 'rxjs/operators';
-import { CxaiAssistantApiService } from '../../cxai-assistant.api.service';
 import {
   mockOldChatSessionResponse,
   mockCreateSessionResponse,

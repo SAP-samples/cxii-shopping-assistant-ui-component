@@ -1,8 +1,12 @@
-import { OccConfig } from '@spartacus/core';
 import { OccEndpoint } from '@spartacus/core';
 
 export interface AssistantOccEndpoints {
   cxaiAssistant_trackingIdToConsignment?: string | OccEndpoint;
+
+  cxaiAssistant_postMessage?: string | OccEndpoint;
+  cxaiAssistant_getChatSession?: string | OccEndpoint;
+  cxaiAssistant_createChatSession?: string | OccEndpoint;
+  cxaiAssistant_deleteChatSession?: string | OccEndpoint;
 }
 
 declare module '@spartacus/core' {
@@ -10,19 +14,4 @@ declare module '@spartacus/core' {
   interface OccEndpoints extends AssistantOccEndpoints {}
 }
 
-const occAssistantEndpoints: AssistantOccEndpoints = {
-  cxaiAssistant_trackingIdToConsignment: 
-    '/cxai/tools/find-consignment/${trackingId}?fields=code,status,statusDate,statusDisplay,orderCode',
-};
-
 export type AssistantEndpointKey = keyof AssistantOccEndpoints;
-
-export const defaultOccAssistantConfig: OccConfig = {
-  backend: {
-    occ: {
-      endpoints: {
-        ...occAssistantEndpoints,
-      },
-    },
-  },
-};
