@@ -38,8 +38,8 @@ If you use OCC Extensions (`commercewebservices`):
 
 ### Add Required Extensions to Manifest - Legacy OCC addons usage
 If you use legacy OCC addons (`ycommercewebservices` generated extension instead of `commercewebservices`):
-1. Add https://github.com/SAP-samples/cxii-commerce-extn/tree/legacy-occ-addons as submodule, and extensions `cxaioccaddon`, `cxaibackoffice` to CCV2 manifest
-2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/tree/legacy-occ-addons as a submodule, and extensions `cxaiaskproductoccaddon` to manifest
+1. Add https://github.com/SAP-samples/cxii-commerce-extn/ as submodule, and extensions `cxaioccaddon`, `cxaibackoffice` to CCV2 manifest
+2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/ as a submodule, and extensions `cxaiaskproductoccaddon` to manifest
 3. Add `cxaiaskproductaddon` extension to manifest, including `storefrontAddons` section
 4. Add `cxaioccaddon` and `cxaiaskproductoccaddon` to `storefrontAddons` of your `ycommercewebservices` template extension
 5. Deploy with migrate data

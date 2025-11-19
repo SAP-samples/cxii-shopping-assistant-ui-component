@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+						http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<context:annotation-config />
+
+	<!-- cxai config extensions -->
+	<bean id="cxaiAskProductConsumedDestinationPopulator"
+		class="com.sap.cxaiaskproductocc.populator.ConsumedDestinationPopulator">
+	</bean>
+
+	<bean id="cxaiConfigAskProductPopulator"
+		class="com.sap.cxaiaskproductocc.populator.CxaiConfigAskProductPopulator">
+		<constructor-arg ref="cxaiAskProductConsumedDestinationConverter"></constructor-arg>
+	</bean>
+
+	<bean id="cxaiAskProductConsumedDestinationConverter"
+		parent="abstractPopulatingConverter">
+		<property name="targetClass"
+			value="com.sap.cxai.askproduct.ConsumedDestinationData" />
+		<property name="populators">
+			<list merge="true">
+				<ref bean="cxaiAskProductConsumedDestinationPopulator" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cxaiConfigConverter" />
+		<property name="add" ref="cxaiConfigAskProductPopulator" />
+	</bean>
+	
+		<bean id="askProductRestrictionEvaluator"
+					class="com.sap.cxaiaskproductocc.restriction.AskProductRestrictionEvaluator" scope="tenant">
+				<constructor-arg name="cxaiConfigService" ref="cxaiConfigService"/>
+		</bean>
+
+		<bean id="askProductRestrictionEvaluatorMapping"
+					class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" scope="tenant">
+				<property name="restrictionTypeCode" value="AskProductRestriction"/>
+				<property name="restrictionEvaluator" ref="askProductRestrictionEvaluator"/>
+		</bean>
+		
+	<!-- assistant -->
+	<bean id="cxaiConfigAssistantPopulator"
+		class="com.sap.cxaiaskproductocc.populator.CxaiConfigAssistantPopulator">
+		<constructor-arg ref="cxaiAskProductConsumedDestinationConverter"></constructor-arg>
+	</bean>
+	<bean parent="modifyPopulatorList">
+		<property name="list" ref="cxaiConfigConverter" />
+		<property name="add" ref="cxaiConfigAssistantPopulator" />
+	</bean>
+	
+		<bean id="assistantRestrictionEvaluator"
+					class="com.sap.cxaiaskproductocc.restriction.AssistantRestrictionEvaluator" scope="tenant">
+				<constructor-arg name="cxaiConfigService" ref="cxaiConfigService"/>
+		</bean>
+
+		<bean id="assistantRestrictionEvaluatorMapping"
+					class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" scope="tenant">
+				<property name="restrictionTypeCode" value="AssistantRestriction"/>
+				<property name="restrictionEvaluator" ref="assistantRestrictionEvaluator"/>
+		</bean>
+		
+	 	<bean id="cxaiConfigAssistantConfigAttributeHandler" class="com.sap.cxaiaskproductocc.attribute.CxaiConfigAssistantConfigAttributeHandler"></bean>
+		
+		<bean id="caiAssistantApiService" class="com.sap.cxaiaskproductocc.service.CxaiAssistantApiService"></bean>
+		<bean id="cxaiAskProductApiService" class="com.sap.cxaiaskproductocc.service.CxaiAskProductApiService"></bean>
+		
+		<bean id="cxaiAssistantConfigSaveInterceptor"
+		class="com.sap.cxaiaskproductocc.interceptor.CxaiAssistantConfigSaveInterceptor">
+	</bean>
+
+	<bean
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="cxaiAssistantConfigSaveInterceptor" />
+		<property name="typeCode" value="CxaiAssistantConfig" />
+	</bean>
+	
+	<bean id="backofficeCxaiApiServiceWrapper" class="com.sap.cxaiaskproductocc.service.BackofficeCxaiApiServiceWrapper"></bean>
+	
+	<!-- requires ruleengineservices to be loaded, if not loaded either comment it or copy RuleEngineExceptionTranslationHandler -->
+	<bean depends-on="exceptionTranslationForInterceptors"
+		parent="listMergeDirective">
+		<property name="add" value="CxaiAssistantConfigSaveInterceptor" />
+	</bean>
+</beans>

@@ -1,0 +1,23 @@
+# ---------------------------------------------------------------------------
+# Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved.
+# ---------------------------------------------------------------------------
+# you can put key/value pairs here.
+# Use Config.getParameter(..) to retrieve the values during runtime.
+
+cxaiaskproductoccaddon.key=value
+
+# Specifies the location of the spring context file added automatically to the global platform application context.
+cxaiaskproductoccaddon.application-context=cxaiaskproductoccaddon-spring.xml
+
+# Specifies the location of the spring context file which will be added to commerce web services web context
+ycommercewebservices.additionalWebSpringConfigs.cxaiaskproductoccaddon=classpath:/cxaiaskproductoccaddon/web/spring/cxaiaskproductoccaddon-web-spring.xml
+
+#Use for generating static swagger documentation
+cxaiaskproductoccaddon.documentation.static.generate=true
+ext.cxaiaskproductoccaddon.extension.webmodule.webroot=/rest/v2
+
+log4j2.logger.AskProductPayloadLoggingInterceptor.name=com.sap.cxaiaskproductocc.logging.PayloadLoggingInterceptor
+log4j2.logger.AskProductPayloadLoggingInterceptor.level=info
+
+cxai.ask-product.api.path=/products/v1/about/ask
+cxai-assistant.api.path=/shopping-assistant/api/v1
