@@ -1,18 +1,51 @@
 import { inject, Injectable } from '@angular/core';
-import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantAction, AssistantChatMessage, AssistantChatResponse, AssistantChatSession, AssistantChatSessionInternal, AssistantContext, AssistantUserInput, CxaiAssistantConfig, EMPTY_CHAT_SESSION, mapActionToTokenType } from '@cx-spartacus/cxai-assistant/root';
+import {
+  ASSISTANT_CONFIG_SCOPE,
+  ASSISTANT_LOG_MARKER,
+  AssistantAction,
+  AssistantChatMessage,
+  AssistantChatResponse,
+  AssistantChatSession,
+  AssistantChatSessionInternal,
+  AssistantContext,
+  AssistantUserInput,
+  CxaiAssistantApiService,
+  CxaiAssistantConfig,
+  EMPTY_CHAT_SESSION,
+  mapActionToTokenType,
+} from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
 import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, TranslationService, WindowRef } from '@spartacus/core';
 import { CurrentProductService } from '@spartacus/storefront';
 import { UserAccountFacade } from '@spartacus/user/account/root';
-import { asyncScheduler, BehaviorSubject, catchError, combineLatest, defaultIfEmpty, distinctUntilChanged, EMPTY, filter, finalize, forkJoin, map, Observable, observeOn, of, skip, Subject, switchMap, take, tap, timeout } from 'rxjs';
-import { CxaiAssistantApiService } from './cxai-assistant.api.service';
+import {
+  asyncScheduler,
+  BehaviorSubject,
+  catchError,
+  combineLatest,
+  defaultIfEmpty,
+  distinctUntilChanged,
+  EMPTY,
+  filter,
+  finalize,
+  forkJoin,
+  map,
+  Observable,
+  observeOn,
+  of,
+  skip,
+  Subject,
+  switchMap,
+  take,
+  tap,
+  timeout,
+} from 'rxjs';
 
-export const SESSION_STORAGE_KEY_PREFIX = 'cxai-assistant.sessionId';
+//exported for testing purposes
 export const ERROR_SESSION_ID = '';
+const SESSION_STORAGE_KEY_PREFIX = 'cxai-assistant.sessionId';
 const WELCOME_MESSAGE_TRANSLATION_KEY = 'cxaiAssistant.welcomeMessage';
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 export class CxaiAssistantService {
   protected sessionStorageKey: string | undefined;
   protected sessionId$: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(null);

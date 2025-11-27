@@ -24,7 +24,7 @@ public class AskProductRestrictionEvaluator implements CMSRestrictionEvaluator<A
 	@Override
 	public boolean evaluate(final AbstractRestrictionModel gigyaComponentRestrictionModel, final RestrictionData restrictionData)
 	{
-		final var config = this.cxaiConfigService.getConfigForCurrentSite().orElse(null);
+		final var config = AssistantRestrictionEvaluator.getCxaiConfigNoException(cxaiConfigService);
 		if (config == null)
 		{
 			LOGGER.debug("AskProduct restriction: hidden because no config");

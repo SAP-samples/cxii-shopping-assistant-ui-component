@@ -1,20 +1,20 @@
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { AssistantChatResponse, AssistantChatSessionInternal, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantChatResponse, AssistantChatSessionInternal, CxaiAssistantApiService, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
 import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, OccEndpointsService, TranslationService, UserIdService, WindowRef } from "@spartacus/core";
 import { CurrentProductService } from '@spartacus/storefront';
 import { UserAccountFacade } from '@spartacus/user/account/root';
 import { EMPTY, of, skip, take } from 'rxjs';
-import { CxaiAssistantApiService } from "./cxai-assistant.api.service";
 import { CxaiAssistantService, ERROR_SESSION_ID } from './cxai-assistant.service';
 import { mockCreateSessionResponse, mockFreshChatSessionResponse, mockOldChatSessionResponse, mockPostMessageResponse } from './testing/mocks/mock-responses';
 import { provideHttpClient } from '@angular/common/http';
+import { CxaiAssistantOccApiService } from './cxai-assistant-occ.api.service';
 
 describe('CxaiAssistantService', () => {
   const debug = false;
   let service: CxaiAssistantService;
-  let apiService: CxaiAssistantApiService;
+  let apiService: CxaiAssistantOccApiService;
   let loggerServiceSpy: jasmine.SpyObj<LoggerService>;
   let currentProductServiceSpy: jasmine.SpyObj<CurrentProductService>;
   let activeCartFacadeSpy: jasmine.SpyObj<ActiveCartFacade>;
@@ -59,6 +59,7 @@ describe('CxaiAssistantService', () => {
       imports: [],
       providers: [
         CxaiAssistantService,
+        { provide: CxaiAssistantApiService, useClass: CxaiAssistantOccApiService },
         { provide: LoggerService, useValue: loggerServiceSpy },
         { provide: CurrentProductService, useValue: currentProductServiceSpy },
         { provide: BaseSiteService, useValue: baseServiceSpy },
@@ -75,7 +76,7 @@ describe('CxaiAssistantService', () => {
 
     service = TestBed.inject(CxaiAssistantService);
     service["config"] = { assistantConfigId: 'config-mock' };
-    apiService = TestBed.inject(CxaiAssistantApiService);
+    apiService = TestBed.inject(CxaiAssistantOccApiService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -166,7 +167,7 @@ describe('CxaiAssistantService', () => {
       expect(session.session_id).toBeUndefined();
     });
 
-    httpMock.expectNone(apiService.buildUrl(`/chat_session`));
+    httpMock.expectNone(apiService.buildUrl('cxaiAssistant_createChatSession'));
     tick();
     expect(sessionSeen).toBe(1);
     tick();
@@ -211,7 +212,7 @@ describe('CxaiAssistantService', () => {
     });
 
     //should not try to create new session
-    httpMock.expectNone(apiService.buildUrl(`/chat_session`));
+    httpMock.expectNone(apiService.buildUrl('cxaiAssistant_createChatSession'));
     tick();
 
     //should load current session
@@ -243,7 +244,7 @@ describe('CxaiAssistantService', () => {
     tick();
 
     //session belongs to another user, don't delete it just create new one
-    httpMock.expectNone(apiService.buildUrl(`/sessions`));
+    httpMock.expectNone(apiService.buildUrl(`cxaiAssistant_deleteChatSession`));
     expectCreateSessionRequest(mockCreateSessionResponse);
     tick();
 
@@ -278,7 +279,7 @@ describe('CxaiAssistantService', () => {
 
     //received invalid session, send request to create new session
     //we dont do delete request for "invalid" session
-    httpMock.expectNone(apiService.buildUrl(`/sessions`));
+    httpMock.expectNone(apiService.buildUrl(`cxaiAssistant_deleteChatSession`));
     expectCreateSessionRequest(mockCreateSessionResponse);
     tick();
     expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockFreshChatSessionResponse);
@@ -357,7 +358,7 @@ describe('CxaiAssistantService', () => {
   }));
 
   function expectCreateSessionRequest(payload: any = mockCreateSessionResponse) {
-    const req = httpMock.expectOne(apiService.buildUrl(`/chat_session`));
+    const req = httpMock.expectOne(apiService.buildUrl('cxaiAssistant_createChatSession'));
     expect(req.request.method).toBe('POST');
     flushErrorOrPayload(req, payload);
   }
@@ -365,20 +366,20 @@ describe('CxaiAssistantService', () => {
   function expectGetChatSessionRequest(
     sessionId: string = mockCreateSessionResponse.session_id, 
     payload: AssistantChatSessionInternal | { errorStatus: number, statusText?: string } = mockFreshChatSessionResponse) {
-    const req = httpMock.expectOne(apiService.buildUrl(`/chat_session/${sessionId}`));
+    const req = httpMock.expectOne(apiService.buildUrl(`cxaiAssistant_getChatSession`, { urlParams: { sessionId } }));
     expect(req.request.method).toBe('GET');
     flushErrorOrPayload(req, payload);
   }
 
   function expectSendMessageRequest(payload: AssistantChatResponse | { errorStatus: number, statusText?: string }) {
-    const req = httpMock.expectOne(apiService.buildUrl(`/chat`));
+    const req = httpMock.expectOne(apiService.buildUrl(`cxaiAssistant_postMessage`));
     expect(req.request.method).toBe('POST');
     flushErrorOrPayload(req, payload);
     return req;
   }
 
   function expectSessionDeleteRequest(sessionId: string | { errorStatus: number, statusText?: string }) {
-    const req = httpMock.expectOne(apiService.buildUrl(`/sessions`));
+    const req = httpMock.expectOne(apiService.buildUrl(`cxaiAssistant_deleteChatSession`));
     expect(req.request.method).toBe('DELETE');
     expect(req.request.body).toEqual({ session_ids: [sessionId] });
     flushErrorOrPayload(req, {});

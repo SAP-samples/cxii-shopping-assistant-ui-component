@@ -9,7 +9,20 @@
 ## Backend assumptions
 This library uses cxai backend, which contains:
 1. `/cxai/config` endpoint to fetch configuration - can be configured or turned off via local config `configInitializerEndpoint`
-2. `/cxai/assistant/*` proxy which forwards requests to assistant API and handles authorization, this library does not send any credentials and doesn't manage tokens. If you implement this kind of proxy be sure to filter (allowlist) allowed API calls and not forward all requests. See `CxaiAssistantApiService` to check which endpoints / methods are required. Other calls to the API should be blocked.
+2. `/cxai/assistant/*` proxy which forwards requests to assistant API and handles authorization, this library does not send any credentials and doesn't manage tokens. If you implement this kind of proxy be sure to filter (allowlist) allowed API calls and not forward all requests. See `CxaiAssistantOccApiService` to check which endpoints / methods are required. Other calls to the API should be blocked.
+3. You can provide your own `CxaiAssistantApiService` implementation, or overwrite API URLs via standard Spartacus mechanism.
+```js
+const occAssistantEndpoints: AssistantOccEndpoints = {
+  cxaiAssistant_trackingIdToConsignment: 
+    '/cxai/tools/find-consignment/${trackingId}?fields=code,status,statusDate,statusDisplay,orderCode',
+
+  // sessionId or configId parameters are available where it makes sense, but not always used in default API
+  cxaiAssistant_postMessage: '/cxai/assistant/chat',
+  cxaiAssistant_getChatSession: '/cxai/assistant/chat_session/${sessionId}',
+  cxaiAssistant_createChatSession: '/cxai/assistant/chat_session',
+  cxaiAssistant_deleteChatSession: '/cxai/assistant/sessions',
+};
+```
 
 ## Spartacus config
 Config is fetched from backend, but can be also provided locally. Backend values (if defined) will overwrite local.
