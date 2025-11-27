@@ -1,0 +1,11 @@
+#Ant properties
+#Tue Jul 01 12:34:36 CEST 2025
+builddate=20250701 1233
+description=cxaiaskproductoccaddon
+group.id=de.hybris.platform
+module.name=platform-module
+name=cxaiaskproductoccaddon
+releasedate=20250604 0846
+vendor=hybris
+version=2211.42
+version.api=2211

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<!--
+	ATTENTION: This is just an example file. You have to edit it according to your needs.
+-->
+
+<items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="items.xsd">
+
+	<itemtypes>
+		<typegroup name="ask-product">
+			<itemtype code="CxaiConfig" autocreate="false" generate="false">
+				<attributes>
+					<attribute type="ConsumedDestination" qualifier="askProductDestination">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.Integer" qualifier="askProductContextMessageWindow">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.Integer" qualifier="askProductContextCharacterLimit">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+					<itemtype code="AskProductRestriction"
+										extends="AbstractRestriction"
+										jaloclass="com.sap.cxaiaskproductocc.jalo.restrictions.AskProductRestriction"
+										autocreate="true" generate="false">
+							<attributes>
+									<attribute qualifier="description" redeclare="true" type="java.lang.String">
+											<persistence type="dynamic" attributeHandler="AbstractRestriction_descriptionAttributeHandler"/>
+											<modifiers write="false"/>
+									</attribute>
+							</attributes>
+					</itemtype>
+		</typegroup>
+		
+		<typegroup name="assistant">
+				<itemtype code="CxaiConfig" autocreate="false" generate="false">
+				<attributes>
+					<attribute type="ConsumedDestination" qualifier="assistantDestination">
+						<description>If not provided VS destination will be used</description>
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="assistantConfigId">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="CxaiAssistantConfig" qualifier="assistantConfig">
+						<persistence type="dynamic" attributeHandler="cxaiConfigAssistantConfigAttributeHandler"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+				<itemtype code="AssistantRestriction"
+									extends="AbstractRestriction"
+									jaloclass="com.sap.cxaiaskproductocc.jalo.restrictions.AssistantRestriction"
+									autocreate="true" generate="false">
+									<attributes>
+											<attribute qualifier="description" redeclare="true" type="java.lang.String">
+													<persistence type="dynamic" attributeHandler="AbstractRestriction_descriptionAttributeHandler"/>
+													<modifiers write="false"/>
+											</attribute>
+									</attributes>
+					</itemtype>
+				<itemtype code="CxaiAssistantConfig" autocreate="true" generate="false">
+					<deployment table="CxaiAssistantConfig" typecode="24055"/>
+				<attributes>
+					<attribute type="java.lang.String" qualifier="configId">
+						<persistence type="property"/>
+						<modifiers initial="true" optional="true" unique="true" write="false" />
+					</attribute>
+					<attribute type="CxaiConfig" qualifier="cxaiConfig">
+						<persistence type="property" />
+						<modifiers optional="false" initial="true" write="false"/>
+						<description>CX AI tenant where this config is stored</description>
+					</attribute>
+					<attribute type="Catalog" qualifier="productCatalog">
+						<persistence type="property" />
+					</attribute>
+					<attribute type="java.lang.String" qualifier="productCatalogVersion">
+						<persistence type="property" />
+						<defaultvalue>"Online"</defaultvalue>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="name">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="description">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="initialMessage">
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="defaultLanguage">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="boolean" qualifier="active">
+						<persistence type="property"/>
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+					</attribute>
+					<attribute type="boolean" qualifier="valid">
+						<persistence type="property"/>
+						<defaultvalue>Boolean.TRUE</defaultvalue>
+						<description>Marker if remote synchronization succeeded</description>
+					</attribute>
+					<attribute type="boolean" qualifier="removeRemoteConfigWhenObjectIsDeleted">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+						<description>When removing this object a DELETE call will be made to remote. It is then impossible to re-add the same config.</description>
+						<defaultvalue>Boolean.FALSE</defaultvalue>
+					</attribute>
+					<attribute type="java.lang.String" qualifier="json">
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>						
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="java.util.Date" qualifier="synchTimestamp">
+						<persistence type="property"/>
+						<modifiers optional="true"/>
+					</attribute>
+				</attributes>
+			</itemtype>
+		</typegroup>
+	</itemtypes>
+</items>

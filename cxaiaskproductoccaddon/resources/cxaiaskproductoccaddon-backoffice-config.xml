@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved
+-->
+<config xmlns="http://www.hybris.com/cockpit/config">
+
+	<!-- ask-product -->
+	<context component="listview" type="CxaiConfig" merge-by="type">
+		<lv:list-view xmlns:lv="http://www.hybris.com/cockpitng/component/listView">
+			<lv:column qualifier="askProductDestination" />
+		</lv:list-view>
+	</context>
+
+	<context component="editor-area" type="CxaiConfig" merge-by="type">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+			<ea:tab name="cxai.cxaiConfig.editorArea.tab.askProduct">
+				<ea:section name="cxai.cxaiConfig.editorArea.tab.askProduct">
+					<ea:attribute qualifier="askProductDestination" />
+					<ea:attribute qualifier="askProductContextMessageWindow" />
+					<ea:attribute qualifier="askProductContextCharacterLimit" />
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+
+	<context component="create-wizard" type="CxaiConfig" merge-by="type">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="askProductCxAiConfigWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="askProductPrepare">
+				<wz:initialize property="newItem" type="CxaiConfig"/>
+			</wz:prepare>
+			<wz:step id="askProduct" label="cxai.cxaiConfig.editorArea.tab.askProduct">
+				<wz:content id="askProduct.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="askProductDestination" />
+						<wz:property qualifier="askProductContextMessageWindow" />
+						<wz:property qualifier="askProductContextCharacterLimit" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="askProduct.navigation">
+					<wz:cancel/>
+					<wz:back/>
+					<wz:next/>
+					<wz:done visible="!#empty(newItem.code)">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+	
+	<!-- assistant -->
+	<context component="editor-area" type="CxaiConfig" merge-by="type">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+			<ea:tab name="cxai.cxaiConfig.editorArea.tab.assistant">
+				<ea:section name="cxai.cxaiConfig.editorArea.tab.assistant">
+					<ea:attribute qualifier="assistantDestination" />
+					<ea:attribute qualifier="assistantConfigId" />
+					<ea:attribute qualifier="assistantConfig" />
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	
+	<context component="create-wizard" type="CxaiConfig" merge-by="type">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="assistantProductCxAiConfigWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="assistantProductPrepare">
+				<wz:initialize property="newItem" type="CxaiConfig"/>
+			</wz:prepare>
+			<wz:step id="assistant" label="cxai.cxaiConfig.editorArea.tab.assistant">
+				<wz:content id="assistant.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="assistantDestination" />
+						<wz:property qualifier="assistantConfigId" />
+						<wz:property qualifier="assistantConfig" />
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="assistant.navigation">
+					<wz:cancel/>
+					<wz:back/>
+					<wz:next/>
+					<wz:done visible="!#empty(newItem.code)">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+	
+	<context component="listview" type="CxaiConfig" merge-by="type">
+		<lv:list-view xmlns:lv="http://www.hybris.com/cockpitng/component/listView">
+			<lv:column qualifier="assistantConfigId" />
+		</lv:list-view>
+	</context>
+	
+	<!-- assistant configs -->
+	<context component="explorer-tree" merge-by="type">
+		<et:explorer-tree xmlns:et="http://www.hybris.com/cockpitng/config/explorertree">
+			<et:navigation-node id="cxai.explorerTree.root">
+				<et:type-node id="CxaiAssistantConfig" code="CxaiAssistantConfig" />
+			</et:navigation-node>
+		</et:explorer-tree>
+	</context>
+
+	<context component="simple-search" type="CxaiAssistantConfig">
+		<ss:simple-search xmlns:ss="http://www.hybris.com/cockpitng/config/simplesearch">
+			<ss:field name="configId" />
+			<ss:sort-field name="name" />
+		</ss:simple-search>
+	</context>
+	
+ 	<context component="advanced-search" type="CxaiAssistantConfig">
+		<as:advanced-search xmlns:as="http://www.hybris.com/cockpitng/config/advancedsearch">
+			<as:field-list>
+				<as:field name="configId" operator="equals" />
+				<as:field name="name" operator="contains" />
+				<as:field name="description" operator="contains" />
+				<as:field name="defaultLanguage" operator="contains" />
+				<as:field name="initialMessage" operator="contains" />
+				<as:field name="productCatalog" operator="equals" />
+				<as:field name="active" operator="equals" />
+				<as:field name="valid" operator="equals" />
+				<as:field name="removeRemoteConfigWhenObjectIsDeleted" operator="equals" />
+				<as:field name="json" operator="contains" />
+			</as:field-list>
+		</as:advanced-search>
+	</context>
+
+	<context component="listview" type="CxaiAssistantConfig" merge-by="type">
+		<lv:list-view xmlns:lv="http://www.hybris.com/cockpitng/component/listView">
+			<lv:column qualifier="configId" />
+			<lv:column qualifier="name" />
+			<lv:column qualifier="description" />
+			<lv:column qualifier="defaultLanguage" />
+			<lv:column qualifier="active" />
+			<lv:column qualifier="cxaiConfig" />
+		</lv:list-view>
+	</context>
+
+	<context component="base" type="CxaiAssistantConfig">
+		<y:base xmlns:y="http://www.hybris.com/cockpit/config/hybris">
+			<y:labels>
+				<y:label>(valid ? '' : '[INVALID] ') + ((active || invalid) ? '' : '[INACTIVE] ') + name + ' (' + configId + ')'</y:label>
+			</y:labels>
+		</y:base>
+	</context>
+
+	<context component="editor-area" type="CxaiAssistantConfig">
+		<ea:editorArea xmlns:ea="http://www.hybris.com/cockpitng/component/editorArea">
+			<ea:tab name="cxai.cxaiAssistantConfig.editorArea.section.basic">
+				<ea:section name="cxai.cxaiAssistantConfig.editorArea.section.basic">
+					<ea:attribute qualifier="configId" />
+					<ea:attribute qualifier="cxaiConfig" />
+					<ea:attribute qualifier="productCatalog" />
+					<ea:attribute qualifier="productCatalogVersion" />
+					<ea:attribute qualifier="name" />
+					<ea:attribute qualifier="description" />
+					<ea:attribute qualifier="initialMessage">
+						<ea:editor-parameter>
+							<ea:name>rows</ea:name>
+							<ea:value>4</ea:value>
+						</ea:editor-parameter>
+					</ea:attribute>
+					<ea:attribute qualifier="defaultLanguage" />
+					<ea:attribute qualifier="active" />
+				</ea:section>
+				<ea:section name="cxai.cxaiAssistantConfig.editorArea.section.json">
+					<ea:panel>
+						<ea:attribute qualifier="json">
+							<ea:editor-parameter>
+								<ea:name>rows</ea:name>
+								<ea:value>25</ea:value>
+							</ea:editor-parameter>
+						</ea:attribute>
+					</ea:panel>
+				</ea:section>
+				<ea:section name="cxai.cxaiAssistantConfig.editorArea.section.extended">
+					<ea:attribute qualifier="synchTimestamp" />
+					<ea:attribute qualifier="valid" editor="com.hybris.cockpitng.editor.boolean.checkbox" readonly="true" />
+					<ea:attribute qualifier="removeRemoteConfigWhenObjectIsDeleted" editor="com.hybris.cockpitng.editor.boolean.checkbox"/>
+				</ea:section>
+			</ea:tab>
+		</ea:editorArea>
+	</context>
+	
+	<context component="create-wizard" type="CxaiAssistantConfig">
+		<wz:flow xmlns:wz="http://www.hybris.com/cockpitng/config/wizard-config" id="CxaiAssistantConfigWizard" title="create.title(ctx.TYPE_CODE)">
+			<wz:prepare id="wizPrepare">
+				<wz:initialize property="newItem" type="ctx.TYPE_CODE"/>
+				<wz:assign property="newItem.cxaiConfig" value="ctx.parentObject"/>
+			</wz:prepare>
+			<wz:step id="step1" label="cxai.cxaiAssistantConfig.editorArea.section.basic">
+				<wz:content id="step1.content">
+					<wz:property-list root="newItem">
+						<wz:property qualifier="configId" />
+						<wz:property qualifier="cxaiConfig" />
+						<wz:property qualifier="json">
+							<wz:editor-parameter>
+								<wz:name>rows</wz:name>
+								<wz:value>25</wz:value>
+							</wz:editor-parameter>
+						</wz:property>
+					</wz:property-list>
+				</wz:content>
+				<wz:navigation id="step1.navigation">
+					<wz:cancel/>
+					<wz:done visible="newItem.cxaiConfig != null and (!#empty(newItem.configId) or !#empty(newItem.json))">
+						<wz:save property="newItem"/>
+					</wz:done>
+				</wz:navigation>
+			</wz:step>
+		</wz:flow>
+	</context>
+</config>

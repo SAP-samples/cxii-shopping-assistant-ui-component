@@ -6,6 +6,10 @@ Spartacus library to use CXII Assistant and Ask Product API.
 CXAI Assistant library for use with CXAI assistant API
 CXAI Ask Product library for use with CXAI Ask Product API
 
+## Accelerator (JSP) version
+This instruction is for Composable Storefront library. If you use Accelerator see [Accelerator Addon](#cxaiaskproductaddon/README.md)
+Currently only Ask Product component is provided in Accelerator addon.
+
 ## Requirements
 1. Node version specified in `.nvmrc` files
 2. Valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it, or use provided sample backend extensions. See section in [Backend README](cxaiaskproductocc/README.md#sample-assistant-config-json).

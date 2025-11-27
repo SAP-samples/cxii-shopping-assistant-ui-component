@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2020 SAP SE or an SAP affiliate company. All rights reserved.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context.xsd">
+  
+	<import resource="occ-extension-web-spring.xml"/>
+    <context:component-scan base-package="com.sap.cxaiaskproductocc.controllers"/>
+
+	<!-- Cache manager for addon -->
+
+	<alias name="defaultCxaiaskproductoccaddonCacheManager" alias="cxaiaskproductoccaddonCacheManager"/>
+	<bean id="defaultCxaiaskproductoccaddonCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="cxaiaskproductoccaddonEhcache"/>
+	</bean>
+
+	<alias name="defaultCxaiaskproductoccaddonEhcache" alias="cxaiaskproductoccaddonEhcache"/>
+	<bean id="defaultCxaiaskproductoccaddonEhcache" class="de.hybris.platform.webservicescommons.cache.TenantAwareEhCacheManagerFactoryBean">
+		<property name="cacheNamePrefix" value="cxaiaskproductoccaddonCache_"/>
+		<property name="configLocation" value="/WEB-INF/cache/addons/cxaiaskproductoccaddon/ehcache.xml"/>
+	</bean>
+
+	<bean depends-on="wsCacheManagerList" parent="listMergeDirective">
+		<property name="add" ref="cxaiaskproductoccaddonCacheManager"/>
+	</bean>
+</beans>
