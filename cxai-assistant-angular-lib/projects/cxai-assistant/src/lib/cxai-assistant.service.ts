@@ -69,7 +69,7 @@ export class CxaiAssistantService {
   );
 
   protected customerId$ = this.currentUser$.pipe(
-    map((user) => user?.customerId || user?.uid || null), 
+    map((user) => user?.customerId || user?.uid || null),
     distinctUntilChanged(),
   );
 
@@ -299,7 +299,7 @@ export class CxaiAssistantService {
         user_input: initialUserMessage,
         config_id: this.config.assistantConfigId,
       }) :
-      this.apiService.createChatSession(this.config.assistantConfigId);
+      this.apiService.createChatSession(this.config.assistantConfigId, this.config.assistantProductFilters ?? []);
 
     request.pipe(
       finalize(() => this.sessionIsBeingCreated = false),
@@ -361,7 +361,7 @@ export class CxaiAssistantService {
 
   private fillTokens(message: AssistantChatMessage, actions: AssistantAction[] | undefined) {
     if (!actions?.length) return;
-    
+
     message.tokens ??= {};
     actions
       .filter(action => action.codes?.length)
@@ -372,7 +372,7 @@ export class CxaiAssistantService {
   }
 
   /**
-   * if chatbot did some backend modifications that require refreshing data 
+   * if chatbot did some backend modifications that require refreshing data
    */
   protected processActions(message: AssistantChatResponse) {
     if(!message.actions) {
@@ -380,7 +380,7 @@ export class CxaiAssistantService {
     }
 
     const processedActions = new Set<string>();
-    message.actions.filter(action => 
+    message.actions.filter(action =>
       !processedActions.has(action.action) && processedActions.add(action.action)
     ).forEach(action => {
       switch (action.action) {

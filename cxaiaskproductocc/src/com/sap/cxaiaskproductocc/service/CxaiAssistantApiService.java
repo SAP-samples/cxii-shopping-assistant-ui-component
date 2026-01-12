@@ -97,7 +97,7 @@ public class CxaiAssistantApiService extends BaseCxaiApiService
 
 	protected void addOccUserAuthTokenIfNeeded(final String requestSubpath, final HttpHeaders headers)
 	{
-		if (requestSubpath.equals("/chat_session") || requestSubpath.equals("/chat"))
+		if (requestSubpath.equals("/chat"))
 		{
 			final String userAuthToken = headers.getFirst(HttpHeaders.AUTHORIZATION);
 			if (StringUtils.isNotEmpty(userAuthToken))

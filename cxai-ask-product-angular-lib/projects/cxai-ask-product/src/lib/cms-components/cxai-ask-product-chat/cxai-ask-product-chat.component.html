@@ -39,7 +39,7 @@
       <button type="button" class="btn cxai-btn-clear btn-secondary" [disabled]="busy || !messages?.length" (click)="clearConversation(productCode)">
         {{ 'askProduct.clearChat' | cxTranslate }}
       </button>
-      <button type="submit" class="btn cxai-btn-send btn-primary" [disabled]="busy || !isMessageValid" (click)="sendMessage(productCode)">
+      <button type="button" class="btn cxai-btn-send btn-primary" [disabled]="busy || !isMessageValid" (click)="sendMessage(productCode, $event)">
         <ng-container *ngTemplateOutlet="aiIcon"></ng-container>
         {{ 'askProduct.send' | cxTranslate }}
       </button>

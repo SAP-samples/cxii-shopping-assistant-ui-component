@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import {
+  AssistantProductFilter,
   AssistantUserInput,
   CxaiAssistantApiService
 } from '@cx-spartacus/cxai-assistant/root';
@@ -28,7 +29,7 @@ export class CxaiAssistantMockApiService extends CxaiAssistantApiService {
     return this.mockResponse(mockOldChatSessionResponse, delayMs, errorStatus);
   }
 
-  override createChatSession(configId: string, delayMs = 0, errorStatus = 0) {
+  override createChatSession(configId: string, _filters: AssistantProductFilter[] = [], delayMs = 0, errorStatus = 0) {
     return this.mockResponse(mockCreateSessionResponse, delayMs, errorStatus);
   }
 

@@ -34,7 +34,7 @@
       --ct: var(--cxai-message-user-text);
 
       border-bottom-right-radius: 0;
-      border: unset;
+      border: var(--cxai-message-user-border);
       place-self: end;
     }
 
@@ -99,8 +99,8 @@
     border: var(--cxai-border);
     border-radius: var(--cxai-border-radius--small);
     border-bottom: var(--cxai-border--dark);
-    padding: var(--cxai-spacer--extra-small);
-    line-height: 2;
+    padding: 8px;
+
     &:is(:hover, :focus, :active) {
       background-color: var(--cxai-input-bg);
       box-shadow: var(--cxai-shadow--small);
@@ -148,5 +148,5 @@
       border-radius: var(--cxai-border-radius--small);
     }
   }
-  
+
 }

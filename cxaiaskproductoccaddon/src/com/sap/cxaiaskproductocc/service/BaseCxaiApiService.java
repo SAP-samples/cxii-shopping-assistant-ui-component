@@ -17,6 +17,7 @@ import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.log4j.Logger;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -174,6 +175,12 @@ public abstract class BaseCxaiApiService implements CxaiApiService
 		//handled by oauth resttemplate
 		headers.remove(HttpHeaders.AUTHORIZATION);
 		headers.remove(HttpHeaders.HOST);
+		headers.remove(HttpHeaders.CACHE_CONTROL);
+		headers.remove(HttpHeaders.PRAGMA);
+
+		// Disable caching
+		headers.setCacheControl(CacheControl.noCache().getHeaderValue());
+		headers.set(HttpHeaders.PRAGMA, "no-cache");
 		return headers;
 	}
 

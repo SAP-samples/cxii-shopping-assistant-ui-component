@@ -15,6 +15,11 @@ export interface AssistantChatMessage {
   error?: boolean;
 }
 
+export interface AssistantProductFilter {
+  name: string;
+  value: string[];
+}
+
 export interface AssistantChatSession {
   chat_history: AssistantChatMessage[];
   session_id?: string;
@@ -22,6 +27,8 @@ export interface AssistantChatSession {
   //dummy sessions, e.g. EMPTY_CHAT_SESSION, or error sessions don't have this field
   //so this can be used to check if session is valid, or error
   status?: string;
+  // example: { "name": "approvalstatus.code", "value": ["approved","checked"] },
+  filter_attributes?: AssistantProductFilter[];
 }
 
 //internal api response formats
