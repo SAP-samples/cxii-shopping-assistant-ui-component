@@ -86,7 +86,7 @@ describe('CxaiAssistantService', () => {
 
   it('start chat session', () => {
     service.startNewChatSession();
-    
+
     expectCreateSessionRequest();
     expect(service['sessionId$'].value).toBe(mockCreateSessionResponse.session_id);
     expect(windowRefSpy.sessionStorage?.setItem).withContext("sessionId saved to storage").toHaveBeenCalled();
@@ -217,23 +217,21 @@ describe('CxaiAssistantService', () => {
 
     //should load current session
     expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockOldChatSessionResponse);
-    
+
     expect(sessionSeen).toBe(1);
   }));
 
-  it('getChatSession discard current session if its personalized and user_id doesnt match', fakeAsync(() => {
+  it('getChatSession dont discard current session if its personalized and user_id doesnt match', fakeAsync(() => {
     const otherUserSessionId = 'other-user-session-id';
     service['sessionId$'].next(otherUserSessionId);
     let sessionSeen = 0;
     service.getChatSession().subscribe(session => {
       sessionSeen += 1;
       if(sessionSeen === 1) {
-        expect(session).withContext("Empty session during loading").toEqual(EMPTY_CHAT_SESSION);
-        //expect to remove invalid session from storage
-        expect(windowRefSpy.sessionStorage?.removeItem).toHaveBeenCalled();
-      } else {
-        expect(session.session_id).toEqual(mockCreateSessionResponse.session_id);
+        //accept this session even if user_id doesnt match current user as sessions are no longer permanently tied to users
+        expect(session.session_id).toEqual(otherUserSessionId);
         expect(service['sessionId$'].value).toBe(session.session_id!);
+        expect(windowRefSpy.sessionStorage?.removeItem).not.toHaveBeenCalled();
       }
     });
 
@@ -245,14 +243,10 @@ describe('CxaiAssistantService', () => {
 
     //session belongs to another user, don't delete it just create new one
     httpMock.expectNone(apiService.buildUrl(`cxaiAssistant_deleteChatSession`));
-    expectCreateSessionRequest(mockCreateSessionResponse);
+    httpMock.expectNone(apiService.buildUrl('cxaiAssistant_createChatSession'));
     tick();
 
-    //and load new session
-    expectGetChatSessionRequest(mockCreateSessionResponse.session_id, mockFreshChatSessionResponse);
-    tick();
-
-    expect(sessionSeen).toBe(2);
+    expect(sessionSeen).toBe(1);
   }));
 
   it('getChatSession discard invalid session and open a new one', fakeAsync(() => {
@@ -364,7 +358,7 @@ describe('CxaiAssistantService', () => {
   }
 
   function expectGetChatSessionRequest(
-    sessionId: string = mockCreateSessionResponse.session_id, 
+    sessionId: string = mockCreateSessionResponse.session_id,
     payload: AssistantChatSessionInternal | { errorStatus: number, statusText?: string } = mockFreshChatSessionResponse) {
     const req = httpMock.expectOne(apiService.buildUrl(`cxaiAssistant_getChatSession`, { urlParams: { sessionId } }));
     expect(req.request.method).toBe('GET');

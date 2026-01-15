@@ -15,9 +15,8 @@ import {
   mapActionToTokenType,
 } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
-import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, TranslationService, WindowRef } from '@spartacus/core';
+import { BaseSiteService, LoggerService, TranslationService, WindowRef } from '@spartacus/core';
 import { CurrentProductService } from '@spartacus/storefront';
-import { UserAccountFacade } from '@spartacus/user/account/root';
 import {
   asyncScheduler,
   BehaviorSubject,
@@ -34,7 +33,6 @@ import {
   observeOn,
   of,
   skip,
-  Subject,
   switchMap,
   take,
   tap,
@@ -61,40 +59,23 @@ export class CxaiAssistantService {
   private readonly baseSiteService = inject(BaseSiteService);
   private readonly translationService = inject(TranslationService);
   private readonly apiService = inject(CxaiAssistantApiService);
-  private readonly userAccountFacade = inject(UserAccountFacade);
   protected currentBaseSite;
   currentBaseSiteName;
-  protected currentUser$ = this.userAccountFacade.get().pipe(
-    distinctUntilChanged((prev, curr) => prev?.uid === curr?.uid),
-  );
-
-  protected customerId$ = this.currentUser$.pipe(
-    map((user) => user?.customerId || user?.uid || null),
-    distinctUntilChanged(),
-  );
-
-  //notification with new sesssion id, when it changes
-  readonly currentUserChange$ = new Subject<{ new_session_id: string | null }>();
 
   constructor() {
     combineLatest([
-      this.currentUser$.pipe(
-        map(user => user?.uid || OCC_USER_ID_ANONYMOUS),
-      ),
       this.baseSiteService.getActive().pipe(filter(Boolean), distinctUntilChanged()),
     ]).pipe(
-      tap(([userId, site]) => {
+      tap(([site]) => {
         this.currentBaseSite = site;
-        this.sessionStorageKey = SESSION_STORAGE_KEY_PREFIX + '_' + site + '_' + userId;
+        this.sessionStorageKey = SESSION_STORAGE_KEY_PREFIX + '_' + site;// + '_' + userId;
         const sessionId = this.winRef.sessionStorage?.getItem(this.sessionStorageKey) || null;
-        this.sessionId$.next(sessionId);
-
-        //component can listen for this to create new session if conversation was in progress but user logged in/out
-        //and have no session
-        this.currentUserChange$.next({ new_session_id: sessionId });
+        if(sessionId !== this.sessionId$.value) {
+          this.sessionId$.next(sessionId);
+        }
       }),
-      distinctUntilChanged((prev, curr) => prev[1] === curr[1]), //when site changes
-      switchMap(([_, site]) => {
+      distinctUntilChanged((prev, curr) => prev[0] === curr[0]), //when site changes
+      switchMap(([site]) => {
         return this.baseSiteService.getAll().pipe(
           filter(Boolean),
           map((sites) => sites.find((s) => s.uid === site)),
@@ -183,14 +164,9 @@ export class CxaiAssistantService {
       switchMap(([sessionId, welcomeMessageOverwrite]) => {
         if(sessionId) {
           return forkJoin([
-            this.customerId$.pipe(take(1)),
             this.apiService.getChatSession(sessionId),
           ]).pipe(
-            map(([customerId, session]) => {
-              if(!this.validateSessionOwnership(session, customerId)) {
-                throw new Error(`Session user_id ${session} does not belong to current customer`);
-              }
-
+            map(([session]) => {
               const adaptedSession = this.adaptInternalChatSession(session, welcomeMessageOverwrite);
               adaptedSession.session_id = sessionId;
               return adaptedSession;
@@ -226,16 +202,6 @@ export class CxaiAssistantService {
         }
       }),
     );
-  }
-
-  protected validateSessionOwnership(session: AssistantChatSessionInternal, customerId: string | null): boolean {
-    if(customerId) {
-      //user is logged in, we accept both anonymous and sessions belonging to the user
-      return session.user_id === customerId || !session.user_id;
-    } else {
-      //anonymous user, we accept only anonymous sessions
-      return !session.user_id;
-    }
   }
 
   protected getEmptyChatSession(loading: boolean, welcomeMessage: string): AssistantChatSession {

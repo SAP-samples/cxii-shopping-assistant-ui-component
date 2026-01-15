@@ -80,15 +80,6 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
       this.focusInput();
       this.changeDetectorRef.markForCheck();
     });
-
-    this.cxaiAssistantService.currentUserChange$.pipe(
-      takeUntilDestroyed(),
-    ).subscribe(newSession => {
-      //user logged in/out, or site changed etc. if we don't have cached session need to create new one
-      if(!newSession.new_session_id && !this.config?.openSessionOnlyAfterFirstMessage) {
-        this.newSession(true);
-      }
-    });
   }
 
   ngOnInit() {
