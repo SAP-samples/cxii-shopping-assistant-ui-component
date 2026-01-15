@@ -41,7 +41,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
 
   sendQuestionSubscription = signal<Subscription | undefined>(undefined);
   messages: AssistantChatSession | undefined;
-  
+
   //to keep scroll-to-bottom on new message
   lastMessageHeight = 0;
 
@@ -52,7 +52,8 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   //external interface state
   formValid = toSignal(this.form.statusChanges.pipe(map(status => status === 'VALID')), { initialValue: false });
   hasValidSession = signal<boolean>(false); // until messages are signal, this must be manually updated
-  inputTextDisabled = computed(() => !this.hasValidSession() || !!this.sendQuestionSubscription());
+  //we allow to type even if send is disabled
+  inputTextDisabled = signal(false);
   sendDisabled = computed(() => !!this.sendQuestionSubscription() || !this.formValid() || !this.hasValidSession());
   outletContext: AssistantChatWindowOutletContext = { chatWindowComponent: this };
 
@@ -205,7 +206,10 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
 
   onKeyPress(e: KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
-      this.sendMessage();
+      if(!this.sendDisabled()) {
+        this.sendMessage();
+      }
+
       e.preventDefault();
     }
   }

@@ -105,7 +105,9 @@ export class CxaiAskProductChatComponent implements OnInit {
     }
   }
 
-  sendMessage(productCode: string) {
+  sendMessage(productCode: string, event?: Event) {
+    event?.preventDefault();
+
     const message = this.message?.trim();
     if (!message) {
       this.renderer

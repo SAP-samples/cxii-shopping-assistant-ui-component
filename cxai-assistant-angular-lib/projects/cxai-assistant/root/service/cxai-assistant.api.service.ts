@@ -4,10 +4,11 @@ import {
   AssistantChatResponse,
   AssistantChatSessionInternal,
   AssistantNoSessionYetUserInput,
+  AssistantProductFilter,
   AssistantUserInput,
 } from '../models';
 
-/** 
+/**
  * Can be overwritten from root, by default uses OCC implementation
  */
 export abstract class CxaiAssistantApiService {
@@ -15,10 +16,10 @@ export abstract class CxaiAssistantApiService {
 
   abstract getChatSession(sessionId: string): Observable<AssistantChatSessionInternal>;
 
-  abstract createChatSession(configId: string): Observable<{ session_id: string }>;
+  abstract createChatSession(configId: string, filters?: AssistantProductFilter[]): Observable<{ session_id: string }>;
 
-  postMessageAndCreateSession(payload: AssistantNoSessionYetUserInput): Observable<{ session_id: string }> {
-    return this.createChatSession(payload.config_id).pipe(
+  postMessageAndCreateSession(payload: AssistantNoSessionYetUserInput, filters: AssistantProductFilter[] = []): Observable<{ session_id: string }> {
+    return this.createChatSession(payload.config_id, filters).pipe(
       switchMap((sessionResponse) => {
         return this.postMessage({
           session_id: sessionResponse.session_id,

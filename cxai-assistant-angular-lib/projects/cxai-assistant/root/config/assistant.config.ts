@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Config } from '@spartacus/core';
 import { CXAI_ASSISTANT_FEATURE } from '../feature-name';
-import { AssistantContext } from '../models/assistant.model';
+import { AssistantContext, AssistantProductFilter } from '../models/assistant.model';
 
 export const ASSISTANT_CONFIG_SCOPE = CXAI_ASSISTANT_FEATURE;
 export const ASSISTANT_LOG_MARKER = '[cxai-assistant]';
@@ -29,6 +29,10 @@ export interface CxaiAssistantConfigInternal {
   //in rare use case where product.name doesn't contain full product name, you can provide a template like "{name} {summary}"
   //product codes in chat message will be replaced accordingly
   productNameTemplate?: string;
+  //product filters defined in the backend
+  assistantProductFiltersJson?: string;
+  //parsed product filters
+  assistantProductFilters?: AssistantProductFilter[];
   //returns additional context pasted directly into chat message - see sampleAssistantContextProvider for example
   //context is not visible in the UI, it's appended into each message and stripped before displaying it in the chat
   //however it may allow the user to ask about current product, or cart contents etc

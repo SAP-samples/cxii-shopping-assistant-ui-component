@@ -29,9 +29,9 @@
 		<property name="levelMapping">
 			<map>
 				<entry key="BASIC"
-					value="assistantConfigId,assistantDestination(url)" />
+					value="assistantProductFiltersJson,assistantConfigId,assistantDestination(url)" />
 				<entry key="FULL"
-					value="assistantConfigId,assistantDestination(url)" />
+					value="assistantProductFiltersJson,assistantConfigId,assistantDestination(url)" />
 			</map>
 		</property>
 	</bean>

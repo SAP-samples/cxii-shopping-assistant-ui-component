@@ -59,30 +59,36 @@
 		<property name="add" ref="cxaiConfigAssistantPopulator" />
 	</bean>
 	
-		<bean id="assistantRestrictionEvaluator"
-					class="com.sap.cxaiaskproductocc.restriction.AssistantRestrictionEvaluator" scope="tenant">
-				<constructor-arg name="cxaiConfigService" ref="cxaiConfigService"/>
-		</bean>
+	<bean id="assistantRestrictionEvaluator"
+				class="com.sap.cxaiaskproductocc.restriction.AssistantRestrictionEvaluator" scope="tenant">
+			<constructor-arg name="cxaiConfigService" ref="cxaiConfigService"/>
+	</bean>
 
-		<bean id="assistantRestrictionEvaluatorMapping"
-					class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" scope="tenant">
-				<property name="restrictionTypeCode" value="AssistantRestriction"/>
-				<property name="restrictionEvaluator" ref="assistantRestrictionEvaluator"/>
-		</bean>
+	<bean id="assistantRestrictionEvaluatorMapping"
+				class="de.hybris.platform.cms2.servicelayer.services.evaluator.CMSRestrictionEvaluatorMapping" scope="tenant">
+			<property name="restrictionTypeCode" value="AssistantRestriction"/>
+			<property name="restrictionEvaluator" ref="assistantRestrictionEvaluator"/>
+	</bean>
+	
+ 	<bean id="cxaiConfigAssistantConfigAttributeHandler" class="com.sap.cxaiaskproductocc.attribute.CxaiConfigAssistantConfigAttributeHandler"></bean>
+	
+	<bean id="caiAssistantApiService" class="com.sap.cxaiaskproductocc.service.CxaiAssistantApiService"></bean>
+	<bean id="cxaiAskProductApiService" class="com.sap.cxaiaskproductocc.service.CxaiAskProductApiService"></bean>
 		
-	 	<bean id="cxaiConfigAssistantConfigAttributeHandler" class="com.sap.cxaiaskproductocc.attribute.CxaiConfigAssistantConfigAttributeHandler"></bean>
-		
-		<bean id="caiAssistantApiService" class="com.sap.cxaiaskproductocc.service.CxaiAssistantApiService"></bean>
-		<bean id="cxaiAskProductApiService" class="com.sap.cxaiaskproductocc.service.CxaiAskProductApiService"></bean>
-		
-		<bean id="cxaiAssistantConfigSaveInterceptor"
+	<bean id="cxaiAssistantConfigSaveInterceptor"
 		class="com.sap.cxaiaskproductocc.interceptor.CxaiAssistantConfigSaveInterceptor">
 	</bean>
 
+	<bean id="cxaiConfigAssistantJsonSaveInterceptor" class="com.sap.cxaiaskproductocc.interceptor.CxaiConfigAssistantJsonSaveInterceptor"/>
 	<bean
 		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
 		<property name="interceptor" ref="cxaiAssistantConfigSaveInterceptor" />
 		<property name="typeCode" value="CxaiAssistantConfig" />
+	</bean>
+	<bean
+		class="de.hybris.platform.servicelayer.interceptor.impl.InterceptorMapping">
+		<property name="interceptor" ref="cxaiConfigAssistantJsonSaveInterceptor" />
+		<property name="typeCode" value="CxaiConfig" />
 	</bean>
 	
 	<bean id="backofficeCxaiApiServiceWrapper" class="com.sap.cxaiaskproductocc.service.BackofficeCxaiApiServiceWrapper"></bean>
@@ -91,5 +97,9 @@
 	<bean depends-on="exceptionTranslationForInterceptors"
 		parent="listMergeDirective">
 		<property name="add" value="CxaiAssistantConfigSaveInterceptor" />
+	</bean>
+	<bean depends-on="exceptionTranslationForInterceptors"
+		parent="listMergeDirective">
+		<property name="add" value="CxaiConfigAssistantJsonSaveInterceptor" />
 	</bean>
 </beans>

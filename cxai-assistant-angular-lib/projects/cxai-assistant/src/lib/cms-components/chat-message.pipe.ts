@@ -10,7 +10,7 @@ import { AssistantChatMessage, AssistantTokenType, ChatMessageToken } from "@cx-
   standalone: false,
 })
 export class ChatMessagePipe implements PipeTransform {
-  readonly productMentionRegex = /(?:Product Code:\s*)?\{([^}\s\\"']{4,32})\}/g
+  readonly productMentionRegex = /(?:Product Code:\s*)?\{([^}\s\\"']{4,64})\}/g
 
   transform(message: AssistantChatMessage): ChatMessageToken[] {
     const result: ChatMessageToken[] = [];
@@ -22,7 +22,7 @@ export class ChatMessagePipe implements PipeTransform {
 
     //escape html, parse markdown for assistant
     if(message.role === 'assistant') {
-      content = this.escapeHtml(content); 
+      content = this.escapeHtml(content);
       if(content.includes('**')) {
         //parse basic markdown
         content = content.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');

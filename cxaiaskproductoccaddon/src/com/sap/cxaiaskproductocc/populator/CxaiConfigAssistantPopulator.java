@@ -41,6 +41,7 @@ public class CxaiConfigAssistantPopulator implements Populator<CxaiConfigModel, 
 			target.setAssistantDestination(consumedDestinationConverter.convert(source.getAssistantDestination()));
 		}
 
+		target.setAssistantProductFiltersJson(source.getAssistantProductFiltersJson());
 		target.setAssistantConfigId(source.getAssistantConfigId());
 	}
 }

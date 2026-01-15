@@ -35,6 +35,8 @@ export class CxaiAssistantInitializer implements ConfigInitializer {
         const url = this.occ.buildUrl(configInitializerEndpoint);
         return this.http.get<any>(url).pipe(
           map((config: Partial<CxaiAssistantConfigInternal>) => {
+            this.populateProductFilters(config);
+
             const result: CxaiAssistantConfig = {
               [ASSISTANT_CONFIG_SCOPE]: Object.assign({}, config),
             };
@@ -53,5 +55,20 @@ export class CxaiAssistantInitializer implements ConfigInitializer {
         );
       })
     );
+  }
+
+  protected populateProductFilters(
+    serverSideConfig: Partial<CxaiAssistantConfigInternal>,
+    targetConfig: Partial<CxaiAssistantConfigInternal> = serverSideConfig
+  ) {
+    if(serverSideConfig?.assistantProductFiltersJson) {
+      try {
+        const backendFilters = JSON.parse(serverSideConfig?.assistantProductFiltersJson);
+        targetConfig.assistantProductFilters = [...backendFilters];
+        delete targetConfig?.assistantProductFiltersJson;
+      } catch (e) {
+        this.loggerService.error(ASSISTANT_LOG_MARKER, 'Error parsing assistantProductFiltersJson', e, serverSideConfig);
+      }
+    }
   }
 }

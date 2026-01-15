@@ -55,6 +55,14 @@
 					<attribute type="CxaiAssistantConfig" qualifier="assistantConfig">
 						<persistence type="dynamic" attributeHandler="cxaiConfigAssistantConfigAttributeHandler"/>
 					</attribute>
+					<attribute type="java.lang.String" qualifier="assistantProductFiltersJson">
+						<persistence type="property">
+							<columntype>
+								<value>HYBRIS.LONG_STRING</value>
+							</columntype>
+						</persistence>
+						<modifiers optional="true"/>
+					</attribute>
 				</attributes>
 			</itemtype>
 				<itemtype code="AssistantRestriction"
