@@ -3,13 +3,33 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
+    "build": "npm run build:ask-product && npm run build:assistant",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "test-once": "ng test --watch=false",
+
+    "pretest": "npm run sync:all",
+    "test:assistant": "ng test --project cxai-assistant",
+
     "lint": "eslint \"projects/**/*.{ts,html,scss}\"",
-    "lint:fix": "eslint \"projects/**/*.{ts,html,scss}\" --fix"
+    "lint:fix": "eslint \"projects/**/*.{ts,html,scss}\" --fix",
+
+    "sync:ask-product": "cpx \"projects/spartacus-adapters/src/lib/**/*\" projects/cxai-ask-product/root/spartacus-adapters",
+    "sync:assistant": "cpx \"projects/spartacus-adapters/src/lib/**/*\" projects/cxai-assistant/root/spartacus-adapters",
+    "sync:all": "npm run sync:ask-product && npm run sync:assistant",
+
+    "prebuild:ask-product": "npm run sync:all",
+    "build:ask-product": "ng build cxai-ask-product --configuration production",
+    "prebuild:ask-product-no-spartacus": "npm run sync:all",
+    "build:ask-product-no-spartacus": "ng build cxai-ask-product --configuration production-no-spartacus",
+    "watch:ask-product": "concurrently \"npm run sync:all -- --watch\" \"ng build cxai-ask-product --watch --configuration development\"",
+    "watch:ask-product-no-spartacus": "concurrently \"npm run sync:all -- --watch\" \"ng build cxai-ask-product --watch --configuration development-no-spartacus\"",
+
+    "prebuild:assistant": "npm run sync:assistant",
+    "build:assistant": "ng build cxai-assistant --configuration production",
+    "prebuild:assistant-no-spartacus": "npm run sync:assistant",
+    "build:assistant-no-spartacus": "ng build cxai-assistant --configuration production-no-spartacus",
+    "watch:assistant": "concurrently \"npm run sync:assistant -- --watch\" \"ng build cxai-assistant --watch --configuration development\"",
+    "watch:assistant-no-spartacus": "concurrently \"npm run sync:assistant -- --watch\" \"ng build cxai-assistant --watch --configuration development-no-spartacus\"",
+    "build:web-component": "npm run build:ask-product-no-spartacus && ng build web-component --stats-json --configuration production"
   },
   "private": true,
   "dependencies": {
@@ -17,6 +37,7 @@
     "@angular/common": "^19.2.15",
     "@angular/compiler": "^19.2.15",
     "@angular/core": "^19.2.15",
+    "@angular/elements": "^19.2.15",
     "@angular/forms": "^19.2.15",
     "@angular/platform-browser": "^19.2.15",
     "@spartacus/cart": "~221121.2.0",
@@ -35,6 +56,8 @@
     "@spartacus/schematics": "~221121.2.0",
     "@types/jasmine": "~5.1.0",
     "angular-eslint": "19.8.1",
+    "concurrently": "^9.2.1",
+    "cpx": "^1.5.0",
     "eslint": "^9.28.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
