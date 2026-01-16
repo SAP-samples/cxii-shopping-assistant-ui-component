@@ -34,8 +34,8 @@ Development guide for building and debugging the library.
     - if you use private npm registry (e.g. Verdaccio, GitHub Packages etc.) as a proxy for `@spartacus` and to host your own packages then just set environment variables to your proxy URL and auth token
     - otherwise replace `@spartacus:registry` with URL and credentials that you use in your spartacus app (e.g. RBSC) and optionally add `@cx-spartacus:registry` to be able to `npm publish`
 4. `npm i`
-    - never run `npm install` inside projects/cxai-assistant/, only in workspace root
-5. `npm run build`
+    - never run `npm install` inside `projects/*`, only in workspace root
+5. `npm run build:assistant`
 
 #### Publishing to Your Private npm Repository
 If you own a private npm repository:
@@ -57,7 +57,7 @@ If you want to run the library in watch mode:
 1. Run `npm link` in `dist/cxai-assistant` folder (after `npm run build`)
 2. Run `npm link @cx-spartacus/cxai-assistant` in your application
     > You need to have `"preserveSymlinks": true,` in app's `angular.json` projects/<project_name>/architect/build/options
-3. Run the library using `npm run watch`
+3. Run the library using `npm run watch:assistant`
 4. Run your app `ng s`
 5. When you modify library code, the application will reload automatically
 6. `npm link` is temporary and will be removed after each `npm install` in your application
@@ -70,7 +70,7 @@ After you've successfully added library as a dependency in your application's `p
 Next follow [Assistant README](cxai-assistant-angular-lib/README.md) for instructions about backend, configuration options and how to add the cms component.
 
 ### Ask Product Library
-For ask product library, do the same steps in `cxai-ask-product-angular-lib` workspace and follow [Ask Product README](cxai-ask-product-angular-lib/README.md)
+For ask product library, do the same steps but use `:ask-product` for npm commands. Follow [Ask Product README](cxai-assistant-angular-lib/projects/cxai-ask-product/README.md)
 
 ## Known Issues (Assistant)
 This implementation assumes one chat config per site. Currently backend configs do not take into account language parameter, also language is not passed when opening a new session. To support welcome message in different languages it is required to use translations - see `lib.i18n.ts` for translation keys.
