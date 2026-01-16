@@ -1,9 +1,12 @@
 import { NgModule } from '@angular/core';
-import { CxaiAskProductRootModule } from '@cx-spartacus/cxai-ask-product/root';
-import { ASK_PRODUCT_FEATURE } from '@cx-spartacus/cxai-ask-product/root';
+import { ASK_PRODUCT_FEATURE, AskProductConfig } from '@cx-spartacus/cxai-ask-product/root';
 import { provideConfig, CmsConfig } from '@spartacus/core';
+import { CxaiAskProductRootModule } from './cxai-ask-product-root.module';
 
 
+declare module '@spartacus/core' {
+  interface Config extends AskProductConfig {}
+}
 
 @NgModule({
   imports: [CxaiAskProductRootModule],
@@ -19,3 +22,4 @@ import { provideConfig, CmsConfig } from '@spartacus/core';
   ],
 })
 export class CxaiAskProductFeatureModule {}
+

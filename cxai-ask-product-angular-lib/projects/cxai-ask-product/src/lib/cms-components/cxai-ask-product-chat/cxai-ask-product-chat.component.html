@@ -11,7 +11,7 @@
       <div class="message-content">{{ message.message || ('askProduct.noAnswerMessage' | cxTranslate) }}</div>
       <div class="sources" *ngIf="message.sources?.length">
         <div class="source" *ngFor="let source of message.sources">
-          <cx-icon [cxIcon]="icon.FILE"></cx-icon>
+          <i class="fas fa-file"></i>
           <a *ngIf="source.downloadUrl" [href]="source.downloadUrl" target="_blank">{{ source.name }}</a>
           <span *ngIf="!source.downloadUrl">{{ source.name }}</span>
         </div>

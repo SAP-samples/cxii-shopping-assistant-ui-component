@@ -8,7 +8,7 @@
       ],
       "@cx-spartacus/cxai-ask-product/*": [
         "./projects/cxai-ask-product/*"
-      ]
+      ],
     },
     "outDir": "./dist/out-tsc",
     "strict": true,
