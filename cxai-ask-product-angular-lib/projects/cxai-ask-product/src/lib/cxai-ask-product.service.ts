@@ -1,17 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { LoggerService, OccEndpointsService } from '@spartacus/core';
-import { Observable, catchError, of } from 'rxjs';
 import {
   ASK_PRODUCT_CONFIG_SCOPE,
-  ASK_PRODUCT_LOG_MARKER,
-  AskProductConfig,
-} from '@cx-spartacus/cxai-ask-product/root';
-import {
   AskProductChatMessage,
+  AskProductConfig,
   AskProductQuestion,
   AskProductResponse,
+  ILoggerService,
+  IOccEndpointsService
 } from '@cx-spartacus/cxai-ask-product/root';
+import { Observable, catchError, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -19,16 +17,12 @@ import {
 export class CxaiAskProductService {
   protected http = inject(HttpClient);
   protected config = inject(AskProductConfig)[ASK_PRODUCT_CONFIG_SCOPE];
-  protected endpointsService = inject(OccEndpointsService);
-  protected loggerService = inject(LoggerService);
-  
+  protected endpointsService = inject(IOccEndpointsService);
+  protected loggerService = inject(ILoggerService);
+
   protected tokens: {
     [key: string]: { token: string; expiration_timestamp: number };
   } = {};
-
-  constructor() {
-    this.loggerService.info(ASK_PRODUCT_LOG_MARKER, 'Final cxai ask product config', this.config);
-  }
 
   sendQuestion(
     productCode: string,

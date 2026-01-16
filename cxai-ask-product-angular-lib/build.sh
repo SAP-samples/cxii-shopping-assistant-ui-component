@@ -1,7 +1,7 @@
-npm run build
-
-#set unpublish variable to true if cli arg --unpublish is passed as $1
-
+echo "### Building spartacus library ###"
+npm run build-lib
+echo "### Building web-component ###"
+npm run build-web-component
 
 # go to dist/cxai-ask-product-angular-lib and publish
 
@@ -22,3 +22,8 @@ fi
 npm publish
 popd
 
+addon_dir=..
+target_dir=$addon_dir/cxaiaskproductaddon/acceleratoraddon/web/webroot/_ui/responsive/common/js
+cp -r dist/web-component/browser/polyfills.js $target_dir/angular-polyfills.js
+cp -r dist/web-component/browser/main.js $target_dir/cxai-components.js
+#set unpublish variable to true if cli arg --unpublish is passed as $1

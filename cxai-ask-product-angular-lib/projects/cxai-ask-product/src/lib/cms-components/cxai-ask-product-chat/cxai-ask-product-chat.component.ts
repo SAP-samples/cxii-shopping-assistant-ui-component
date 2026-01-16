@@ -4,7 +4,6 @@ import {
   Component,
   ElementRef,
   OnInit,
-  Optional,
   Renderer2,
   ViewChild,
   inject
@@ -13,13 +12,9 @@ import {
   ASK_PRODUCT_LOG_MARKER,
   AskProductChatMessage,
   AskProductSource,
+  ICurrentProductService,
+  ILoggerService,
 } from '@cx-spartacus/cxai-ask-product/root';
-import { LoggerService } from '@spartacus/core';
-import {
-  CurrentProductService,
-  ICON_TYPE,
-  ProductListItemContext,
-} from '@spartacus/storefront';
 import {
   Observable,
   distinctUntilChanged,
@@ -44,15 +39,12 @@ import { CxaiAskProductService } from '../../cxai-ask-product.service';
   standalone: false,
 })
 export class CxaiAskProductChatComponent implements OnInit {
-  private currentProductService = inject(CurrentProductService);
+  private currentProductService = inject(ICurrentProductService);
   private cxaiAskProductService = inject(CxaiAskProductService);
   private changeDetectorRef = inject(ChangeDetectorRef);
   private renderer = inject(Renderer2);
-  protected loggerService = inject(LoggerService);
+  protected loggerService = inject(ILoggerService);
 
-  @Optional() private productListItemContext: ProductListItemContext;
-
-  icon = ICON_TYPE;
   @ViewChild('chatInputField') chatInputField: ElementRef | undefined;
   @ViewChild('chat') chatNode: ElementRef | undefined;
 
@@ -62,7 +54,6 @@ export class CxaiAskProductChatComponent implements OnInit {
   //to keep scroll-to-bottom on new message
   lastMessageHeight = 0;
 
-  //form data
   message = '';
   isMessageValid = false;
 
@@ -83,7 +74,6 @@ export class CxaiAskProductChatComponent implements OnInit {
     }
 
     const product$ =
-      this.productListItemContext?.product$ ||
       this.currentProductService.getProduct();
     this.productCode$ = product$.pipe(
       filter((p) => !!p?.code),
