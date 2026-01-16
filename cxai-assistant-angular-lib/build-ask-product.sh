@@ -1,4 +1,5 @@
 set -e
+npm run lint
 
 echo "### Building spartacus library ###"
 npm run build:ask-product
