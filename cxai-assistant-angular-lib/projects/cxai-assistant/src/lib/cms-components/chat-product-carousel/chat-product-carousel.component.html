@@ -1,6 +1,6 @@
 <div class="chat-product-carousel-container">
   <button class="scroll-button prev-button" (click)="scrollCarousel(-1)" *ngIf="scrollValue > 0">
-    <cx-icon [cxIcon]="iconTypes.CARET_LEFT"></cx-icon>
+    <i class="fas fa-angle-left"></i>
   </button>
 
   <div class="chat-product-carousel inline-snap scroll-{{scrollValue}}" [class.scrollMax]="scrollValue === maxScrollValue" #carousel>
@@ -12,6 +12,6 @@
   </div>
 
   <button class="scroll-button next-button" (click)="scrollCarousel(1)" *ngIf="scrollValue < maxScrollValue">
-    <cx-icon [cxIcon]="iconTypes.CARET_RIGHT"></cx-icon>
+    <i class="fas fa-angle-right"></i>
   </button>
 </div>

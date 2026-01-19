@@ -48,3 +48,4 @@ hycloudext/
 node_modules/
 *.DS_Store
 *.log
+cxaiaskproductoccaddon/project.properties

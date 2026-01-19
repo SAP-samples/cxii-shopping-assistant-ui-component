@@ -1,5 +1,5 @@
 import { inject, Injectable } from "@angular/core";
-import { IBaseSiteService, IOccEndpointsService } from "@cx-spartacus/cxai-ask-product/root";
+import { DynamicAttributes, IBaseSiteService, IOccEndpointsService } from "@cx-spartacus/cxai-ask-product/root";
 import { filter, take } from "rxjs";
 
 @Injectable({
@@ -7,6 +7,8 @@ import { filter, take } from "rxjs";
 })
 export class WcOccEndpointsService extends IOccEndpointsService {
   private readonly baseSiteService = inject(IBaseSiteService);
+  private readonly namedUrls = window?.ACC?.spartacus?.occEndpoints ?? {};
+
   private baseUrl!: string;
   private baseSite: string | undefined;
 
@@ -24,7 +26,7 @@ export class WcOccEndpointsService extends IOccEndpointsService {
     this.baseUrl = baseUrl;
   }
 
-  override buildUrl(endpoint: string, urlParams?: object, queryParams?: object): string {
+  override buildUrl(endpoint: string, attributes?: DynamicAttributes): string {
     let url = this.baseUrl;
     if (!url.endsWith('/')) {
       url += '/';
@@ -32,14 +34,26 @@ export class WcOccEndpointsService extends IOccEndpointsService {
 
     url += this.baseSite + '/';
 
+    if(this.namedUrls[endpoint]) {
+      endpoint = this.namedUrls[endpoint];
+    }
+
     // Remove leading slash from endpoint if present
     if (endpoint.startsWith('/')) {
       endpoint = endpoint.substring(1);
     }
+
+    // Replace URL parameters
+    if (attributes?.urlParams) {
+      for (const [key, value] of Object.entries(attributes.urlParams)) {
+        endpoint = endpoint.replace(`\${${key}}`, encodeURIComponent(String(value)));
+      }
+    }
+
     url += endpoint;
     // Optionally add query params
-    if (queryParams && Object.keys(queryParams).length > 0) {
-      const query = Object.entries(queryParams)
+    if (attributes?.queryParams && Object.keys(attributes.queryParams).length > 0) {
+      const query = Object.entries(attributes.queryParams)
         .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
         .join('&');
       url += `?${query}`;

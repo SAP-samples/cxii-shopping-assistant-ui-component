@@ -16,6 +16,10 @@ yacceleratorstorefront.additionalWebSpringConfigs.cxaiaskproductaddon=classpath:
 cxaiaskproductaddon.javascript.paths.responsive=/responsive/common/js/cxaiaskproductaddon.js
 cxaiaskproductaddon.css.paths.responsive=/responsive/common/css/cxaiaskproductaddon.css
 
+# Change when script is updated to invalidate browser cache
+cxaiaskproductaddon.script.version=2211.47.0
+# Set to false if you already have font awesome icons
+cxaiaskproductaddon.importFontAwesome=true
 # Uncomment and set if default resolution is not returning correct values
 #cxaiaskproductaddon.occ.prefix=/occ/v2/
 #cxaiaskproductaddon.occ.baseUrl=

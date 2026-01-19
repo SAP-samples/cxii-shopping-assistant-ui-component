@@ -14,4 +14,6 @@ export abstract class ILoggerService {
    * Log an error message
    */
   abstract error(marker: string, ...args: any[]): void;
+
+  abstract debug(marker: string, ...args: any[]): void;
 }

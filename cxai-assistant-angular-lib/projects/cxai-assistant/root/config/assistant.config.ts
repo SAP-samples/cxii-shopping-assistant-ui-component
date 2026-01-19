@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { Config } from '@spartacus/core';
+import { Injectable, Type } from '@angular/core';
 import { CXAI_ASSISTANT_FEATURE } from '../feature-name';
 import { AssistantContext, AssistantProductFilter } from '../models/assistant.model';
 
@@ -8,7 +7,6 @@ export const ASSISTANT_LOG_MARKER = '[cxai-assistant]';
 
 @Injectable({
   providedIn: 'root',
-  useExisting: Config,
 })
 export abstract class CxaiAssistantConfig {
   [ASSISTANT_CONFIG_SCOPE]?: CxaiAssistantConfigInternal;
@@ -40,7 +38,19 @@ export interface CxaiAssistantConfigInternal {
   chatMessageContextProvider?: ((context: AssistantContext) => string) | null;
 }
 
-declare module '@spartacus/core' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  interface Config extends CxaiAssistantConfig {}
+//token components overrides
+export interface AssistantTokenComponentConfig {
+  [componentType: string]: Type<any> | null;
+}
+
+/** Default token components - override by CxaiAssistantTokenComponentsConfig */
+@Injectable()
+export abstract class CxaiAssistantTokenComponentsConfigInternal {
+  assistantTokens?: AssistantTokenComponentConfig;
+}
+
+/** Allows to overwrite token components with custom implementations */
+@Injectable()
+export abstract class CxaiAssistantTokenComponentsConfig {
+  assistantTokens?: AssistantTokenComponentConfig;
 }

@@ -1,8 +1,6 @@
-import { CommonModule } from '@angular/common';
+/* eslint-disable @typescript-eslint/no-empty-object-type */
 import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
-import { AssistantComponents, CxaiAssistantApiService, CxaiAssistantInitializer, defaultAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantComponents, AssistantOccEndpoints, CxaiAssistantApiService, CxaiAssistantConfig, CxaiAssistantInitializer, CxaiAssistantTokenComponentsConfigInternal, defaultAssistantConfig } from '@cx-spartacus/cxai-assistant/root';
 import {
   CmsConfig,
   ConfigInitializerService,
@@ -11,7 +9,7 @@ import {
   provideDefaultConfig,
   UrlModule,
 } from '@spartacus/core';
-import { IconModule, MediaModule, OutletModule, PageComponentModule, StarRatingModule } from '@spartacus/storefront';
+import { MediaModule, OutletModule, StarRatingModule } from '@spartacus/storefront';
 import { ChatIconComponent } from './cms-components/chat-icon/chat-icon.component';
 import { ChatProductCarouselComponent } from './cms-components/chat-product-carousel/chat-product-carousel.component';
 import { AssistantChatWindowComponent } from './cms-components/assistant-chat-window/assistant-chat-window.component';
@@ -19,12 +17,16 @@ import { AssistantProductReferenceComponent } from './cms-components/assistant-p
 import { ChatMessagePipe } from './cms-components/chat-message.pipe';
 import { ProductCardComponent } from './cms-components/product-card/product-card.component';
 import { AssistantProductNamePipe } from './cms-components/product-name.pipe';
-import { AssistantTokenComponent } from './cms-components/assistant-token/assistant-token.component';
 import { AssistantOrderReferenceComponent } from './cms-components/assistant-order-reference/assistant-order-reference.component';
 import { AssistantTrackingIdReferenceComponent } from './cms-components/assistant-tracking-id-reference/assistant-tracking-id-reference.component';
 import { defaultOccAssistantConfig } from './config/assistant-endpoint.config';
 import { CxaiAssistantService } from './cxai-assistant.service';
 import { CxaiAssistantOccApiService } from './cxai-assistant-occ.api.service';
+import { CxaiAssistantMainBaseModule } from './cxai-assistant-main-base.module';
+import { MiscSpartacusActionsService } from './misc-spartacus-actions.service';
+import { IMiscSpartacusActionsService } from './i-cart-actions.service';
+import { defaultAssistantTokenComponents } from './config/assistant-tokens.config';
+import { RouterModule } from '@angular/router';
 
 /**
  * @deprecated Please import lazy CxaiAskProductFeatureModule
@@ -38,39 +40,38 @@ import { CxaiAssistantOccApiService } from './cxai-assistant-occ.api.service';
     AssistantOrderReferenceComponent,
     AssistantTrackingIdReferenceComponent,
     ProductCardComponent,
-    AssistantTokenComponent,
     ChatMessagePipe,
     AssistantProductNamePipe,
   ],
   imports: [
-    CommonModule,
+    CxaiAssistantMainBaseModule,
     I18nModule,
-    ReactiveFormsModule,
-    IconModule,
     MediaModule,
     StarRatingModule,
-    RouterModule,
     UrlModule,
-    PageComponentModule,
     OutletModule,
+    RouterModule,
   ],
   providers: [
     provideDefaultConfig(defaultAssistantConfig),
+    {
+      provide: CxaiAssistantTokenComponentsConfigInternal,
+      useValue: { assistantTokens: {
+          ...defaultAssistantTokenComponents.assistantTokens,
+          [AssistantComponents.AssistantToken_tracking_id]: AssistantTrackingIdReferenceComponent,
+        }
+      },
+    },
+    MiscSpartacusActionsService,
+    {
+      provide: IMiscSpartacusActionsService,
+      useClass: MiscSpartacusActionsService,
+    },
     provideDefaultConfig(defaultOccAssistantConfig),
     provideDefaultConfig(<CmsConfig>{
       cmsComponents: {
         [AssistantComponents.AssistantChatWindowComponent]: {
           component: AssistantChatWindowComponent,
-        },
-        //components for chat-token (returned by ChatMessagePipe)
-        [AssistantComponents.AssistantToken_product]: {
-          component: AssistantProductReferenceComponent,
-        },
-        [AssistantComponents.AssistantToken_order]: {
-          component: AssistantOrderReferenceComponent,
-        },
-        [AssistantComponents.AssistantToken_tracking_id]: {
-          component: AssistantTrackingIdReferenceComponent,
         },
       },
     }),
@@ -102,4 +103,9 @@ function moduleConfigInitializer(
   configInitializerService: ConfigInitializerService,
 ) {
   return () => configInitializerService['initialize']([initializer]);
+}
+
+declare module '@spartacus/core' {
+  interface Config extends CxaiAssistantConfig {}
+  interface OccEndpoints extends AssistantOccEndpoints {}
 }

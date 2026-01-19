@@ -16,4 +16,8 @@ export class WcLoggerService extends ILoggerService {
   override error(marker: string, ...args: any[]): void {
     console.error(marker, ...args);
   }
+
+  override debug(marker: string, ...args: any[]): void {
+    console.debug(marker, ...args);
+  }
 }

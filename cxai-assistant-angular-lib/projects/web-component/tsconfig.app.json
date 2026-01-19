@@ -8,7 +8,9 @@
     "baseUrl": "../../",
     "paths": {
       "@cx-spartacus/cxai-ask-product/root": ["dist/cxai-ask-product-no-spartacus/root"],
-      "@cx-spartacus/cxai-ask-product": ["dist/cxai-ask-product-no-spartacus"]
+      "@cx-spartacus/cxai-ask-product": ["dist/cxai-ask-product-no-spartacus"],
+      "@cx-spartacus/cxai-assistant/root": ["dist/cxai-assistant-no-spartacus/root"],
+      "@cx-spartacus/cxai-assistant": ["dist/cxai-assistant-no-spartacus"]
     }
   },
   "files": [

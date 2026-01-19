@@ -36,4 +36,11 @@
 		<property name="extensionName" value="cxaiaskproductaddon" />
 	</bean>
 
+	<!-- valid customer's occ token is needed to perform actions like add to cart etc -->
+	<alias name="defaultAcceleratorOccTokenService" alias="acceleratorOccTokenService"/>
+	<bean id="defaultAcceleratorOccTokenService" class="com.sap.cxaiaskproductaddon.service.impl.DefaultAcceleratorOccTokenService">
+		<constructor-arg ref="userService"/>
+		<constructor-arg ref="oauthTokenServices"/>
+		<constructor-arg ref="configurationService"/>
+	</bean>
 </beans>

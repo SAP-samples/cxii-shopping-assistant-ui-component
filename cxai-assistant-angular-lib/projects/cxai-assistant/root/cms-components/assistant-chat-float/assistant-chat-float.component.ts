@@ -15,8 +15,8 @@ import {
   transition,
   trigger,
 } from '@angular/animations';
-import { CxaiAssistantOutlets } from '../../models/outlets';
 import { AssistantComponents } from '../../models';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'lib-assistant-chat-float',
@@ -24,6 +24,9 @@ import { AssistantComponents } from '../../models';
   styleUrls: [
     './assistant-chat-float.component.scss',
     '../_common-variables.scss',
+  ],
+  imports: [
+    CommonModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
@@ -43,7 +46,6 @@ import { AssistantComponents } from '../../models';
       transition('hidden <=> shown', [animate('.3s ease-in')]),
     ]),
   ],
-  standalone: false,
 })
 export class AssistantChatFloatComponent implements OnInit {
   buttonState = 'hidden';
@@ -52,9 +54,8 @@ export class AssistantChatFloatComponent implements OnInit {
   loadChat$ = new ReplaySubject<boolean>(1);
   useSapIcons = this.cxaiAssistantRootService.useSapIcons;
   chatOpened$ = this.cxaiAssistantRootService.getChatOpenedStatus();
-  outlets = CxaiAssistantOutlets;
   readonly mainComponent = AssistantComponents.AssistantChatWindowComponent;
-  
+
   constructor() {
     //trigger loading of lazy chunk once somebody requests to open chat window (see template @if)
     this.cxaiAssistantRootService.chatOpenRequest$

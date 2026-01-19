@@ -1,27 +1,28 @@
+import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting, TestRequest } from '@angular/common/http/testing';
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
-import { AssistantChatResponse, AssistantChatSessionInternal, CxaiAssistantApiService, EMPTY_CHAT_SESSION } from '@cx-spartacus/cxai-assistant/root';
+import { AssistantChatResponse, AssistantChatSessionInternal, CxaiAssistantApiService, EMPTY_CHAT_SESSION, IBaseSiteService, ICurrentProductService, ILoggerService, IOccEndpointsService, ITranslationService, IWindowRef } from '@cx-spartacus/cxai-assistant/root';
 import { ActiveCartFacade } from '@spartacus/cart/base/root';
-import { BaseSiteService, LoggerService, OCC_USER_ID_ANONYMOUS, OccEndpointsService, TranslationService, UserIdService, WindowRef } from "@spartacus/core";
-import { CurrentProductService } from '@spartacus/storefront';
+import { OCC_USER_ID_ANONYMOUS, UserIdService } from "@spartacus/core";
 import { UserAccountFacade } from '@spartacus/user/account/root';
 import { EMPTY, of, skip, take } from 'rxjs';
+import { CxaiAssistantOccApiService } from './cxai-assistant-occ.api.service';
 import { CxaiAssistantService, ERROR_SESSION_ID } from './cxai-assistant.service';
 import { mockCreateSessionResponse, mockFreshChatSessionResponse, mockOldChatSessionResponse, mockPostMessageResponse } from './testing/mocks/mock-responses';
-import { provideHttpClient } from '@angular/common/http';
-import { CxaiAssistantOccApiService } from './cxai-assistant-occ.api.service';
+import { IMiscSpartacusActionsService } from './i-cart-actions.service';
+import { MiscSpartacusActionsService } from './misc-spartacus-actions.service';
 
 describe('CxaiAssistantService', () => {
   const debug = false;
   let service: CxaiAssistantService;
   let apiService: CxaiAssistantOccApiService;
-  let loggerServiceSpy: jasmine.SpyObj<LoggerService>;
-  let currentProductServiceSpy: jasmine.SpyObj<CurrentProductService>;
+  let loggerServiceSpy: jasmine.SpyObj<ILoggerService>;
+  let currentProductServiceSpy: jasmine.SpyObj<ICurrentProductService>;
   let activeCartFacadeSpy: jasmine.SpyObj<ActiveCartFacade>;
-  let baseServiceSpy: jasmine.SpyObj<BaseSiteService>;
-  let translateServiceSpy: jasmine.SpyObj<TranslationService>;
-  let occEndpointsServiceSpy: jasmine.SpyObj<OccEndpointsService>;
-  let windowRefSpy: jasmine.SpyObj<WindowRef>;
+  let baseServiceSpy: jasmine.SpyObj<IBaseSiteService>;
+  let translateServiceSpy: jasmine.SpyObj<ITranslationService>;
+  let occEndpointsServiceSpy: jasmine.SpyObj<IOccEndpointsService>;
+  let windowRefSpy: jasmine.SpyObj<IWindowRef>;
   let userIdServiceSpy: jasmine.SpyObj<UserIdService>;
   let userAccountFacadeSpy: jasmine.SpyObj<UserAccountFacade>;
   let httpMock: HttpTestingController;
@@ -60,12 +61,13 @@ describe('CxaiAssistantService', () => {
       providers: [
         CxaiAssistantService,
         { provide: CxaiAssistantApiService, useClass: CxaiAssistantOccApiService },
-        { provide: LoggerService, useValue: loggerServiceSpy },
-        { provide: CurrentProductService, useValue: currentProductServiceSpy },
-        { provide: BaseSiteService, useValue: baseServiceSpy },
-        { provide: TranslationService, useValue: translateServiceSpy },
-        { provide: OccEndpointsService, useValue: occEndpointsServiceSpy },
-        { provide: WindowRef, useValue: windowRefSpy },
+        { provide: IMiscSpartacusActionsService, useClass: MiscSpartacusActionsService },
+        { provide: ILoggerService, useValue: loggerServiceSpy },
+        { provide: ICurrentProductService, useValue: currentProductServiceSpy },
+        { provide: IBaseSiteService, useValue: baseServiceSpy },
+        { provide: ITranslationService, useValue: translateServiceSpy },
+        { provide: IOccEndpointsService, useValue: occEndpointsServiceSpy },
+        { provide: IWindowRef, useValue: windowRefSpy },
         { provide: ActiveCartFacade, useValue: activeCartFacadeSpy },
         { provide: UserIdService, useValue: userIdServiceSpy },
         { provide: UserAccountFacade, useValue: userAccountFacadeSpy },

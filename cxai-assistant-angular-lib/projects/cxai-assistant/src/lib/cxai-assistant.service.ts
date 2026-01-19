@@ -14,15 +14,12 @@ import {
   EMPTY_CHAT_SESSION,
   mapActionToTokenType,
 } from '@cx-spartacus/cxai-assistant/root';
-import { ActiveCartFacade } from '@spartacus/cart/base/root';
-import { BaseSiteService, LoggerService, TranslationService, WindowRef } from '@spartacus/core';
-import { CurrentProductService } from '@spartacus/storefront';
+import { IBaseSiteService, ILoggerService, ITranslationService, IWindowRef } from '@cx-spartacus/cxai-assistant/root';
 import {
   asyncScheduler,
   BehaviorSubject,
   catchError,
   combineLatest,
-  defaultIfEmpty,
   distinctUntilChanged,
   EMPTY,
   filter,
@@ -36,8 +33,8 @@ import {
   switchMap,
   take,
   tap,
-  timeout,
 } from 'rxjs';
+import { IMiscSpartacusActionsService } from './i-cart-actions.service';
 
 //exported for testing purposes
 export const ERROR_SESSION_ID = '';
@@ -52,12 +49,11 @@ export class CxaiAssistantService {
 
   // reassigned in test cases
   protected config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
-  private readonly winRef = inject(WindowRef);
-  private readonly loggerService = inject(LoggerService);
-  private readonly activeCartFacade = inject(ActiveCartFacade);
-  private readonly currentProductService = inject(CurrentProductService);
-  private readonly baseSiteService = inject(BaseSiteService);
-  private readonly translationService = inject(TranslationService);
+  private readonly winRef = inject(IWindowRef);
+  private readonly loggerService = inject(ILoggerService);
+  private readonly baseSiteService = inject(IBaseSiteService);
+  private readonly miscSpartacusActionsService = inject(IMiscSpartacusActionsService);
+  private readonly translationService = inject(ITranslationService);
   private readonly apiService = inject(CxaiAssistantApiService);
   protected currentBaseSite;
   currentBaseSiteName;
@@ -351,29 +347,9 @@ export class CxaiAssistantService {
     ).forEach(action => {
       switch (action.action) {
         case 'add_to_cart':
-          this.reloadCart();
+          this.miscSpartacusActionsService.reloadCart();
           break;
       }
-    });
-  }
-
-  protected reloadCart() {
-    this.activeCartFacade.getActiveCartId().pipe(
-      switchMap(cartId => {
-        if(cartId) {
-          this.activeCartFacade.reloadActiveCart();
-          return of(cartId);
-        } else {
-          return this.activeCartFacade.requireLoadedCart().pipe(
-            filter(cart => !!cart?.code || !!cart?.guid),
-            take(1),
-            map(cart => cart.code || cart.guid || ''),
-          )
-        }
-      }),
-      take(1),
-    ).subscribe(cartId => {
-      this.loggerService.info(ASSISTANT_LOG_MARKER, 'Reloaded cart', cartId);
     });
   }
 
@@ -406,18 +382,7 @@ export class CxaiAssistantService {
   }
 
   getPageContext(): Observable<AssistantContext> {
-    return combineLatest([
-      this.activeCartFacade.getActive(),
-      this.currentProductService.getProduct().pipe(
-        defaultIfEmpty(null),
-        timeout({ first: 1, with: () => of(undefined) }),
-      )
-    ]).pipe(map(([cart, pdpProduct]) => {
-      return {
-        cartProductCodes: cart.entries ? cart.entries.map(e => e.product?.code).filter(Boolean) as string[] : [],
-        pdpProductCode: pdpProduct?.code,
-      }
-    }));
+    return this.miscSpartacusActionsService.getPageContext();
   }
 
   notifyResize(x: number, y: number) {

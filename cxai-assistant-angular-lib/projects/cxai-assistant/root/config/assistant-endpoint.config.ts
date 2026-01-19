@@ -9,9 +9,4 @@ export interface AssistantOccEndpoints {
   cxaiAssistant_deleteChatSession?: string | OccEndpoint;
 }
 
-declare module '@spartacus/core' {
-  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-  interface OccEndpoints extends AssistantOccEndpoints {}
-}
-
 export type AssistantEndpointKey = keyof AssistantOccEndpoints;

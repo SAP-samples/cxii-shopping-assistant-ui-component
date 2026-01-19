@@ -29,7 +29,7 @@
     "build:assistant-no-spartacus": "ng build cxai-assistant --configuration production-no-spartacus",
     "watch:assistant": "concurrently \"npm run sync:assistant -- --watch\" \"ng build cxai-assistant --watch --configuration development\"",
     "watch:assistant-no-spartacus": "concurrently \"npm run sync:assistant -- --watch\" \"ng build cxai-assistant --watch --configuration development-no-spartacus\"",
-    "build:web-component": "npm run build:ask-product-no-spartacus && ng build web-component --stats-json --configuration production"
+    "build:web-component": "npm run build:ask-product-no-spartacus && npm run build:assistant-no-spartacus && ng build web-component --stats-json --configuration production"
   },
   "private": true,
   "dependencies": {

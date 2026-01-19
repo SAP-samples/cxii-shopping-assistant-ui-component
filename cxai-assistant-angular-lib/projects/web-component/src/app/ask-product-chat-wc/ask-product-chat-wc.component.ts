@@ -1,17 +1,20 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, Input, OnInit } from '@angular/core';
-import { CxaiAskProductModule, AskProductInitializer } from '@cx-spartacus/cxai-ask-product';
-import { ASK_PRODUCT_CONFIG_SCOPE, AskProductConfig, IBaseSiteService, ICurrentProductService, IOccEndpointsService } from '@cx-spartacus/cxai-ask-product/root';
+import { AskProductInitializer, CxaiAskProductModule } from '@cx-spartacus/cxai-ask-product';
+import {
+  ASK_PRODUCT_CONFIG_SCOPE,
+  AskProductConfig,
+  IBaseSiteService,
+  ICurrentProductService,
+  IOccEndpointsService
+} from '@cx-spartacus/cxai-ask-product/root';
 
 @Component({
   selector: 'lib-ask-product-chat-wc',
   templateUrl: './ask-product-chat-wc.component.html',
   styleUrls: ['./ask-product-chat-wc.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    CommonModule,
-    CxaiAskProductModule,
-  ],
+  imports: [CommonModule, CxaiAskProductModule],
   // this will require style refactor, e.g. all css variables to be defined in :host
   // encapsulation: ViewEncapsulation.ShadowDom,
 })
@@ -29,8 +32,8 @@ export class AskProductChatWcComponent implements OnInit {
   config = inject(AskProductConfig);
 
   ngOnInit() {
-    this.config$.then(config => {
-      if(config) {
+    this.config$.then((config) => {
+      if (config) {
         this.config[ASK_PRODUCT_CONFIG_SCOPE] = config[ASK_PRODUCT_CONFIG_SCOPE];
       }
     });

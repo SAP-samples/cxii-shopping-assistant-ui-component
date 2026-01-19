@@ -1,0 +1,26 @@
+{
+  "name": "@cx-spartacus/cxai-ask-product",
+  "version": "2211.47.0",
+  "peerDependencies": {
+    "@angular/common": "^19.0.0",
+    "@angular/core": "^19.0.0",
+    "@spartacus/core": "^2211.35.0 || ^221121.1.0",
+    "@spartacus/storefront": "^2211.35.0 || ^221121.1.0",
+    "rxjs": "^7.8.1"
+  },
+  "peerDependenciesMeta": {
+    "@spartacus/core": {
+      "optional": true
+    },
+    "@spartacus/storefront": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "repository": {
+    "url": "https://github.com/SAP-samples/cxii-shopping-assistant-ui-component"
+  },
+  "sideEffects": false
+}

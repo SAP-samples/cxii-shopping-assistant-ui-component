@@ -8,8 +8,7 @@ import {
   ViewChild, OnInit, AfterViewInit
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Product, ProductService } from '@spartacus/core';
-import { ICON_TYPE } from '@spartacus/storefront';
+import { Product, IProductService } from '@cx-spartacus/cxai-assistant/root';
 import { debounceTime, Observable } from 'rxjs';
 import { CxaiAssistantService } from '../../cxai-assistant.service';
 
@@ -21,7 +20,7 @@ import { CxaiAssistantService } from '../../cxai-assistant.service';
   standalone: false,
 })
 export class ChatProductCarouselComponent implements OnInit, AfterViewInit {
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(IProductService);
   private readonly cxaiAssistantService = inject(CxaiAssistantService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
 
@@ -32,7 +31,6 @@ export class ChatProductCarouselComponent implements OnInit, AfterViewInit {
   gapWidth = 20;
   scrollValue = 0;
   maxScrollValue = 0;
-  iconTypes = ICON_TYPE;
 
   constructor() {
     this.cxaiAssistantService

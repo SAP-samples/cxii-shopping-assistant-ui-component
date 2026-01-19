@@ -108,15 +108,24 @@ Chat may return tokens inside a message, e.g. product code, order code etc. Thes
 See `AssistantTokenType` for available token types (`product`, `order`, `tracking_id` etc). 
 
 ```ts
-    provideConfig(<CmsConfig>{
-      cmsComponents: {
-       AssistantToken_product: { //AssistantToken_<tokenType>
-         component: MyComponent, //overwrite with custom component or undefined to display tokens as-is (e.g. just raw product code)
-       }
-      },
-    }),
+    {
+      provide: CxaiAssistantTokenComponentsConfig,
+      useValue: {
+        assistantTokens: {
+          [AssistantComponents.AssistantToken_product]: SampletokenComponent,
+        }
+      } satisfies CxaiAssistantTokenComponentsConfig,
+    }
 ```
 Inside component inject `AssistantTokenContext` - see `AssistantProductReference` or `AssistantOrderReferenceComponent` for an example.
+
+```ts
+export class SampletokenComponent implements OnInit {
+  tokenContext: AssistantTokenContext = inject(AssistantTokenContext);
+  token = this.tokenContext.token;
+  ...
+}
+```
 
 ### Extend via outlets
 You can change float button appearance or add custom titlebar actions, buttons next to "send" etc. via Spartacus outlets.

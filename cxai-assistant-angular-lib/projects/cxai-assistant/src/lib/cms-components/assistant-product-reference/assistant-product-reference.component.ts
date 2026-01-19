@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
-import { Product, ProductService } from '@spartacus/core';
+import { Product, IProductService } from '@cx-spartacus/cxai-assistant/root';
 import { Observable, tap } from 'rxjs';
 import { AssistantProductNamePipe } from '../product-name.pipe';
 import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
@@ -13,7 +13,7 @@ import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
 export class AssistantProductReferenceComponent implements OnInit {
   tokenContext: AssistantTokenContext = inject(AssistantTokenContext);
   token = this.tokenContext.token;
-  private readonly productService = inject(ProductService);
+  private readonly productService = inject(IProductService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly assistantProductNamePipe = inject(AssistantProductNamePipe);
 

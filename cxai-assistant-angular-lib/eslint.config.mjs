@@ -48,14 +48,6 @@ export default defineConfig([{
         }],
 
         "eqeqeq": ["error", "smart"],
-        "@angular-eslint/directive-selector": [
-            "error",
-            {
-            type: "attribute",
-            prefix: "lib",
-            style: "camelCase",
-            },
-        ],
 
         "@angular-eslint/component-selector": [
             "error",

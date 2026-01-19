@@ -1,0 +1,9 @@
+@if(config$ | async; as config) {
+  <lib-assistant-chat-float>
+    <ng-container slot="main-component">
+          @if(loadChat$ | async) {
+            <lib-assistant-chat-window></lib-assistant-chat-window>
+          }
+    </ng-container>
+  </lib-assistant-chat-float>
+}

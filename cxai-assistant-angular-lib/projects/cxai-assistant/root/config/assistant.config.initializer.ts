@@ -1,22 +1,21 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import {
-  BaseSiteService,
-  ConfigInitializer,
-  LoggerService,
-  OccEndpointsService,
-} from '@spartacus/core';
+  IBaseSiteService,
+  ILoggerService,
+  IOccEndpointsService,
+} from '../spartacus-adapters/index';
 import { firstValueFrom, Observable, of } from 'rxjs';
 import { catchError, filter, map, switchMap, take } from 'rxjs/operators';
 import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, CxaiAssistantConfig, CxaiAssistantConfigInternal } from './assistant.config';
 import { defaultAssistantConfigInternal } from './default.assistant.config';
 
 @Injectable({ providedIn: 'root' })
-export class CxaiAssistantInitializer implements ConfigInitializer {
+export class CxaiAssistantInitializer {
   private readonly http = inject(HttpClient);
-  private readonly occ = inject(OccEndpointsService);
-  private readonly baseSiteService = inject(BaseSiteService);
-  private readonly loggerService = inject(LoggerService);
+  private readonly occ = inject(IOccEndpointsService);
+  private readonly baseSiteService = inject(IBaseSiteService);
+  private readonly loggerService = inject(ILoggerService);
 
   readonly scopes = [ASSISTANT_CONFIG_SCOPE];
   readonly clientSideConfig = Object.assign({}, defaultAssistantConfigInternal, inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE]);

@@ -8,7 +8,6 @@ CXAI Ask Product library for use with CXAI Ask Product API
 
 ## Accelerator (JSP) version
 This instruction is for Composable Storefront library. If you use Accelerator see [Accelerator Addon](#cxaiaskproductaddon/README.md)
-Currently only Ask Product component is provided in Accelerator addon.
 
 ## Requirements
 1. Node version specified in `.nvmrc` files

@@ -1,38 +1,27 @@
+import { importProvidersFrom } from '@angular/core';
 import { createCustomElement } from '@angular/elements';
 import { createApplication } from '@angular/platform-browser';
-import { importProvidersFrom } from '@angular/core';
 import { CxaiAskProductModule } from '@cx-spartacus/cxai-ask-product';
+import { CxaiAssistantMainModule } from '@cx-spartacus/cxai-assistant';
 import { AskProductChatWcComponent } from './app/ask-product-chat-wc/ask-product-chat-wc.component';
-import {
-  IBaseSiteService,
-  ICurrentProductService,
-  ILoggerService,
-  IOccEndpointsService,
-} from '@cx-spartacus/cxai-ask-product/root';
-import { WcCurrentProductService } from './app/spartacus/wc-current-product-service';
-import { WcLoggerService } from './app/spartacus/wc-logger-service';
-import { WcOccEndpointsService } from './app/spartacus/wc-occ-endpoints-service';
-import { WcBaseSiteService } from './app/spartacus/wc-base-site-service';
+import { AssistantChatFloatWcComponent } from './app/assistant-chat-float-wc/assistant-chat-float-wc.component';
+import { askProductSpaProviders } from './ask-product-spa-providers';
+import { assistantSpaProviders } from './assistant-spa-providers';
+import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi } from '@angular/common/http';
+import { OccTokenInterceptor } from './app/assistant-chat-float-wc/occ-token.interceptor';
 
 async function bootstrapWebComponent() {
   const app = await createApplication({
     providers: [
+      ...askProductSpaProviders,
+      ...assistantSpaProviders,
       importProvidersFrom(CxaiAskProductModule),
+      importProvidersFrom(CxaiAssistantMainModule),
+      provideHttpClient(withFetch(), withInterceptorsFromDi()),
       {
-        provide: ICurrentProductService,
-        useExisting: WcCurrentProductService,
-      },
-      {
-        provide: ILoggerService,
-        useExisting: WcLoggerService,
-      },
-      {
-        provide: IOccEndpointsService,
-        useExisting: WcOccEndpointsService,
-      },
-      {
-        provide: IBaseSiteService,
-        useExisting: WcBaseSiteService,
+        provide: HTTP_INTERCEPTORS,
+        useClass: OccTokenInterceptor,
+        multi: true,
       },
     ],
   });
@@ -42,8 +31,14 @@ async function bootstrapWebComponent() {
     injector: app.injector,
   });
 
-  // Register the custom element
+
+  const assistantChatElement = createCustomElement(AssistantChatFloatWcComponent, {
+    injector: app.injector,
+  });
+
+  // you can comment out not used component registration to reduce bundle size
   customElements.define('cxai-ask-product-chat', askProductChatElement);
+  customElements.define('cxai-assistant-chat', assistantChatElement);
 }
 
 bootstrapWebComponent().catch((err) => console.error(err));

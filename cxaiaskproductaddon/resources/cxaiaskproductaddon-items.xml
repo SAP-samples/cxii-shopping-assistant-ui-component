@@ -14,5 +14,9 @@
 			jaloclass="com.sap.cxaiaskproductaddon.jalo.components.CxaiAskProductChatJspComponent"
 			extends="SimpleCMSComponent">
 		</itemtype>
+		<itemtype code="CxaiAssistantChatJspComponent" autocreate="true" generate="true"
+			jaloclass="com.sap.cxaiaskproductaddon.jalo.components.CxaiAssistantChatJspComponent"
+			extends="SimpleCMSComponent">
+		</itemtype>
 	</itemtypes>
 </items>

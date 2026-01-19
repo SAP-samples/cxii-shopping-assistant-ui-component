@@ -4,17 +4,17 @@
   "compilerOptions": {
     "paths": {
       "@cx-spartacus/cxai-assistant": [
-        "./projects/cxai-assistant"
+        "./projects/cxai-assistant/src/public-api"
       ],
       "@cx-spartacus/cxai-assistant/*": [
         "./projects/cxai-assistant/*"
       ],
       "@cx-spartacus/cxai-ask-product": [
-        "./projects/cxai-ask-product"
+        "./projects/cxai-ask-product/src/public-api"
       ],
       "@cx-spartacus/cxai-ask-product/*": [
         "./projects/cxai-ask-product/*"
-      ],
+      ]
     },
     "outDir": "./dist/out-tsc",
     "strict": true,

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
-import { AssistantTokenContext } from '@cx-spartacus/cxai-assistant/root';
-import { CmsConfig } from '@spartacus/core';
+import { AssistantTokenContext, CxaiAssistantTokenComponentsConfig, CxaiAssistantTokenComponentsConfigInternal } from '@cx-spartacus/cxai-assistant/root';
 
 class AssistantTokenContextImpl extends AssistantTokenContext {
 
@@ -19,21 +18,25 @@ class AssistantTokenContextImpl extends AssistantTokenContext {
 })
 export class AssistantTokenComponent implements OnInit {
   childContext = inject(AssistantTokenContextImpl);
-  private readonly config = inject(CmsConfig).cmsComponents!;
+  private readonly defaultTokenComponents = inject(CxaiAssistantTokenComponentsConfigInternal).assistantTokens ?? {};
+  private readonly customTokenComponents = inject(CxaiAssistantTokenComponentsConfig, { optional: true })?.assistantTokens ?? {};
 
   @Input({ required: true }) context!: AssistantTokenContext;
   componentId!: string;
-  hasCustomComponent!: boolean;
+  customComponent!: any;
 
-  //logic to hide component tag 
+  //logic to hide component tag
   private readonly viewContainerRef = inject(ViewContainerRef);
-  @ViewChild('template', { static: true }) 
+  @ViewChild('template', { static: true })
   template: any;
 
   ngOnInit() {
     Object.assign(this.childContext, this.context);
     this.componentId = `AssistantToken_${this.context.token.type}`;
-    this.hasCustomComponent = this.config[this.componentId]?.component;
+    this.customComponent = this.customTokenComponents[this.componentId];
+    if(this.customComponent === undefined) {
+      this.customComponent = this.defaultTokenComponents[this.componentId];
+    }
 
     this.viewContainerRef.createEmbeddedView(this.template);
     this.viewContainerRef.element.nativeElement.remove();

@@ -3,11 +3,13 @@ import { NgModule } from '@angular/core';
 import { CmsConfig, I18nModule, provideConfig, provideDefaultConfigFactory } from '@spartacus/core';
 import { OutletModule, OutletPosition, PageComponentModule, provideOutlet, SearchBoxOutlets } from '@spartacus/storefront';
 import { libTranslations, libTranslationsChunksConfig } from './assets/translations/lib-translations';
-import { AssistantChatFloatComponent } from './cms-components/assistant-chat-float/assistant-chat-float.component';
+import { AssistantChatFloatComponent } from '@cx-spartacus/cxai-assistant/root';
 import { SearchBoxChatOutletComponent } from './cms-components/search-box-chat-outlet/search-box-chat-outlet.component';
-import { CXAI_ASSISTANT_FEATURE } from './feature-name';
+import { CXAI_ASSISTANT_FEATURE } from '@cx-spartacus/cxai-assistant/root';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { AssistantComponents } from './models';
+import { AssistantComponents } from '@cx-spartacus/cxai-assistant/root';
+import { SpartacusProvidersModule } from './spartacus-providers.module';
+import { AssistantChatFloatSpartacusComponent } from './cms-components/assistant-chat-float-spartacus/assistant-chat-float.component';
 
 
 function defaultModuleConfigFactory(): CmsConfig {
@@ -20,14 +22,14 @@ function defaultModuleConfigFactory(): CmsConfig {
       },
     },
   };
- 
+
   return config;
 }
 
 @NgModule({
   declarations: [
-    AssistantChatFloatComponent,
     SearchBoxChatOutletComponent,
+    AssistantChatFloatSpartacusComponent,
   ],
   imports: [
     CommonModule,
@@ -35,13 +37,15 @@ function defaultModuleConfigFactory(): CmsConfig {
     BrowserAnimationsModule,
     I18nModule,
     OutletModule,
+    SpartacusProvidersModule,
+    AssistantChatFloatComponent,
   ],
   providers: [
     provideDefaultConfigFactory(defaultModuleConfigFactory),
     provideConfig({
       cmsComponents: {
         AssistantChatFloatComponent: {
-          component: AssistantChatFloatComponent,
+          component: AssistantChatFloatSpartacusComponent,
         },
       },
     } satisfies CmsConfig),

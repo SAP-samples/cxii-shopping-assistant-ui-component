@@ -23,8 +23,16 @@
             "production": {
               "tsConfig": "projects/cxai-assistant/tsconfig.lib.prod.json"
             },
+            "production-no-spartacus": {
+              "tsConfig": "projects/cxai-assistant/tsconfig.lib.prod.json",
+              "project": "projects/cxai-assistant/ng-package-no-spartacus.json"
+            },
             "development": {
               "tsConfig": "projects/cxai-assistant/tsconfig.lib.json"
+            },
+            "development-no-spartacus": {
+              "tsConfig": "projects/cxai-assistant/tsconfig.lib.json",
+              "project": "projects/cxai-assistant/ng-package-no-spartacus.json"
             }
           },
           "defaultConfiguration": "production"
