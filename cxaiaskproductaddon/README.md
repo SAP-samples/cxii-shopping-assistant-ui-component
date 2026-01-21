@@ -84,6 +84,10 @@ $contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCa
 INSERT_UPDATE CxaiAskProductChatJspComponent;$contentCV[unique=true];uid[unique=true];name
 ;;CxaiAskProductChatJspComponent;CxaiAskProductChatJspComponent
 
+# Optional restriction - don't render component if no valid CXAI Config
+INSERT_UPDATE AskProductRestriction; $contentCV[unique = true]; uid[unique = true]      ; name                    ; components(uid, $contentCV)
+                                       ;                      ; AskProductRestriction   ; Ask Product Restriction ; CxaiAskProductChatJspComponent
+
 # (+?) = append if not already appended
 INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)
 ;;<SlotName>;(+?)CxaiAskProductChatJspComponent
@@ -99,6 +103,10 @@ $contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCa
 
 INSERT_UPDATE CxaiAssistantChatJspComponent;$contentCV[unique=true];uid[unique=true];name
 ;;CxaiAssistantChatJspComponent;CxaiAssistantChatJspComponent
+
+# Optional restriction - don't render component if no valid CXAI Config
+INSERT_UPDATE AssistantRestriction; $contentCV[unique = true]; uid[unique = true]      ; name                    ; components(uid, $contentCV)
+                                       ;                     ; AssistantRestriction    ; Assistant Restriction   ; CxaiAssistantChatJspComponent
 
 # (+?) = append if not already appended
 INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)

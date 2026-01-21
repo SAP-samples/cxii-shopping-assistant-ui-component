@@ -34,6 +34,7 @@ export class AssistantChatFloatWcComponent extends AssistantChatFloatComponent {
   baseSiteService = inject(IBaseSiteService);
   config$ = inject(CxaiAssistantInitializer).configFactory();
   config = inject(CxaiAssistantConfig);
+  hasValidConfig = false;
 
   override ngOnInit() {
     if (this.occToken && window.ACC) {
@@ -44,6 +45,7 @@ export class AssistantChatFloatWcComponent extends AssistantChatFloatComponent {
     this.config$.then((config) => {
       if (config) {
         this.config[ASSISTANT_CONFIG_SCOPE] = config[ASSISTANT_CONFIG_SCOPE];
+        this.hasValidConfig = !!this.config?.[ASSISTANT_CONFIG_SCOPE]?.assistantConfigId;
       }
     });
 
