@@ -22,4 +22,6 @@ public interface CxaiApiService
 			Map<String, Object> body, HttpMethod method, HttpHeaders headers);
 
 	String getOccPrefix();
+
+	boolean isAllowApiAccess();
 }

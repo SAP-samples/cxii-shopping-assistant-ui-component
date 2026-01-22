@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +27,6 @@ import com.sap.cxaiaskproductocc.service.CxaiAssistantApiService;
 
 @RestController
 @RequestMapping("/{baseSiteId}/cxai/assistant")
-@Secured({ "ROLE_CUSTOMERGROUP", "ROLE_CUSTOMERMANAGERGROUP", "ROLE_TRUSTED_CLIENT" })
 public class AssistantApiController
 {
 	private static final Logger LOGGER = Logger.getLogger(AssistantApiController.class);
@@ -51,6 +49,11 @@ public class AssistantApiController
 
 	protected boolean checkApiPath(final String path, final HttpMethod method)
 	{
+		if (!this.cxaiAssistantApiService.isAllowApiAccess())
+		{
+			return false;
+		}
+
 		for (final AllowlistEntry entry : this.apiAllowlist)
 		{
 			if (entry.pattern.matcher(path).matches())

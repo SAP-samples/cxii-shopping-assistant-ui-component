@@ -26,7 +26,7 @@ UPDATE AbstractCMSComponent; uid[unique = true]          ; onlyOneRestrictionMus
 
 ```
 
-Alternatively you can remove `@Secured` from OCC Controllers classes, in this case OCC proxy will be fully open which is not recommended.
+Alternatively you can set property `cxai.anonymous.api.access.enabled=true` to allow anonymous API calls.
 
 ## Sample Assistant Config JSON 
 Sample payload for use when creating a config from backoffice (JSON field). This is subject to change and not all features are currently used, please consult https://api.sap.com/api/sap-cxai-apiResource-ShoppingAssistant-v1/resource/create_config_v2_v2_config_post

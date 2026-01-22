@@ -8,7 +8,10 @@ package com.sap.cxaiaskproductocc.service;
 import de.hybris.platform.servicelayer.config.ConfigurationService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -23,6 +26,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.client.OAuth2RestTemplate;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.web.client.HttpStatusCodeException;
@@ -42,6 +48,9 @@ public abstract class BaseCxaiApiService implements CxaiApiService
 {
 	private static final Logger LOGGER = Logger.getLogger(BaseCxaiApiService.class);
 	private static final Logger PAYLOAD_INTERCEPTOR_LOGGER = Logger.getLogger(PayloadLoggingInterceptor.class);
+	private static final String CXAI_ANONYMOUS_API_ACCESS_ENABLED_PROPERTY_KEY = "cxai.anonymous.api.access.enabled";
+	private static final List<String> API_ACCESS_ROLES = Collections
+			.unmodifiableList(Arrays.asList("ROLE_CUSTOMERGROUP", "ROLE_CUSTOMERMANAGERGROUP", "ROLE_TRUSTED_CLIENT"));
 
 	protected final ConfigurationService configurationService;
 
@@ -196,6 +205,36 @@ public abstract class BaseCxaiApiService implements CxaiApiService
 		});
 
 		return filteredHeaders;
+	}
+
+	@Override
+	public boolean isAllowApiAccess()
+	{
+		if (isCxaiApiAnonymousAccessEnabled())
+		{
+			return true;
+		}
+
+		final Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		final List<String> allowedRoles = API_ACCESS_ROLES;
+		final Collection<? extends GrantedAuthority> authorities = auth == null ? Collections.emptyList() : auth.getAuthorities();
+		final String authName = auth == null ? "null" : auth.getName();
+
+		final boolean accessAllowed = authorities.stream() //
+				.map(GrantedAuthority::getAuthority) //
+				.anyMatch(allowedRoles::contains);
+
+		if (!accessAllowed)
+		{
+			LOGGER.warn("CXAI API access denied for: " + authName);
+		}
+
+		return accessAllowed;
+	}
+
+	protected boolean isCxaiApiAnonymousAccessEnabled()
+	{
+		return configurationService.getConfiguration().getBoolean(CXAI_ANONYMOUS_API_ACCESS_ENABLED_PROPERTY_KEY, false);
 	}
 
 }

@@ -47,6 +47,11 @@ public class AskProductApiController
 
 	protected boolean checkApiPath(final String path, final HttpMethod method)
 	{
+		if (!this.cxaiAskProductApiService.isAllowApiAccess())
+		{
+			return false;
+		}
+
 		for (final AllowlistEntry entry : this.apiAllowlist)
 		{
 			if (entry.pattern.matcher(path).matches())
