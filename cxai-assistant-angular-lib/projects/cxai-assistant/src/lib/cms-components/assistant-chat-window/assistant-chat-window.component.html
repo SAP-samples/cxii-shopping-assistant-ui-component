@@ -88,7 +88,7 @@
     ></textarea>
 
     <ng-template [cxOutlet]="outlets.CHAT_BUTTONS" [cxOutletContext]="outletContext">
-      <button class="cxai-btn-send" [disabled]="sendDisabled()" (click)="sendMessage()">
+      <button type="button" class="cxai-btn-send" [disabled]="sendDisabled()" (click)="sendMessage()">
         <lib-chat-icon faIcon="far fa-paper-plane"></lib-chat-icon>
       </button>
     </ng-template>
