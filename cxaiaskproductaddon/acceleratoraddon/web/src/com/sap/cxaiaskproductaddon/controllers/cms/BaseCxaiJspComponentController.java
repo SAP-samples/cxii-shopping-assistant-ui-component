@@ -14,6 +14,7 @@ import org.apache.log4j.Logger;
 import org.springframework.ui.Model;
 
 import com.sap.cxaiaskproductaddon.constants.CxaiaskproductaddonConstants;
+import com.sap.cxaiaskproductaddon.service.AcceleratorOccUrlService;
 
 
 public class BaseCxaiJspComponentController extends GenericCMSAddOnComponentController
@@ -27,47 +28,19 @@ public class BaseCxaiJspComponentController extends GenericCMSAddOnComponentCont
 
 	@Resource(name = "configurationService")
 	private ConfigurationService configurationService;
+	@Resource(name = "acceleratorOccUrlService")
+	private AcceleratorOccUrlService acceleratorOccUrlService;
 
 	@Override
 	protected void fillModel(final HttpServletRequest request, final Model model, final AbstractCMSComponentModel component)
 	{
 		super.fillModel(request, model, component);
 
-		String occPrefix = "/occ/v2";
-		occPrefix = configurationService.getConfiguration().getString("ext.cxaiaskproductoccaddon.extension.webmodule.webroot",
-				occPrefix);
-		occPrefix = configurationService.getConfiguration().getString("ext.siteonecommercewebservices.extension.webmodule.webroot",
-				occPrefix);
-		occPrefix = configurationService.getConfiguration().getString("ext.commercewebservices.extension.webmodule.webroot",
-				occPrefix);
-
-		occPrefix = configurationService.getConfiguration().getString(OCC_PREFIX_PROPERTY, occPrefix);
-
-		String occBaseUrl = ""; //means same domain as storefront
-		if (isInsideCcv2())
-		{
-			occBaseUrl = configurationService.getConfiguration().getString("ccv2.services.api.url.0", occBaseUrl);
-		}
-
-		occBaseUrl = configurationService.getConfiguration().getString(OCC_BASEURL_PROPERTY, occBaseUrl);
-
-
-		if (occBaseUrl.endsWith("/"))
-		{
-			occBaseUrl = occBaseUrl.substring(0, occBaseUrl.length() - 1);
-		}
-
-		if (!occPrefix.startsWith("/"))
-		{
-			occPrefix = "/" + occPrefix;
-		}
-
 		final String scriptVersion = configurationService.getConfiguration().getString(COMPONENT_VERSION_PROPERTY, "1.0");
-		final boolean importFontAwesome = configurationService.getConfiguration().getBoolean(IMPORT_FONT_AWESOME_PROPERTY,
-				false);
-		final String occUrl = (occBaseUrl + occPrefix);
-		model.addAttribute("backendUrl", occBaseUrl);
-		model.addAttribute("occUrl", occUrl);
+		final boolean importFontAwesome = configurationService.getConfiguration().getBoolean(IMPORT_FONT_AWESOME_PROPERTY, false);
+
+		model.addAttribute("mediaBaseUrl", acceleratorOccUrlService.getMediaBaseUrl());
+		model.addAttribute("occUrl", acceleratorOccUrlService.getFullOccUrlForFrontend(request));
 		model.addAttribute("scriptVersion", scriptVersion);
 		model.addAttribute("importFontAwesome", importFontAwesome);
 	}

@@ -23,3 +23,10 @@ cxaiaskproductaddon.importFontAwesome=true
 # Uncomment and set if default resolution is not returning correct values
 #cxaiaskproductaddon.occ.prefix=/occ/v2/
 #cxaiaskproductaddon.occ.baseUrl=
+
+#uncomment if media are stored on a different server or aspect
+#cxaiaskproductaddon.media.baseUrl=
+
+#if you don't have public OCC endpoint set to true
+cxaiaskproductaddon.occ.proxy.enabled=false
+

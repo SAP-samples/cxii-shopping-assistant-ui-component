@@ -44,7 +44,7 @@
 
 <cxai-assistant-chat
   base-url="${occUrl}"
-  media-base-url="${backendUrl}"
+  media-base-url="${mediaBaseUrl}"
   site="${siteUid}"
   site-name="${siteName}"
   occ-token="${occToken}"

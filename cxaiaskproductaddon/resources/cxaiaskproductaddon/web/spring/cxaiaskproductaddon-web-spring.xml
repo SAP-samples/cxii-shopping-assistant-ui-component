@@ -35,4 +35,8 @@
 		<property name="add" ref="getCxaiaskproductaddonBeforeViewHandler"/>
 	</bean>
 
+	<bean depends-on="csrfAllowedUrlPatternsList" parent="listMergeDirective">
+		<property name="add" value="/acc-occ-proxy/.*" />
+	</bean>
+	
 </beans>
