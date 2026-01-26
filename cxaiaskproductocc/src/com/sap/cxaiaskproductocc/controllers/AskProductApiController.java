@@ -12,7 +12,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,7 +28,6 @@ import com.sap.cxaiaskproductocc.service.CxaiAskProductApiService;
 
 @RestController
 @RequestMapping("/{baseSiteId}/cxai/ask-product")
-@Secured({ "ROLE_CUSTOMERGROUP", "ROLE_CUSTOMERMANAGERGROUP", "ROLE_TRUSTED_CLIENT" })
 public class AskProductApiController
 {
 	private static final Logger LOGGER = Logger.getLogger(AskProductApiController.class);
@@ -49,6 +47,11 @@ public class AskProductApiController
 
 	protected boolean checkApiPath(final String path, final HttpMethod method)
 	{
+		if (!this.cxaiAskProductApiService.isAllowApiAccess())
+		{
+			return false;
+		}
+
 		for (final AllowlistEntry entry : this.apiAllowlist)
 		{
 			if (entry.pattern.matcher(path).matches())
