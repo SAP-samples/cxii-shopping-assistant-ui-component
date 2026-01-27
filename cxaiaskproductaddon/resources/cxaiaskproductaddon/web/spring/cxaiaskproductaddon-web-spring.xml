@@ -4,10 +4,13 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
        xmlns:aop="http://www.springframework.org/schema/aop"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util
+           http://www.springframework.org/schema/util/spring-util.xsd
            http://www.springframework.org/schema/aop
            http://www.springframework.org/schema/aop/spring-aop.xsd
            http://www.springframework.org/schema/context
@@ -39,4 +42,19 @@
 		<property name="add" value="/acc-occ-proxy/.*" />
 	</bean>
 	
+	<!-- avoid storing it as "last visited page" - invalid redirect when e.g. switching language -->
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" depends-on="refererExcludeUrlSet">
+		<property name="targetObject">
+			<ref bean="refererExcludeUrlSet"/>
+		</property>
+		<property name="targetMethod">
+			<value>addAll</value>
+		</property>
+		<property name="arguments">
+			<util:set>
+				<!-- ant matcher -->
+				<value>/**/acc-occ-proxy/**</value>
+			</util:set>
+		</property>
+	</bean>
 </beans>
