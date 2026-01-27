@@ -49,10 +49,11 @@ public class DefaultAcceleratorOccUrlService implements AcceleratorOccUrlService
 	public String getOccPrefix()
 	{
 		String occPrefix = "/occ/v2";
+
+		//only if occ addon is loaded
 		occPrefix = configurationService.getConfiguration().getString("ext.cxaiaskproductoccaddon.extension.webmodule.webroot",
 				occPrefix);
-		occPrefix = configurationService.getConfiguration().getString("ext.siteonecommercewebservices.extension.webmodule.webroot",
-				occPrefix);
+		//if OCC extensions are loaded - they should not be used together with occ addons
 		occPrefix = configurationService.getConfiguration().getString("ext.commercewebservices.extension.webmodule.webroot",
 				occPrefix);
 

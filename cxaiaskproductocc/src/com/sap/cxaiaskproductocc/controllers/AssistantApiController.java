@@ -69,8 +69,7 @@ public class AssistantApiController
 	public ResponseEntity<?> handleRequest(@RequestBody(required = false) final Map<String, Object> body, final HttpMethod method,
 			@RequestHeader final HttpHeaders headers, final HttpServletRequest request)
 	{
-		final String occPrefix = this.cxaiAssistantApiService.getOccPrefix();
-		final String requestSubpath = request.getRequestURI().replaceFirst(occPrefix + "/[^/]+/cxai/assistant", "");
+		final String requestSubpath = request.getRequestURI().replaceFirst(".+/[^/]+/cxai/assistant", "");
 
 		if (!checkApiPath(requestSubpath, method))
 		{

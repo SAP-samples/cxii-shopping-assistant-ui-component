@@ -21,7 +21,5 @@ public interface CxaiApiService
 	ResponseEntity<String> handleRequest(final CxaiConfigData config, String requestSubpath, String queryString,
 			Map<String, Object> body, HttpMethod method, HttpHeaders headers);
 
-	String getOccPrefix();
-
 	boolean isAllowApiAccess();
 }
