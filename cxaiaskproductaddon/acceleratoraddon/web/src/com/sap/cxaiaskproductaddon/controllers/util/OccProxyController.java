@@ -11,6 +11,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -53,6 +54,7 @@ import com.sap.cxaiaskproductaddon.service.AcceleratorOccUrlService;
 public class OccProxyController
 {
 	private static final Logger LOGGER = Logger.getLogger(OccProxyController.class);
+	private static final Pattern OCC_PRODUCT_PATH_PATTERN = Pattern.compile("^/products/[^/]+$");
 
 	@Resource(name = "configurationService")
 	private ConfigurationService configurationService;
@@ -128,9 +130,14 @@ public class OccProxyController
 
 	protected boolean checkApiPath(final String path, final HttpMethod method)
 	{
-		if (!path.contains("/cxai/"))
+		if (path.contains("/cxai/"))
 		{
-			return false;
+			return true;
+		}
+
+		if (method == HttpMethod.GET && OCC_PRODUCT_PATH_PATTERN.matcher(path).matches())
+		{
+			return true;
 		}
 
 		return true;
@@ -152,11 +159,15 @@ public class OccProxyController
 		String targetSystemUrl = acceleratorOccUrlService.getFullOccUrl();
 		final byte[] body = StreamUtils.copyToByteArray(request.getInputStream());
 
-		if (StringUtils.isEmpty(targetSystemUrl))
+		//if it's on the same host, append current url
+		if (targetSystemUrl.startsWith("/"))
 		{
-			//set this to current server base + context path
-			targetSystemUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-					+ request.getContextPath() + "/";
+			// get current baseUrl from request
+			final String requestURL = request.getRequestURL().toString();
+			final String currentBaseUrl = requestURL.substring(0, 
+					requestURL.length() - request.getRequestURI().length());
+
+			targetSystemUrl = currentBaseUrl + targetSystemUrl;
 		}
 
 		try
