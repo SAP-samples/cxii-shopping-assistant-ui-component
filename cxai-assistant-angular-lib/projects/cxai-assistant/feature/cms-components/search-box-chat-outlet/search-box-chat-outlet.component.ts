@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, ViewEncapsulation } from '@angular/core';
 import { OutletContextData } from '@spartacus/storefront';
-import { CxaiAssistantRootService } from '../../cxai-assistant.root.service';
+import { CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
 
 interface SearchBoxOutlet {
   search: string;

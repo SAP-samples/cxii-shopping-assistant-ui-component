@@ -1,6 +1,6 @@
 import { inject, Injectable, Pipe, PipeTransform } from "@angular/core";
 import { ASSISTANT_CONFIG_SCOPE, CxaiAssistantConfig } from "@cx-spartacus/cxai-assistant/root";
-import { Product } from "@spartacus/core";
+import { Product } from "@cx-spartacus/cxai-assistant/root";
 
 @Injectable({
   providedIn: 'root'

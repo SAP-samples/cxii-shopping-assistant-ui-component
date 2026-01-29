@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { DynamicAttributes, OccEndpointsService } from '@spartacus/core';
+import { DynamicAttributes, IOccEndpointsService } from '@cx-spartacus/cxai-assistant/root';
 import {
   AssistantChatResponse,
   AssistantChatSessionInternal,
@@ -14,7 +14,7 @@ import {
   providedIn: 'root',
 })
 export class CxaiAssistantOccApiService extends CxaiAssistantApiService {
-  protected readonly endpointsService = inject(OccEndpointsService);
+  protected readonly endpointsService = inject(IOccEndpointsService);
   protected readonly http = inject(HttpClient);
 
   override postMessage(payload: AssistantUserInput) {

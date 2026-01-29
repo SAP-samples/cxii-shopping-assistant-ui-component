@@ -54,7 +54,6 @@ public abstract class BaseCxaiApiService implements CxaiApiService
 
 	protected final ConfigurationService configurationService;
 
-	private final String occPrefix;
 	private final long longResponseWarningThresholdMs;
 	private final ClientHttpRequestFactory requestFactory;
 
@@ -72,19 +71,10 @@ public abstract class BaseCxaiApiService implements CxaiApiService
 		super();
 		this.configurationService = configurationService;
 
-		this.occPrefix = configurationService.getConfiguration().getString("ext.commercewebservices.extension.webmodule.webroot",
-				"/occ/v2");
-
 		this.longResponseWarningThresholdMs = configurationService.getConfiguration()
 				.getInt("cxai.long-response-warning-threshold-ms", 45000);
 
 		this.requestFactory = createClientHttpRequestFactory();
-	}
-
-	@Override
-	public String getOccPrefix()
-	{
-		return occPrefix;
 	}
 
 	protected void logResponseTime(final long startTime, final HttpMethod method, final String requestSubpath)

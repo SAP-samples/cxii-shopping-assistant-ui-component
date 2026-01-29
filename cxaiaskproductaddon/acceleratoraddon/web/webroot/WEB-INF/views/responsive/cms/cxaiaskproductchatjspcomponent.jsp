@@ -10,7 +10,7 @@
 
 <script type="text/javascript">
     /*<![CDATA[*/
-	document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() {
         const translations = {
             inputPlaceholder: '<spring:theme code="askProduct.inputPlaceholder" text="{empty}" />',
             welcomeMessage: '<spring:theme code="askProduct.welcomeMessage" text="{empty}" />',
@@ -18,22 +18,22 @@
             send: '<spring:theme code="askProduct.send" text="{empty}" />',
             clearChat: '<spring:theme code="askProduct.clearChat" text="{empty}" />',
         };
-		
-		//remove all keys with <empty> values
-		Object.keys(translations).forEach(key => {
-		    if (translations[key] === '{empty}') {
-		        delete translations[key];
-		    }
-		});
-		
+
+        //remove all keys with <empty> values
+        Object.keys(translations).forEach(key => {
+            if (translations[key] === '{empty}') {
+                delete translations[key];
+            }
+        });
+
         ACC.cxaiaskproduct.i18n['askProduct'] = translations;
-		<%-- ACC.cxaiaskproduct.config = { } //set this to disable fetching config from occ endpoint --%>
-	});
+        <%-- ACC.cxaiaskproduct.config = { } //set this to disable fetching config from occ endpoint --%>
+    });
     /*]]>*/
 </script>
 
 <script type="module" src="${contextPath}/_ui/addons/cxaiaskproductaddon/responsive/common/js/angular-polyfills.js"></script>
-<script type="module" src="${contextPath}/_ui/addons/cxaiaskproductaddon/responsive/common/js/cxai-components.js" ></script>
+<script type="module" src="${contextPath}/_ui/addons/cxaiaskproductaddon/responsive/common/js/cxai-components.js?v=${scriptVersion}" ></script>
 
 <cxai-ask-product-chat
   base-url="${occUrl}"

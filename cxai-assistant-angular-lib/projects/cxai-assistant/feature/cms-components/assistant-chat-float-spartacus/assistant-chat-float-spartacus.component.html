@@ -1,0 +1,20 @@
+<lib-assistant-chat-float>
+  <ng-container slot="chat-button">
+    <ng-template [cxOutlet]="outlets.START_BUTTON">
+      <button class="chat-btn" [@showHide]="buttonState">
+        <i *ngIf="!useSapIcons" class="fa-regular fa-message"></i>
+        <i *ngIf="useSapIcons" class="sap-icon post"></i>
+      </button>
+    </ng-template>
+  </ng-container>
+  <ng-container slot="main-component">
+    @if(loadChat$ | async) {
+      <ng-container
+        [cxComponentWrapper]="{
+          flexType: mainComponent,
+        }"
+      >
+      </ng-container>
+    }
+  </ng-container>
+</lib-assistant-chat-float>

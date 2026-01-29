@@ -9,20 +9,7 @@
   --cx-color-danger: #dc3545;
 }
 
-.page-productDetails cxai-ask-product-chat .cxai-chat-wrapper {
-  --cxai-font-size: 14px;
-}
-
-.page-productDetails cxai-ask-product-chat {
-  --cx-color-primary: #0066cc;
-  --cx-color-text: #333333;
-  --cx-color-medium: #999999;
-  --cx-color-light: #f5f5f5;
-  --cx-color-background: #ffffff;
-  --cx-color-inverse: #ffffff;
-  --cx-color-danger: #dc3545;
-}
-
-.page-productDetails cxai-ask-product-chat .cxai-chat-wrapper {
+.page-productDetails cxai-ask-product-chat .cxai-chat-wrapper,
+cxai-assistant-chat .cxai-chat {
   --cxai-font-size: 14px;
 }

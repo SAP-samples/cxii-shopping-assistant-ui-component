@@ -1,10 +1,8 @@
 import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, ElementRef, HostListener, inject, OnInit, QueryList, Renderer2, signal, ViewChild, ViewChildren, OnDestroy } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ASSISTANT_CONFIG_SCOPE, ASSISTANT_LOG_MARKER, AssistantChatSession, AssistantChatWindowComponentInterface, AssistantChatWindowOutletContext, CxaiAssistantConfig, CxaiAssistantOutlets, CxaiAssistantRootService } from '@cx-spartacus/cxai-assistant/root';
-import { LoggerService } from '@spartacus/core';
-import { ICON_TYPE } from '@spartacus/storefront';
-import { distinctUntilChanged, finalize, map, Subscription, take } from 'rxjs';
+import { ILoggerService } from '@cx-spartacus/cxai-assistant/root';
+import { distinctUntilChanged, finalize, Subscription, take } from 'rxjs';
 import { CxaiAssistantService } from '../../cxai-assistant.service';
 import { AssistantProductReferenceComponent } from '../assistant-product-reference/assistant-product-reference.component';
 @Component({
@@ -22,12 +20,11 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
 
   private readonly config = inject(CxaiAssistantConfig)[ASSISTANT_CONFIG_SCOPE];
   private readonly destroyRef = inject(DestroyRef);
-  private readonly fb = inject(FormBuilder);
   private readonly cxaiAssistantService = inject(CxaiAssistantService);
   private readonly cxaiAssistantRootService = inject(CxaiAssistantRootService);
   private readonly changeDetectorRef = inject(ChangeDetectorRef);
   private readonly renderer = inject(Renderer2);
-  private readonly loggerService = inject(LoggerService);
+  private readonly loggerService = inject(ILoggerService);
 
   protected outlets = CxaiAssistantOutlets;
   protected chatOpened$ = this.cxaiAssistantRootService.getChatOpenedStatus();
@@ -35,7 +32,6 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   useSapIcons = this.cxaiAssistantRootService.useSapIcons;
   maximized = false;
 
-  icon = ICON_TYPE;
   @ViewChild('chatInputField') chatInputField!: ElementRef;
   @ViewChild('chat') chatNode!: ElementRef;
 
@@ -44,13 +40,14 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
 
   //to keep scroll-to-bottom on new message
   lastMessageHeight = 0;
-
-  form: FormGroup = this.fb.group({
-    message: ['', Validators.required],
-  });
+  message = signal('');
+  onMessageInput(event: Event): void {
+    const target = event.target as HTMLTextAreaElement;
+    this.message.set(target.value);
+  }
 
   //external interface state
-  formValid = toSignal(this.form.statusChanges.pipe(map(status => status === 'VALID')), { initialValue: false });
+  formValid = computed(() => !!this.message().trim());
   hasValidSession = signal<boolean>(false); // until messages are signal, this must be manually updated
   //we allow to type even if send is disabled
   inputTextDisabled = signal(false);
@@ -98,10 +95,29 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     ).subscribe((data) => {
       this.setInputText(data.text);
     });
+
+    const uiStatus = this.cxaiAssistantRootService.getChatUiStatus();
+    if(uiStatus.maximized) {
+      this.maximized = uiStatus.maximized;
+    }
+    if(uiStatus.width) {
+      this.width = uiStatus.width;
+    }
+    if(uiStatus.height) {
+      this.height = uiStatus.height;
+    }
+    if(this.box.nativeElement) {
+      if(uiStatus.right) {
+        this.box.nativeElement.style.right = uiStatus.right + 'px';
+      }
+      if(uiStatus.bottom) {
+        this.box.nativeElement.style.bottom = uiStatus.bottom + 'px';
+      }
+    }
   }
 
   setInputText(text: string, select = true) {
-    this.form.setValue({ message: text || '' });
+    this.message.set(text || '');
     if (select) {
       this.focusInputAndSelectAll();
     } else {
@@ -112,8 +128,8 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
   appendInputText(text: string, select = true) {
     //append text at the end of current input, and focus
     const input = this.chatInputField.nativeElement;
-    const currentText = this.form.value.message || '';
-    this.form.setValue({ message: currentText + text });
+    const currentText = this.message() || '';
+    this.message.set(currentText + text);
     this.focusInput();
 
     if (select) {
@@ -126,9 +142,9 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     const input = this.chatInputField.nativeElement;
     const start = input.selectionStart;
     const end = input.selectionEnd;
-    const currentText = this.form.value.message || '';
+    const currentText = this.message() || '';
     const newText = currentText.slice(0, start) + text + currentText.slice(end);
-    this.form.setValue({ message: newText });
+    this.message.set(newText);
     this.focusInput();
 
     if (select) {
@@ -153,7 +169,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
       return;
     }
 
-    const message = this.form.value.message?.trim();
+    const message = this.message()?.trim();
     if (!message) {
       this.renderer
         .selectRootElement(this.chatInputField.nativeElement)
@@ -165,7 +181,7 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
       content: message,
       role: 'user',
     });
-    this.form.reset();
+    this.message.set('');
 
     if(this.messages.session_id) {
       const sub = this.cxaiAssistantService
@@ -277,11 +293,13 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     this.width = this.boxPosition.width + (this.boxPosition.left - this.mouse.x);
     this.height = this.boxPosition.height + (this.boxPosition.top - this.mouse.y);
     this.cxaiAssistantService.notifyResize(this.width, this.height);
+    this.cxaiAssistantRootService.storeChatUiStatus({ width : this.width, height: this.height });
   }
 
   toggleMaximize() {
     this.maximized = !this.maximized;
     this.cxaiAssistantService.notifyResize(window.innerWidth, window.innerHeight);
+    this.cxaiAssistantRootService.storeChatUiStatus({ maximized : this.maximized });
   }
 
   // Drag logic
@@ -338,5 +356,13 @@ export class AssistantChatWindowComponent implements OnInit, AfterViewInit, Afte
     this.dragging = false;
     document.removeEventListener('mousemove', this.onDragMove);
     document.removeEventListener('mouseup', this.onDragEnd);
+    const parsePx = (value: string) => {
+      return value ? parseInt(value.replace('px', ''), 10) : undefined;
+    };
+
+    this.cxaiAssistantRootService.storeChatUiStatus({
+      right: parsePx(this.box?.nativeElement.style.right),
+      bottom: parsePx(this.box?.nativeElement.style.bottom),
+    });
   };
 }

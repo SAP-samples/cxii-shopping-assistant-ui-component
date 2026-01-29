@@ -1,42 +1,22 @@
-# SAP-Samples Ask Product UI Web Component
-This project provides an accelerator component for integrating the CXII Ask Product API.
-
+# SAP-Samples Assistant & Ask Product UI Web Component
+This project provides an Accelerator component for integrating the CXII Ask Product and Assistant API.
 
 ## Prerequisites
+You need Commerce instance integrated with [CX AI Toolkit](../README-toolkit.md)
 
-Before you integrate the Ask The Product component and API you have to configure SAP AI Toolkit integration with your SAP Commerce Cloud system.
-All the steps are available here: https://help.sap.com/docs/cx-ai-toolkit/set-up/provision-new-commerce-tenant?version=CLOUD
-
-1. Add necessary extensions
-2. Enable OAuth for selected Integration Objects
-3. Adjust mandatory fields on Integration Objects
-4. Add missing oauthUrl to ConsumedDestination
-5. Adjust IP Filter Set for CCv2 to accept incoming requests from Toolkit's IP Addresses
-6. Create OAuth client configuration
-7. Perform inital integration in the Toolkit
-8. Wait for data replication to complete
-
-### Link IAS Client ID with Toolkit Organizagtion
-
-Follow Step 1 of Procedure available here:
-https://help.sap.com/docs/cx-ai-toolkit/set-up/configuration?version=CLOUD
-
-If you don't know the IAS Client ID it can be found in Backoffice:
-
-1. Go to Backoffice
-2. Navigate to: System > API > Credentials > Consumed OAuthCredentials
-3. Find CXAIToolkitCredentials_\<your-toolkit-organization-id> (The organization id is available in the Toolkit > Settings > Organization)
-4. Copy Client ID value
+Components are based on Spartacus code - they reuse the same backend which is based on OCC. This means you have to enable OCC on your instance. OCC may be private - proxy controller is provided.
 
 ## Install the Component
-### Add Required Extensions to Manifest
+Choose the appropriate option depending on whether you use OCC extensions or deprecated OCC addons.
+
+### Add Required Extensions to Manifest - OCC Extensions
 If you use OCC Extensions (`commercewebservices`):
 1. Add https://github.com/SAP-samples/cxii-commerce-extn as submodule, and extensions `cxaiocc`, `cxaibackoffice` to CCV2 manifest
 2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component as a submodule, and extensions `cxaiaskproductocc` to manifest
 3. Add `cxaiaskproductaddon` extension to manifest, including `storefrontAddons` section
 4. Deploy with migrate data
 
-### Add Required Extensions to Manifest - Legacy OCC addons usage
+### Add Required Extensions to Manifest - Legacy OCC Addons
 If you use legacy OCC addons (`ycommercewebservices` generated extension instead of `commercewebservices`):
 1. Add https://github.com/SAP-samples/cxii-commerce-extn/ as submodule, and extensions `cxaioccaddon`, `cxaibackoffice` to CCV2 manifest
 2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/ as a submodule, and extensions `cxaiaskproductoccaddon` to manifest
@@ -45,34 +25,9 @@ If you use legacy OCC addons (`ycommercewebservices` generated extension instead
 5. Deploy with migrate data
 
 ### Configure CX AI Backend
-Run the following impex to configure CX AI. 
-You need to set proper variable values, and change site / catalog name from `electronics` to your site.
+Follow [Add CX AI Toolkit Configuration](../README.md#add-cx-ai-toolkit-configuration) section from quick start guide to configure backend, then continue to next step.
 
-```bash
-# CXAI config
-$askProductUrl=https://ai-assistant-usea-prod-api.cxai.cloud.sap
-$askProductAuthUrl=https://<ias>.accounts.ondemand.com/oauth2/token
-$askProductClientId=<client_id>
-$askProductClientSecret=<client_secret>
-$siteUid=electronics
-
-INSERT_UPDATE ConsumedDestination; id[unique = true]    ; url                      ; destinationTarget(id); active[default = true]
-                                 ; ask-product          ; $askProductUrl           ; Default_Template     ; 
-
-INSERT_UPDATE ConsumedOAuthCredential; id[unique = true]   ; clientId               ; clientSecret               ; oAuthUrl
-                                     ; ask-product         ; $askProductClientId    ; $askProductClientSecret    ; $askProductAuthUrl
-
-# Alternatively we can link CXAIToolkitCredentials_<your-toolkit-organization-id> as credential(id)
-UPDATE ConsumedDestination; id[unique = true] ; credential(id)
-                          ; ask-product       ; ask-product
-
-INSERT_UPDATE CxaiConfig; code[unique=true]; baseSites(uid)  ; consumedDestination(id); askProductDestination(id); active;
-                        ; $siteUid        ; $siteUid         ;                        ; ask-product              ; true  ;
-```
-
-As a result you'll see new config in backoffice / CX AI Configurations.
-
-### Add the Chat Component to a Slot
+### Add the Ask Product Component to a Slot
 Add component to your desired slot
 ```bash
 $contentCatalog = electronicsContentCatalog
@@ -82,50 +37,92 @@ $contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCa
 INSERT_UPDATE CxaiAskProductChatJspComponent;$contentCV[unique=true];uid[unique=true];name
 ;;CxaiAskProductChatJspComponent;CxaiAskProductChatJspComponent
 
+# Optional restriction - don't render component if no valid CXAI Config
+INSERT_UPDATE AskProductRestriction; $contentCV[unique = true]; uid[unique = true]      ; name                    ; components(uid, $contentCV)
+                                       ;                      ; AskProductRestriction   ; Ask Product Restriction ; CxaiAskProductChatJspComponent
+
 # (+?) = append if not already appended
 INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)
 ;;<SlotName>;(+?)CxaiAskProductChatJspComponent
 ```
 
-Optionally can also run the following to allow adding it in SmartEdit
+### Add the Assistant Component to a Slot
+Add component to slot that is present on every page (e.g. FooterSlot)
+
+```bash
+$contentCatalog = electronicsContentCatalog
+$version = Staged
+$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]), CatalogVersion.version[default=$version])[default=$contentCatalog:$version]
+
+INSERT_UPDATE CxaiAssistantChatJspComponent;$contentCV[unique=true];uid[unique=true];name
+;;CxaiAssistantChatJspComponent;CxaiAssistantChatJspComponent
+
+# Optional restriction - don't render component if no valid CXAI Config
+INSERT_UPDATE AssistantRestriction; $contentCV[unique = true]; uid[unique = true]      ; name                    ; components(uid, $contentCV)
+                                       ;                     ; AssistantRestriction    ; Assistant Restriction   ; CxaiAssistantChatJspComponent
+
+# (+?) = append if not already appended
+INSERT_UPDATE ContentSlot;$contentCV[unique=true];uid[unique=true];cmsComponents(uid, $contentCV)
+;;<FooterSlot>;(+?)CxaiAssistantChatJspComponent
+```
+
+### Allow components to be added in SmartEdit (optional)
+Optionally can also run the following to allow adding the components in SmartEdit
 ```bash
 INSERT_UPDATE ComponentTypeGroups2ComponentType;source(code)[unique=true];target(code)[unique=true]
 ;wide;CxaiAskProductChatJspComponent
 ;narrow;CxaiAskProductChatJspComponent
 ;mobile;CxaiAskProductChatJspComponent
+;wide;CxaiAssistantChatJspComponent
+;narrow;CxaiAssistantChatJspComponent
+;mobile;CxaiAssistantChatJspComponent
 ```
 
-You can also add component directly from JSPInclude / JSP page
+You can also add the components directly from JSPInclude / JSP page, e.g.:
 ```jsp
 <%@ taglib prefix="cms" uri="http://hybris.com/tld/cmstags" %>
 <cms:component uid="CxaiAskProductChatJspComponent"/>
 ```
 
-Component will only work if product.code is available in page context (e.g. on PDP).
+Ask product component will only work if `product.code` is available in page context (e.g. on PDP).
 
-### Verify that component renders properly
-Go to the page where you added the component. If component is not visible, view page source and look for `<cxai-ask`.
-1. Make sure that baseUrl is correct, if not see [Change Backend URL](#change-backend-url)
+### Verify that the Component Renders Properly
+Go to the page where you added the component and **log-in**. If component is not visible, view page source and look for `<cxai-`.
+1. Make sure that parameters (occ url, prefix, media base url) are correct, if not see [Change Backend URL](#change-backend-url)
 2. If `baseUrl` and `productCode` is valid check DevTools Network tab for request to `cxai/config`
-3. if request fails with 403 make sure to set CORS properties in your API aspect for your commercewebservices extension e.g:
-  ```bash
-  corsfilter.commercewebservices.allowedOrigins=<URL of your storefront>
-  # if using legacy OCC
-  corsfilter.ycommercewebservices.allowedOrigins=<URL of your storefront>
-  corsfilter.yoursitecommercewebservices.allowedOrigins=<URL of your storefront>
-  ```
+3. If request fails with 403 make sure to set CORS properties for your commercewebservices extension e.g:
+    ```bash
+    corsfilter.commercewebservices.allowedOrigins=<URL of your storefront>
+    # if using legacy OCC
+    corsfilter.ycommercewebservices.allowedOrigins=<URL of your storefront>
+    corsfilter.yoursitecommercewebservices.allowedOrigins=<URL of your storefront>
+    ```
 
-  URL is just a base URL to your storefront, e.g. `https://some.domain.com`
+    URL is just a base URL to your storefront, e.g. `https://some.domain.com`
+4. If your OCC  is not public or not configured for access from storefront, set 
+    ```properties
+    cxaiaskproductaddon.occ.proxy.enabled=true
+    ```
+    This will expose relevant part of OCC through storefront controller (`/cxai/*` + `GET /product/{code}`).
+
+### Anonymous user
+By default you need to log in to use the components (OCC API is restricted)
+- If you want to allow anonymous user access set `cxai.anonymous.api.access.enabled=true` in hac / properties
+- If you don't want to allow anonymous access add `loggedInUser` restriction to the components so they don't render for anonymous.
 
 ### Change Translation Labels
-You can edit `base_xx.properties` inside `cxaiaskproductaddon/acceleratoraddon/web/webroot/WEB-INF/messages/` to translate the component. You can also add new `base_xx.properties` file for new languages.
-Keys not present in the translation file will default to the English label defined in javascript component.
+You can edit `base_xx.properties` inside `cxaiaskproductaddon/acceleratoraddon/web/webroot/WEB-INF/messages/` to translate the components. You can also add new `base_xx.properties` file for new languages.
+Keys not present in the translation file will default to the English label defined in javascript components.
 ```bash
 askProduct.inputPlaceholder=Ask anything...
 askProduct.welcomeMessage=Hello! If you have any questions about this product feel free to ask here.
 askProduct.noAnswerMessage=Sorry, could not find answer to your question. Please ask a different one.
 askProduct.send=Generate
 askProduct.clearChat=Clear
+
+cxaiAssistant.inputPlaceholder=What are you looking for today?
+cxaiAssistant.title={{siteName}} Assistant
+...
 ```
 ### Change Backend URL
 By default component tries to use `ccv2.services.api.url.0` property as backend (OCC) URL and `ext.commercewebservices.extension.webmodule.webroot` as OCC prefix (e.g. /occ/v2). If default values are not resolved properly you can uncomment the following properties (defined in `project.properties.template`) to force using specific backend URL 
@@ -133,6 +130,23 @@ By default component tries to use `ccv2.services.api.url.0` property as backend 
 ```bash
 cxaiaskproductaddon.occ.prefix=/occ/v2/
 cxaiaskproductaddon.occ.baseUrl=
+```
+
+If your OCC  is not public or not configured for access from storefront, set 
+```properties
+cxaiaskproductaddon.occ.proxy.enabled=true
+```
+This will expose relevant part of OCC through storefront controller (`/cxai/*` + `GET /product/{code}`).
+
+### Extra addon properties
+Assistant requires font-awesome icons to be loaded. If you already use them then set `cxaiaskproductaddon.importFontAwesome` to `false`.
+```properties
+# Change when script is updated to invalidate browser cache
+cxaiaskproductaddon.script.version=2211.47.0
+# Set to false if you already have font awesome icons
+cxaiaskproductaddon.importFontAwesome=true
+# If medias require some custom base url
+cxaiaskproductaddon.media.baseUrl=
 ```
 
 Empty base URL = use the same domain as storefront as backend.
@@ -222,11 +236,28 @@ All defined veriables:
 
 ## Development
 ### Build the Library
-Code to build web component bundle `cxai-components.js` will be shared in future release, currently you can only style the component and modify JSP.
+1. Go to angular workspace `cxai-assistant-angular-lib`
+2. Run `nvm use`
+3. Run `npm i`
+4. Run `./build-web-component.sh` - this will build the bundle and update files in this addon
+5. To make sure file is fetched after modification you can modify `cxaiaskproductaddon.script.version` property when `cxai-components.js` file is updated
+6. You can also run `npm run build:web-component` to just build the code but not copy it to addon
+7. You can run `ng s` to run web-components on localhost page - make sure you set proper parameters in `index.html`
 
 ### Modify JSP Component
-You can modify `cxaiaskproductchatjspcomponent.jsp` and serving controller to change component behavior.
+You can modify `cxaiaskproductchatjspcomponent.jsp` and serving controllers to change component behavior.
 
 `cxaiaskproductaddon.js` contains information about javascript context that is consumed by the component, e.g. you can set `ACC.cxaiaskproductaddon.config` to disable fetching config via occ
 
 `ACC.cxaiaskproductaddon.i18n` contains translation labels that are passed to the component - they are populated automatically from `.properties` files.
+
+`ACC.cxaiaskproductaddon.spartacus` contains required configs normally available in Spartacus storefront.
+
+### OCC Tokens (Assistant)
+Assistant component requires a valid customer OCC token to perform actions like checking orders or adding items to the cart. Since Accelerator doesn't natively authorize with OCC, this token is not available by default.
+
+Sample code is provided with `DefaultAcceleratorOccTokenService`, which attempts to create a customer token. However, this only works with the default configuration.
+
+You may need to develop your own `AcceleratorOccTokenService` implementation to handle OCC authorization, for example, by generating the token when a customer logs in.
+
+Alternatively, you can use `NoopAcceleratorOccTokenService` (via `-spring.xml` override) and disable the relevant agents in the CX AI Assistant Config (`AddToCartAgent`, `OrderStatusAgent`).

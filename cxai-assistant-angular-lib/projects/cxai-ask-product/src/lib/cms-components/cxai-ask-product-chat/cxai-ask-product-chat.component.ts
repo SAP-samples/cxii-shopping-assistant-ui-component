@@ -77,12 +77,10 @@ export class CxaiAskProductChatComponent implements OnInit, AfterViewChecked {
       this.currentProductService.getProduct();
     this.productCode$ = product$.pipe(
       filter((p) => !!p?.code),
-      map((p) => p!.code),
+      map((p) => p?.code || ''),
       distinctUntilChanged(),
       tap((productCode) => this.loadConversation(productCode))
     );
-
-    //TODO: load messages from local storage
   }
 
   ngAfterViewChecked(): void {
@@ -132,9 +130,9 @@ export class CxaiAskProductChatComponent implements OnInit, AfterViewChecked {
         sources = sources
           .map((s) => {
             return {
-              documentId: s.documentId || s.document_id,
+              documentId: s.documentId,
               name: s.name || s.documentId || '',
-              downloadUrl: s.downloadUrl || s.download_url,
+              downloadUrl: s.downloadUrl,
             };
           })
           .filter((s) => {

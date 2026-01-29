@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { Product } from '@spartacus/core';
+import { Product } from '@cx-spartacus/cxai-assistant/root';
 
 @Component({
   selector: 'lib-product-card',

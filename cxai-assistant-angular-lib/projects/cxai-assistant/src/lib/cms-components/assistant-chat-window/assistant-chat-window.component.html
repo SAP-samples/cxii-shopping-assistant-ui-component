@@ -18,7 +18,7 @@
     </div>
 
     <div class="assistant-title" (mousedown)="onTitleBarMouseDown($event)">{{ 'cxaiAssistant.title' | cxTranslate : { siteName: currentSiteName } }}</div>
-    
+
     <div class="title-bar-actions">
       <ng-template [cxOutlet]="outlets.TITLEBAR_ACTIONS" [cxOutletContext]="outletContext">
         <button
@@ -48,7 +48,7 @@
         <div *ngIf="message.content" class="message {{ message.role }}" [class.error]="!!message.error">
           @if (message.role === 'assistant') {
           <div class="message-content">
-            @for (token of message | chatMessage; track $index) { 
+            @for (token of message | chatMessage; track $index) {
               @if(token.type === 'html') {
                 <span [innerHTML]="token.content"></span>
               } @else {
@@ -64,8 +64,8 @@
 
         @if(message.recommendations?.[0]?.codes?.length) {
           <lib-chat-product-carousel [productCodes]="message.recommendations![0].codes!"></lib-chat-product-carousel>
-        } 
-      } 
+        }
+      }
     }
     <div *ngIf="sendQuestionSubscription() || !(hasValidSession() || messages?.chat_history?.length)" class="message assistant waiting">
       <div class="message-content">
@@ -73,21 +73,22 @@
       </div>
     </div>
   </div>
-  <form (ngSubmit)="sendMessage()" [formGroup]="form" class="cxai-chat-form">
+  <form class="cxai-chat-form">
     <textarea
       #chatInputField
-      [maxlength]="1000"
+      maxlength="1000"
       [readonly]="inputTextDisabled()"
+      [value]="message()"
+      (input)="onMessageInput($event)"
       (keypress)="onKeyPress($event)"
       class="form-control cxai-chat-input"
       name="message"
-      formControlName="message"
       [class.ng-invalid]="false"
       placeholder="{{ 'cxaiAssistant.inputPlaceholder' | cxTranslate }}"
     ></textarea>
 
     <ng-template [cxOutlet]="outlets.CHAT_BUTTONS" [cxOutletContext]="outletContext">
-      <button class="cxai-btn-send" [disabled]="sendDisabled()">
+      <button type="button" class="cxai-btn-send" [disabled]="sendDisabled()" (click)="sendMessage()">
         <lib-chat-icon faIcon="far fa-paper-plane"></lib-chat-icon>
       </button>
     </ng-template>

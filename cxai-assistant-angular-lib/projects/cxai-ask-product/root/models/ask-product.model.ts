@@ -10,10 +10,6 @@ export interface AskProductSource {
   documentId?: string;
   name: string;
   downloadUrl?: string;
-
-  //TODO: remove this after backend is fixed
-  document_id?: string;
-  download_url?: string;
 }
 
 export interface AskProductQuestion {

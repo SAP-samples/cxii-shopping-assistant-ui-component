@@ -5,7 +5,7 @@
  */
 
 import { TranslationChunksConfig, TranslationResources } from '@spartacus/core';
-import { en } from './en/index';
+import { en } from '@cx-spartacus/cxai-assistant/root';
 
 export const libTranslations: TranslationResources = {
   en,

@@ -61,3 +61,43 @@ export const mockOldChatSessionResponse: AssistantChatSessionInternal = {
     },
   ],
 };
+
+// for use in AssistantApiService
+// eslint-disable-next-line
+const mockChatSessionWithTokens: AssistantChatSessionInternal = {
+  status: 'active',
+  chat_history: [
+    {
+      role: 'assistant',
+      content: 'hi',
+    },
+    {
+      role: 'user',
+      content: 'recommend some white sneakers',
+    },
+    {
+      role: 'assistant',
+      content: {
+        response: 'order {0000097003} and {DEWE1231NJWS3321} and {1234567899999} and {Track9999}',
+        actions: [
+          {
+            action: 'order_tracking',
+            codes: ['0000097003'],
+          },
+          {
+            action: 'tracking_id',
+            codes: ['DEWE1231NJWS3321'],
+          },
+          {
+            action: 'tracking_id',
+            codes: ['1234567899999'],
+          },
+          {
+            action: 'tracking_id',
+            codes: ['Track9999'],
+          },
+        ]
+      }
+    },
+  ],
+}

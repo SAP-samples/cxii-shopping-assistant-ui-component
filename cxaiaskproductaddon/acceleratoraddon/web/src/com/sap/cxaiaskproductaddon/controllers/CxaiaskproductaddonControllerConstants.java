@@ -4,6 +4,7 @@
 package com.sap.cxaiaskproductaddon.controllers;
 
 import com.sap.cxaiaskproductaddon.model.components.CxaiAskProductChatJspComponentModel;
+import com.sap.cxaiaskproductaddon.model.components.CxaiAssistantChatJspComponentModel;
 
 
 /**
@@ -19,10 +20,8 @@ public interface CxaiaskproductaddonControllerConstants
 			String _Prefix = "/view/";
 			String _Suffix = "Controller";
 
-			/**
-			 * Customized AddToCartAction controller
-			 */
 			String CxaiAskProductChatJsp = _Prefix + CxaiAskProductChatJspComponentModel._TYPECODE + _Suffix;
+			String CxaiAssistantChatJsp = _Prefix + CxaiAssistantChatJspComponentModel._TYPECODE + _Suffix;
 
 		}
 	}

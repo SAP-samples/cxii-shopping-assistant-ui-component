@@ -1,12 +1,7 @@
 <ng-template #template>
-  @if(hasCustomComponent) {
-    <ng-container
-    [cxComponentWrapper]="{
-      flexType: componentId,
-    }"
-    >
-    </ng-container>
+  @if(customComponent) {
+   <ng-container *ngComponentOutlet="customComponent"></ng-container>
   } @else {
     <span class="assistant-chat-token token-type-{{context.token.type}}">{{ context.token.content }}</span>
   }
-</ng-template> 
+</ng-template>

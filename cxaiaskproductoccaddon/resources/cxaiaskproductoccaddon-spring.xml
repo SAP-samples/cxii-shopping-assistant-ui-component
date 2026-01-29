@@ -72,7 +72,7 @@
 	
  	<bean id="cxaiConfigAssistantConfigAttributeHandler" class="com.sap.cxaiaskproductocc.attribute.CxaiConfigAssistantConfigAttributeHandler"></bean>
 	
-	<bean id="caiAssistantApiService" class="com.sap.cxaiaskproductocc.service.CxaiAssistantApiService"></bean>
+	<bean id="cxaiAssistantApiService" class="com.sap.cxaiaskproductocc.service.CxaiAssistantApiService"></bean>
 	<bean id="cxaiAskProductApiService" class="com.sap.cxaiaskproductocc.service.CxaiAskProductApiService"></bean>
 		
 	<bean id="cxaiAssistantConfigSaveInterceptor"
