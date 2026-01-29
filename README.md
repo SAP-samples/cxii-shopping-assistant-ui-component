@@ -195,3 +195,14 @@ After finishing this quick start guide you can check detailed documentation:
 - [Spartacus Workspace README](cxai-assistant-angular-lib/README.md) (how to customize, develop and debug the components)
 - [Backend README](cxaiaskproductocc/README.md) Libraries require backend layer to communicate with toolkit API
 - For production it is advised to fork / mirror original repositories (then add forks / mirrors as a submodules)
+
+## How to Obtain Support
+Create an issue in this repository if you find a bug or have questions about the content.
+
+For additional support, ask a question in SAP Community.
+
+## Contributing
+If you wish to contribute code, offer fixes or improvements, please send a pull request. Due to legal reasons, contributors will be asked to accept a DCO when they create the first pull request to this project. This happens in an automated fashion during the submission process. SAP uses the standard DCO text of the Linux Foundation.
+
+## License
+Copyright (c) 2026 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the LICENSE file.
