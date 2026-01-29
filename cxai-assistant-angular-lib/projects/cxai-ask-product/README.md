@@ -1,4 +1,5 @@
-# CxaiAskProductAngularLib
+# cxai-ask-product library
+Extension to workspace README for ask-product library.
 
 ## Add library to application
 1. Add `@cx-spartacus/cxai-ask-product` to package.json
@@ -16,7 +17,7 @@ When using variant products, the ask product service receives only the currently
 To get answers to general questions that span multiple variants (such as available sizes etc.), you need to provide common datasheets for each variant product.
 
 ## Config
-Config is fetched from backend, but can be also provided locally. Backend values (if defined) will overwrite local.
+Config is fetched from backend, but can be also provided locally. Backend values (if defined) **will overwrite local**.
 
 ```js
     provideConfig({
@@ -58,29 +59,4 @@ INSERT_UPDATE AskProductRestriction; $contentCV[unique = true]; uid[unique = tru
 
 INSERT_UPDATE ContentSlot; $contentCV[unique = true]; uid[unique = true] ; cmsComponents(uid, $contentCV)
                          ;                          ; ProductSummarySlot ; (-)CxaiAskProductChatComponent,(+)CxaiAskProductChatComponent
-```
-
-
-## Backend extensions
-This section is relevant only if you use cxai backend extensions which provide CXAI section in backoffice. Config contains both assistant and ask-product features.
-
-```
-$assistantConfigIdCanary=<config_id>
-# CXAI config
-INSERT_UPDATE ConsumedOAuthCredential; id[unique = true] ; clientId                                      ; clientSecret                               ; oAuthUrl
-                                     ; visual-search-canary     ; $config-stylebuddy.clientId            ; $config-stylebuddy.clientSecret            ; $visualSearchAuthUrl
-                                     ; visual-search-prod       ; $config-stylebuddy.prod.clientId       ; $config-stylebuddy.prod.clientSecret       ; $visualSearchProdAuthUrl
-                                     ; ask-product-canary       ; $config-cxai.ask-product.clientId      ; $config-cxai.ask-product.clientSecret      ; $askProductAuthUrl
-                                     ; ask-product-prod         ; $config-cxai.ask-product.prod.clientId ; $config-cxai.ask-product.prod.clientSecret ; $askProductAuthUrl
-
-INSERT_UPDATE ConsumedDestination; id[unique = true]     ; url                       ; destinationTarget(id); credential(id)       ; active[default = true]
-                                 ; visual-search-canary  ; $visualSearchCanaryUrl    ; Default_Template     ; visual-search-canary ;
-                                 ; visual-search-prod    ; $visualSearchProdUrl      ; Default_Template     ; visual-search-prod   ;
-                                 ; ask-product-canary    ; $askProductCanaryUrl      ; Default_Template     ; ask-product-canary   ;
-                                 ; ask-product-prod      ; $askProductProdUrl        ; Default_Template     ; ask-product-prod     ;
-                                 ; assistant-canary      ; $assistantCanaryUrl       ; Default_Template     ; visual-search-canary ;
-
-INSERT_UPDATE CxaiConfig; code[unique=true]; baseSites(uid); consumedDestination(id); askProductDestination(id); variantDuplicateFiltering; enableObjectDetection; active; assistantConfigId        ; assistantDestination(id);
-                        ; canary           ; $cxaiSites    ; visual-search-canary   ; ask-product-canary       ; true                     ; false                ; true  ; $assistantConfigIdCanary ; assistant-canary
-                        ; prod             ; $cxaiSites    ; visual-search-prod     ; ask-product-prod         ; true                     ; false                ; false ; $assistantConfigIdCanary ; assistant-canary
 ```

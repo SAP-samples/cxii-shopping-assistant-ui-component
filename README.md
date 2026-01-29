@@ -3,84 +3,195 @@ Spartacus library to use CXII Assistant and Ask Product API.
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/cxii-shopping-assistant-ui-component)](https://api.reuse.software/info/github.com/SAP-samples/cxii-shopping-assistant-ui-component)
 
 ## Description
-CXAI Assistant library for use with CXAI assistant API
-CXAI Ask Product library for use with CXAI Ask Product API
+- CXAI Assistant library for use with CXAI assistant API.
+- CXAI Ask Product library for use with CXAI Ask Product API.
 
 ## Accelerator (JSP) version
-This instruction is for Composable Storefront library. If you use Accelerator see [Accelerator Addon](#cxaiaskproductaddon/README.md)
+This instruction is for Composable Storefront library. If you use Accelerator see [Accelerator Addon](cxaiaskproductaddon/README.md)
 
-## Requirements
-1. Node version specified in `.nvmrc` files
-2. Valid `configurationId` created by Assistant API. You can pass it via `provideConfig`, or expose backend endpoint that returns it, or use provided sample backend extensions. See section in [Backend README](cxaiaskproductocc/README.md#sample-assistant-config-json).
-3. Library depends on backend which allows access to part of API without authorization. Library assumes API is served via OCC, you need to modify code (`buildUrl` method) to allow arbitrary URL. Sample backend extension is provided: [Backend README](cxaiaskproductocc/README.md)
+## Prerequisites
+You need Commerce instance integrated with [CX AI Toolkit](README-toolkit.md)
 
-## Download and Installation
-The following instructions are for assistant library. For ask-product you can follow exactly the same steps, just change `assistant` to `ask-product`. You can either use prebuilt release or build the library manually.
+## Quick Start Guide :rocket:
+This guide allows you to quickly connect the component with your Spartacus application using default backend extensions.
 
-### Using Prebuilt Release
-1. Open latest [release](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/releases) 
-2. Modify your application's `package.json` by adding entries specified on release page
-    > Optionally you can `npm publish` the tgzs to your private npm registry and use version syntax instead of URLs
-3. Run `npm i`
-4. Skip to [Importing Assistant Library Module](#importing-assistant-library-module)
+### Add backend extensions
+1. Add https://github.com/SAP-samples/cxii-commerce-extn as a git submodule to your codebase
 
-### Building the Library
-Development guide for building and debugging the library.
-#### Running the Build
-1. cd into **workspace** `cxai-assistant-angular-lib`
-2. `nvm use` or use node version specified in `.nvmrc`
-3. Verify and adjust `.npmrc` file
-    - if you use private npm registry (e.g. Verdaccio, GitHub Packages etc.) as a proxy for `@spartacus` and to host your own packages then just set environment variables to your proxy URL and auth token
-    - otherwise replace `@spartacus:registry` with URL and credentials that you use in your spartacus app (e.g. RBSC) and optionally add `@cx-spartacus:registry` to be able to `npm publish`
-4. `npm i`
-    - never run `npm install` inside `projects/*`, only in workspace root
-5. `npm run build:assistant`
+   `git submodule add https://github.com/SAP-samples/cxii-commerce-extn` (usually inside `core-customize`)
+2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component as a git submodule to your codebase
+3. Add `cxaiocc`, `cxaibackoffice`, `cxaiaskproductocc` to `manifest.json` or `localextensions.xml`
+4. Deploy with migrate data (update system)
 
-#### Publishing to Your Private npm Repository
-If you own a private npm repository:
-1. Update `@cx-spartacus:registry` in `.npmrc` to point to your private repository
-2. Run `build.sh` script
-3. Add library to your application's `package.json`, e.g.
-    - `"@cx-spartacus/cxai-assistant": "~2211.43.0"`
+### Add CX AI Toolkit Configuration
+Run impex with toolkit configuration. **Enable code execution toggle in hac** to respect `if` directives. 
+**Adjust values in `<braces>` to your local environment**.
 
-#### Creating .tgz File (If You Don't Have npm Repository)
-If you don't own a private npm repository:
-1. `cd` into `dist/cxai-assistant` after `npm run build`
-2. Run `npm pack` - this will produce a `.tgz` file
-3. Copy the `.tgz` into your application's codebase, e.g. into `lib/cx-spartacus-cxai-assistant-<version>.tgz`
-4. Add library to your application's `package.json`, e.g.
-    - `"@cx-spartacus/cxai-assistant": "file:lib/cx-spartacus-cxai-assistant-<version>.tgz"`
+```bash
+# Site for which the configuration is applied
+$siteUid = <site-uid>
 
-#### Run in Development Mode
-If you want to run the library in watch mode:
-1. Run `npm link` in `dist/cxai-assistant` folder (after `npm run build`)
-2. Run `npm link @cx-spartacus/cxai-assistant` in your application
-    > You need to have `"preserveSymlinks": true,` in app's `angular.json` projects/<project_name>/architect/build/options
-3. Run the library using `npm run watch:assistant`
-4. Run your app `ng s`
-5. When you modify library code, the application will reload automatically
-6. `npm link` is temporary and will be removed after each `npm install` in your application
+# VS / assistant
+$toolkitProdUrl = https://<usea-prod>.cxai.cloud.sap
+$visualSearchProdUrl = $toolkitProdUrl/vision/api/v2
+$assistantProdUrl = $toolkitProdUrl/shopping-assistant/api/v1
 
-### Importing Assistant Library Module
-After you've successfully added library as a dependency in your application's `package.json`, and either run `npm install` or `npm link` you can now use it.
-1. Add import `CxaiAssistantFeatureModule` from `@cx-spartacus/cxai-assistant/feature` into `app.module`
-2. Build your application - it must build without errors.
+# Ask about product (you can leave it as-is if not used)
+$askProductProdUrl = https://ai-assistant-<usea-prod>-api.cxai.cloud.sap
+$askProductProdAuthUrl = https://<ias>.accounts.ondemand.com/oauth2/token
+# IAS credentials only for ask-product
+$askProductProdClientId = <askProductProdClientId>
+$askProductProdClientSecret = <askProductProdClientSecret>
 
-Next follow [Assistant README](cxai-assistant-angular-lib/README.md) for instructions about backend, configuration options and how to add the cms component.
+# Created by toolkit integration - <org-id> is your toolkit organisation id.
+# You can also find this in Backoffice ConsumedOauthCredentials
+$toolkitCredentialId = CXAICredentials_<org-id>
 
-### Ask Product Library
-For ask product library, do the same steps but use `:ask-product` for npm commands. Follow [Ask Product README](cxai-assistant-angular-lib/projects/cxai-ask-product/README.md)
+# Assistant Config ID if already created by the API, otherwise ignore it for now
+$assistantConfigIdProd = <CONFIG_67658b0c...>
 
-## Known Issues (Assistant)
-This implementation assumes one chat config per site. Currently backend configs do not take into account language parameter, also language is not passed when opening a new session. To support welcome message in different languages it is required to use translations - see `lib.i18n.ts` for translation keys.
+INSERT_UPDATE ConsumedOAuthCredential; id[unique = true]  ; clientId                 ; clientSecret                 ; oAuthUrl
+                                     ; ask-product-prod   ; $askProductProdClientId  ; $askProductProdClientSecret  ; $askProductProdAuthUrl
 
-## How to Obtain Support
-[Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.
- 
-For additional support, [ask a question in SAP Community](https://answers.sap.com/questions/ask.html).
+INSERT_UPDATE ConsumedDestination; id[unique = true]  ; url                  ; destinationTarget(id); credential(id)       ; active[default = true]
+                                 ; visual-search-prod ; $visualSearchProdUrl ; Default_Template     ; $toolkitCredentialId ;
+                                 ; ask-product-prod   ; $askProductProdUrl   ; Default_Template     ; ask-product-prod;
 
-## Contributing
-If you wish to contribute code, offer fixes or improvements, please send a pull request. Due to legal reasons, contributors will be asked to accept a DCO when they create the first pull request to this project. This happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
+# empty values are taken from spartacus provideConfig, concrete values overwrite spartacus config
+INSERT_UPDATE CxaiConfig; code[unique = true]; baseSites(uid); consumedDestination(id); askProductDestination(id); active[default = false];
+                        ; prod-$siteUid      ; $siteUid      ; visual-search-prod     ; ask-product-prod         ; 
 
-## License
-Copyright (c) 2025 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
+#% if: "$assistantConfigIdProd".startsWith("CONFIG_")
+INSERT_UPDATE CxaiAssistantConfig; cxaiConfig(code)   ; configId[unique = true];
+                                 ; prod-$siteUid      ; $assistantConfigIdProd
+
+UPDATE CxaiConfig; code[unique = true]; assistantConfig(configId)
+                 ; prod-$siteUid      ; $assistantConfigIdProd
+#% endif:
+
+UPDATE CxaiConfig; code[unique = true]; active
+                 ; prod-$siteUid      ; true
+```
+
+1. Open **Backoffice / CX AI Configuration** and select configuration that you've just created. 
+    > If you can't see this section press F4 - reset everything - F4. If still can't see make sure `cxaibackoffice` extension is loaded in `hac`
+2. Open **Assistant** tab. 
+3. If there is no **Assistant configuration**, open the dropdown and select **Create CX AI Assistant Config**. 
+![CXAI Config](docs/images/backoffice_cxai_config.png)
+4. Paste the following json into **Config definition (JSON)**, adjust `site_id` and `catalog_id` to your environment, and press **Save**.
+
+```js
+{
+  //this will be displayed only in toolkit UI "Agents"
+  "agent_name": "CX AI Assistant",
+  "agent_description": "Shopping Assistant",
+  "is_active": true,
+  //can be overwritten by Spartacus translations
+  "initial_message": "Hello! How can I help you today?",
+  "catalog_id": "{site}ProductCatalog",
+  "catalog_version": "Online",
+  "site_id": "{site}",
+  //can be empty - what kind of products are available in catalog (e.g. fashion, electronics ...)
+  "classification": "",
+  "sub_agents": [
+    {
+      "name": "PriceRecommendationAgent",
+      "is_active": true
+    },
+    {
+      "name": "SelfServiceAgent",
+      "is_active": true
+    },
+    {
+      "name": "OrderStatusAgent",
+      "is_active": true
+    },
+    {
+      "name": "AddToCartAgent",
+      "is_active": true
+    },
+    {
+      "name": "StockAgent",
+      "is_active": true,
+      "features": {
+        "show_out_of_stock_recommendations": true,
+        "allow_specific_quantity_stock_queries": false
+      }
+    }
+  ],
+  "global_settings": {
+    "default_language": "en-us",
+    // formal, casual ...
+    "tone": "formal"
+  }
+}
+```
+
+![Create Assistant Config](docs/images/backoffice_assistant_config.png)
+> Save should be successful if CX AI credentials are correct. If there is an error, verify credentials and URL on **Basic** tab **Consumed Destination**.
+6. Save CX AI Config with **Assistant configuration** filled in.
+
+> **Hint:** You can also see your newly created Configuration in CX AI Toolkit **AI Agents** section ![AI Agents](docs/images/toolkit_ai_agents.png)
+
+### Add Components to Slots
+Run the following impex to add components to CMS slots. You can adjust slot names (`ProductSummarySlot`, `FooterSlot`). If you use only one component then use only relevant half of this impex. Run the impex in `Online` `$version`, or synchronize components from Backoffice after they are created in `Staged`.
+
+```bash
+$contentCatalog = <site>ContentCatalog
+$version = Staged
+$contentCV = catalogVersion(CatalogVersion.catalog(Catalog.id[default=$contentCatalog]), CatalogVersion.version[default=$version])[default=$contentCatalog:$version]
+
+##### Ask the Product ########
+
+INSERT_UPDATE CMSFlexComponent; $contentCV[unique = true]; uid[unique = true]          ; name                        ; flexType
+                              ;                          ; CxaiAskProductChatComponent ; CxaiAskProductChatComponent ; CxaiAskProductChatComponent
+
+INSERT_UPDATE AskProductRestriction; $contentCV[unique = true]; uid[unique = true]    ; name                    ; components(uid, $contentCV)
+                                   ;                          ; AskProductRestriction ; Ask Product Restriction ; CxaiAskProductChatComponent
+
+# (+?) = append if not already appended
+INSERT_UPDATE ContentSlot; $contentCV[unique = true]; uid[unique = true] ; cmsComponents(uid, $contentCV)
+                         ;                          ; ProductSummarySlot ; (+?)CxaiAskProductChatComponent
+
+##### Assistant ########
+INSERT_UPDATE CMSFlexComponent; $contentCV[unique = true]; uid[unique = true]          ; name                        ; flexType
+                              ;                          ; AssistantChatFloatComponent ; AssistantChatFloatComponent ; AssistantChatFloatComponent
+
+INSERT_UPDATE AssistantRestriction; $contentCV[unique = true]; uid[unique = true]   ; name                  ; components(uid, $contentCV)
+                                  ;                          ; AssistantRestriction ; Assistant Restriction ; AssistantChatFloatComponent
+
+INSERT_UPDATE ContentSlot; $contentCV[unique = true]; uid[unique = true]; cmsComponents(uid, $contentCV)
+                         ;                          ; FooterSlot        ; (+?)AssistantChatFloatComponent
+```
+
+### Configure Frontend
+1. Open latest [release](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/releases) and add libraries to your `package.json`
+2. `npm install`
+3. Import `CxaiAskProductFeatureModule` and `CxaiAssistantFeatureModule` into your `app.module` imports[] array.
+```ts
+import { CxaiAskProductFeatureModule } from '@cx-spartacus/cxai-ask-product/feature';
+import { CxaiAssistantFeatureModule } from '@cx-spartacus/cxai-assistant/feature';
+//then add to imports[]
+```
+4. `ng serve`
+5. By default you need to log in to use the components (OCC API is restricted)
+    - If you want to allow anonymous user access set `cxai.anonymous.api.access.enabled=true` in hac / properties
+    - If you don't want to allow anonymous access add `loggedInUser` restriction to `CMSFlexComponent`s
+    ```bash
+    UPDATE AbstractCMSComponent; uid[unique = true]          ; onlyOneRestrictionMustApply; restrictions(uid,$contentCV); $contentCV[unique = true];
+                              ; AssistantChatFloatComponent ; false                      ; (-)loggedInUser,(+)loggedInUser
+                              ; CxaiAskProductChatComponent ; false                      ; (-)loggedInUser,(+)loggedInUser
+    ```
+### Verify
+If successful, you should be able to see chat component on every page (bottom right) and ask product component on product pages.
+![CXAI Config](docs/images/screenshot_components.png)
+
+#### Common troubleshooting
+1. If you can't see the components, try logging in or adjust `cxai.anonymous.api.access.enabled` property in hac
+2. If you get `401` response from ask-product (despite correct credentials) make sure you [configured IAS client id](README-toolkit.md) in toolkit 
+
+## Next Steps
+After finishing this quick start guide you can check detailed documentation:
+- [Spartacus Workspace README](cxai-assistant-angular-lib/README.md) (how to customize, develop and debug the components)
+- [Backend README](cxaiaskproductocc/README.md) Libraries require backend layer to communicate with toolkit API
+- For production it is advised to fork / mirror original repositories (then add forks / mirrors as a submodules)
