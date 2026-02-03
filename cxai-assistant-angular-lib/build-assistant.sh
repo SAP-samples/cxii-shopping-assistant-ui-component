@@ -1,7 +1,7 @@
 set -e
 npm run lint
-npm run test:assistant -- --watch=false --no-progress
 npm run build:assistant
+npm run test:assistant -- --watch=false --no-progress
 lib_name=cxai-assistant
 current_version=$(node -p "require('./projects/$lib_name/package.json').version")
 cp README.md "dist/$lib_name/"

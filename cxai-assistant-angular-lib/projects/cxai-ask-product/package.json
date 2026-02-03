@@ -1,6 +1,6 @@
 {
   "name": "@cx-spartacus/cxai-ask-product",
-  "version": "2211.47.0",
+  "version": "2211.47.1",
   "peerDependencies": {
     "@angular/common": "^19.0.0",
     "@angular/core": "^19.0.0",

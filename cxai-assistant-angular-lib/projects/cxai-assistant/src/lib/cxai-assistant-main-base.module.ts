@@ -1,5 +1,4 @@
 import { CommonModule, NgComponentOutlet } from '@angular/common';
-import { provideHttpClient } from '@angular/common/http';
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CxaiAssistantService } from './cxai-assistant.service';
 import { CxaiAssistantApiService } from '@cx-spartacus/cxai-assistant/root';
@@ -25,7 +24,6 @@ import { AssistantTokenComponent } from './cms-components/assistant-token/assist
     AssistantTokenComponent,
   ],
   providers: [
-    provideHttpClient(),
     {
       provide: CxaiAssistantApiService,
       useFactory: (rootCxaiAssistantApiService) => {

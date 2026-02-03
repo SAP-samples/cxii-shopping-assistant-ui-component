@@ -113,6 +113,7 @@ export class CxaiAssistantService {
     };
 
     return this.getPageContext().pipe(
+      take(1),
       switchMap(context => {
         this.addContextToUserInput(payload, context);
         return this.apiService.postMessage(payload).pipe(
@@ -381,7 +382,7 @@ export class CxaiAssistantService {
     }
   }
 
-  getPageContext(): Observable<AssistantContext> {
+  protected getPageContext(): Observable<AssistantContext> {
     return this.miscSpartacusActionsService.getPageContext();
   }
 

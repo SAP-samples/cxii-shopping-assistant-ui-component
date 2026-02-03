@@ -17,7 +17,7 @@ cxaiaskproductaddon.javascript.paths.responsive=/responsive/common/js/cxaiaskpro
 cxaiaskproductaddon.css.paths.responsive=/responsive/common/css/cxaiaskproductaddon.css
 
 # Change when script is updated to invalidate browser cache
-cxaiaskproductaddon.script.version=2211.47.0
+cxaiaskproductaddon.script.version=2211.47.1
 # Set to false if you already have font awesome icons
 cxaiaskproductaddon.importFontAwesome=true
 # Uncomment and set if default resolution is not returning correct values
