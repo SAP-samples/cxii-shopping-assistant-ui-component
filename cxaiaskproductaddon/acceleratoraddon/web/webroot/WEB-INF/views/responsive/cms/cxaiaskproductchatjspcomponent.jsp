@@ -12,11 +12,11 @@
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function() {
         const translations = {
-            inputPlaceholder: '<spring:theme code="askProduct.inputPlaceholder" text="{empty}" />',
-            welcomeMessage: '<spring:theme code="askProduct.welcomeMessage" text="{empty}" />',
-            noAnswerMessage: '<spring:theme code="askProduct.noAnswerMessage" text="{empty}" />',
-            send: '<spring:theme code="askProduct.send" text="{empty}" />',
-            clearChat: '<spring:theme code="askProduct.clearChat" text="{empty}" />',
+            inputPlaceholder: "<spring:theme code='askProduct.inputPlaceholder' text='{empty}' htmlEscape='false' />",
+            welcomeMessage: "<spring:theme code='askProduct.welcomeMessage' text='{empty}' htmlEscape='false' />",
+            noAnswerMessage: "<spring:theme code='askProduct.noAnswerMessage' text='{empty}' htmlEscape='false' />",
+            send: "<spring:theme code='askProduct.send' text='{empty}' htmlEscape='false' />",
+            clearChat: "<spring:theme code='askProduct.clearChat' text='{empty}' htmlEscape='false' />",
         };
 
         //remove all keys with <empty> values

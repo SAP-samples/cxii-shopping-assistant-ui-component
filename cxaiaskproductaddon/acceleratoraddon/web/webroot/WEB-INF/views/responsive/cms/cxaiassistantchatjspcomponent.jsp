@@ -12,16 +12,16 @@
     /*<![CDATA[*/
     document.addEventListener('DOMContentLoaded', function() {
         const translations = {
-            inputPlaceholder: '<spring:theme code="cxaiAssistant.inputPlaceholder" text="{empty}" />',
-            title: '<spring:theme code="cxaiAssistant.title" text="{empty}" />',
-            searchBoxChatInvite: '<spring:theme code="cxaiAssistant.searchBoxChatInvite" text="{empty}" />',
-            newSession: '<spring:theme code="cxaiAssistant.newSession" text="{empty}" />',
-            close: '<spring:theme code="cxaiAssistant.close" text="{empty}" />',
-            maximize: '<spring:theme code="cxaiAssistant.maximize" text="{empty}" />',
-            restore: '<spring:theme code="cxaiAssistant.restore" text="{empty}" />',
-            copyProduct: '<spring:theme code="cxaiAssistant.copyProduct" text="{empty}" />',
-            welcomeMessage: '<spring:theme code="cxaiAssistant.welcomeMessage" text="{empty}" />',
-            'welcomeMessage_${siteUid}': '<spring:theme code="cxaiAssistant.welcomeMessage_${siteUid}" text="{empty}" />',
+            inputPlaceholder: "<spring:theme code='cxaiAssistant.inputPlaceholder' text='{empty}' htmlEscape='false' />",
+            title: "<spring:theme code='cxaiAssistant.title' text='{empty}' htmlEscape='false' />",
+            searchBoxChatInvite: "<spring:theme code='cxaiAssistant.searchBoxChatInvite' text='{empty}' htmlEscape='false' />",
+            newSession: "<spring:theme code='cxaiAssistant.newSession' text='{empty}' htmlEscape='false' />",
+            close: "<spring:theme code='cxaiAssistant.close' text='{empty}' htmlEscape='false' />",
+            maximize: "<spring:theme code='cxaiAssistant.maximize' text='{empty}' htmlEscape='false' />",
+            restore: "<spring:theme code='cxaiAssistant.restore' text='{empty}' htmlEscape='false' />",
+            copyProduct: "<spring:theme code='cxaiAssistant.copyProduct' text='{empty}' htmlEscape='false' />",
+            welcomeMessage: "<spring:theme code='cxaiAssistant.welcomeMessage' text='{empty}' htmlEscape='false' />",
+            "welcomeMessage_${siteUid}": "<spring:theme code='cxaiAssistant.welcomeMessage_${siteUid}' text='{empty}' htmlEscape='false' />",
         };
 
         //remove all keys with <empty> values
