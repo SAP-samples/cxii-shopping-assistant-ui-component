@@ -6,8 +6,8 @@ import de.hybris.platform.addonsupport.controllers.cms.GenericCMSAddOnComponentC
 import de.hybris.platform.cms2.model.contents.components.AbstractCMSComponentModel;
 import de.hybris.platform.servicelayer.config.ConfigurationService;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;

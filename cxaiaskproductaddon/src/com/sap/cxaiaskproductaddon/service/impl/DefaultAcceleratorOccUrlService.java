@@ -2,7 +2,7 @@ package com.sap.cxaiaskproductaddon.service.impl;
 
 import de.hybris.platform.servicelayer.config.ConfigurationService;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 

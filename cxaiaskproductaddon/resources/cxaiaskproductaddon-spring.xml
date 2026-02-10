@@ -37,12 +37,9 @@
 	</bean>
 
 	<!-- valid customer's occ token is needed to perform actions like add to cart etc -->
-	<alias name="defaultAcceleratorOccTokenService" alias="acceleratorOccTokenService"/>
-	<bean id="defaultAcceleratorOccTokenService" class="com.sap.cxaiaskproductaddon.service.impl.DefaultAcceleratorOccTokenService">
-		<constructor-arg ref="userService"/>
-		<constructor-arg ref="oauthTokenServices"/>
-		<constructor-arg ref="configurationService"/>
-	</bean>
+	<alias name="noopAcceleratorOccTokenService" alias="acceleratorOccTokenService"/>
+
+	<bean id="noopAcceleratorOccTokenService" class="com.sap.cxaiaskproductaddon.service.impl.NoopAcceleratorOccTokenService" />
 	
 	<alias name="defaultAcceleratorOccUrlService" alias="acceleratorOccUrlService"/>
 	<bean id="defaultAcceleratorOccUrlService" class="com.sap.cxaiaskproductaddon.service.impl.DefaultAcceleratorOccUrlService">

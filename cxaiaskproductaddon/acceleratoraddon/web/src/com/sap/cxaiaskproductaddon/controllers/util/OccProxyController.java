@@ -10,24 +10,22 @@ import java.net.URI;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.net.ssl.SSLContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContextBuilder;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.client5.http.socket.ConnectionSocketFactory;
+import org.apache.hc.client5.http.socket.PlainConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.NoopHostnameVerifier;
+import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
+import org.apache.hc.client5.http.ssl.TrustSelfSignedStrategy;
+import org.apache.hc.core5.http.config.RegistryBuilder;
+import org.apache.hc.core5.ssl.SSLContextBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -43,6 +41,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.sap.cxaiaskproductaddon.service.AcceleratorOccUrlService;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 
 /**
@@ -90,11 +93,9 @@ public class OccProxyController
 				final SSLContext sslContext = SSLContextBuilder.create().loadTrustMaterial(new TrustSelfSignedStrategy()).build();
 				final SSLConnectionSocketFactory sslSocketFactory = new SSLConnectionSocketFactory(sslContext,
 						NoopHostnameVerifier.INSTANCE);
-				connectionManager = new PoolingHttpClientConnectionManager(
-						org.apache.http.config.RegistryBuilder.<org.apache.http.conn.socket.ConnectionSocketFactory> create()
-								.register("https", sslSocketFactory)
-								.register("http", org.apache.http.conn.socket.PlainConnectionSocketFactory.INSTANCE).build(),
-						null, null, null, 5, TimeUnit.MINUTES);
+				connectionManager = new PoolingHttpClientConnectionManager(RegistryBuilder.<ConnectionSocketFactory> create()
+						.register("https", sslSocketFactory).register("http", PlainConnectionSocketFactory.INSTANCE).build(), null,
+						null, Timeout.ofMinutes(5));
 			}
 			catch (NoSuchAlgorithmException | KeyManagementException | KeyStoreException e)
 			{
@@ -104,24 +105,24 @@ public class OccProxyController
 		}
 		else
 		{
-			connectionManager = new PoolingHttpClientConnectionManager(5, TimeUnit.MINUTES);
+			connectionManager = new PoolingHttpClientConnectionManager();
 		}
 
 		connectionManager.setMaxTotal(maxTotalConnections);
 		connectionManager.setDefaultMaxPerRoute(maxPerRouteConnections);
-		connectionManager.setValidateAfterInactivity(60_000);
+		connectionManager.setValidateAfterInactivity(Timeout.ofMilliseconds(60_000));
 
 		final RequestConfig requestConfig = RequestConfig.custom() //
-				.setConnectTimeout(connectTimeout) //
-				.setSocketTimeout(readTimeout) //
-				.setConnectionRequestTimeout(1000) //
+				.setConnectTimeout(Timeout.ofMilliseconds(connectTimeout)) //
+				.setResponseTimeout(Timeout.ofMilliseconds(readTimeout)) //
+				.setConnectionRequestTimeout(Timeout.ofMilliseconds(1000)) //
 				.build();
 
 		final HttpClient httpClient = HttpClients.custom() //
 				.setConnectionManager(connectionManager) //
 				.setDefaultRequestConfig(requestConfig) //
 				.evictExpiredConnections() //
-				.evictIdleConnections(evictIdleConnectionsSec, TimeUnit.SECONDS) //
+				.evictIdleConnections(Timeout.ofSeconds(evictIdleConnectionsSec)) //
 				.build();
 
 		final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);

@@ -3,7 +3,7 @@
  */
 package com.sap.cxaiaskproductaddon.service;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 
 /**

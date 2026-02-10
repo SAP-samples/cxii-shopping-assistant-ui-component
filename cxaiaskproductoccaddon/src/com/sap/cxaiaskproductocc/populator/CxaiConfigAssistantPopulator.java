@@ -9,7 +9,7 @@ import de.hybris.platform.servicelayer.config.ConfigurationService;
 import de.hybris.platform.servicelayer.dto.converter.ConversionException;
 import de.hybris.platform.servicelayer.dto.converter.Converter;
 
-import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration2.Configuration;
 import org.apache.log4j.Logger;
 
 import com.sap.cxai.CxaiConfigData;

@@ -2,8 +2,8 @@ package com.sap.cxaiaskproductaddon.controllers.cms;
 
 import de.hybris.platform.cms2.model.contents.components.AbstractCMSComponentModel;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Controller;

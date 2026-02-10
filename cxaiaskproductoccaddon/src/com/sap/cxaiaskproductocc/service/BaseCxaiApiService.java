@@ -8,6 +8,7 @@ package com.sap.cxaiaskproductocc.service;
 import de.hybris.platform.servicelayer.config.ConfigurationService;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,22 +16,23 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
-import org.apache.log4j.Logger;
+import org.apache.hc.client5.http.classic.HttpClient;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.client5.http.impl.io.PoolingHttpClientConnectionManager;
+import org.apache.hc.core5.util.Timeout;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.client.OAuth2RestTemplate;
-import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
@@ -38,7 +40,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.hash.Hashing;
 import com.sap.cxai.askproduct.ConsumedDestinationData;
+import com.sap.cxaiaskproductocc.interceptor.OAuth2ClientCredentialsInterceptor;
 import com.sap.cxaiaskproductocc.logging.PayloadLoggingInterceptor;
+
 
 
 /**
@@ -46,8 +50,8 @@ import com.sap.cxaiaskproductocc.logging.PayloadLoggingInterceptor;
  */
 public abstract class BaseCxaiApiService implements CxaiApiService
 {
-	private static final Logger LOGGER = Logger.getLogger(BaseCxaiApiService.class);
-	private static final Logger PAYLOAD_INTERCEPTOR_LOGGER = Logger.getLogger(PayloadLoggingInterceptor.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseCxaiApiService.class);
+	private static final Logger PAYLOAD_INTERCEPTOR_LOGGER = LoggerFactory.getLogger(PayloadLoggingInterceptor.class);
 	private static final String CXAI_ANONYMOUS_API_ACCESS_ENABLED_PROPERTY_KEY = "cxai.anonymous.api.access.enabled";
 	private static final List<String> API_ACCESS_ROLES = Collections
 			.unmodifiableList(Arrays.asList("ROLE_CUSTOMERGROUP", "ROLE_CUSTOMERMANAGERGROUP", "ROLE_TRUSTED_CLIENT"));
@@ -101,27 +105,27 @@ public abstract class BaseCxaiApiService implements CxaiApiService
 		try
 		{
 			return restTemplateCache.get(cacheKey, () -> {
-				LOGGER.debug("Creating new OAuth2RestTemplate for: " + data.getClientId() + " logging: " + payloadInterceptorEnabled);
+				LOGGER.debug("Creating new RestTemplate with OAuth2 for: " + data.getClientId());
 
-				final ClientCredentialsResourceDetails resourceDetails = new ClientCredentialsResourceDetails();
-				resourceDetails.setAccessTokenUri(data.getAuthUrl());
-				resourceDetails.setClientId(data.getClientId());
-				resourceDetails.setClientSecret(data.getClientSecret());
+				final RestTemplate restTemplate = new RestTemplate(getClientHttpRequestFactory());
 
-				final OAuth2RestTemplate oAuth2RestTemplate = new OAuth2RestTemplate(resourceDetails);
-				oAuth2RestTemplate.setRequestFactory(getClientHttpRequestFactory());
+				final List<ClientHttpRequestInterceptor> interceptors = new ArrayList<>(2);
+				interceptors.add(new OAuth2ClientCredentialsInterceptor(data.getAuthUrl(), data.getClientId(), data.getClientSecret(),
+						requestFactory));
 
 				if (payloadInterceptorEnabled)
 				{
-					oAuth2RestTemplate.setInterceptors(Collections.singletonList(new PayloadLoggingInterceptor()));
+					interceptors.add(new PayloadLoggingInterceptor());
 				}
 
-				return oAuth2RestTemplate;
+				restTemplate.setInterceptors(interceptors);
+
+				return restTemplate;
 			});
 		}
 		catch (final ExecutionException e)
 		{
-			throw new RuntimeException("Could not create OAuth2RestTemplate", e);
+			throw new RuntimeException("Could not create RestTemplate", e);
 		}
 	}
 
@@ -139,22 +143,22 @@ public abstract class BaseCxaiApiService implements CxaiApiService
 		final int maxPerRouteConnections = config.getInt("cxai.httpclient.max-per-route-connections", maxTotalConnections);
 		final int evictIdleConnectionsSec = config.getInt("cxai.httpclient.evict-idle-connections-seconds", 300);
 
-		final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager(5, TimeUnit.MINUTES);
+		final PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
 		connectionManager.setMaxTotal(maxTotalConnections);
 		connectionManager.setDefaultMaxPerRoute(maxPerRouteConnections);
-		connectionManager.setValidateAfterInactivity(60_000);
+		connectionManager.setValidateAfterInactivity(Timeout.ofMilliseconds(60_000));
 
 		final RequestConfig requestConfig = RequestConfig.custom() //
-				.setConnectTimeout(connectTimeout) //
-				.setSocketTimeout(readTimeout) //
-				.setConnectionRequestTimeout(1000) //
+				.setConnectTimeout(Timeout.ofMilliseconds(connectTimeout)) //
+				.setResponseTimeout(Timeout.ofMilliseconds(readTimeout)) //
+				.setConnectionRequestTimeout(Timeout.ofMilliseconds(1000)) //
 				.build();
 
 		final HttpClient httpClient = HttpClients.custom() //
 				.setConnectionManager(connectionManager) //
 				.setDefaultRequestConfig(requestConfig) //
 				.evictExpiredConnections() //
-				.evictIdleConnections(evictIdleConnectionsSec, TimeUnit.SECONDS) //
+				.evictIdleConnections(Timeout.ofSeconds(evictIdleConnectionsSec)) //
 				.build();
 
 		final HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);

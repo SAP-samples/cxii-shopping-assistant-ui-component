@@ -9,8 +9,8 @@ Spartacus library to use CXII Assistant and Ask Product API.
 ## Accelerator (JSP) version
 This instruction is for Composable Storefront library. If you use Accelerator see [Accelerator Addon](cxaiaskproductaddon/README.md)
 
-## JDK21
-To use with JDK21 SAP Commerce Cloud, use [jdk21](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/tree/jdk21) branch.
+## JDK17
+To use with JDK17 SAP Commerce Cloud, use [main](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/) branch.
 
 ## Prerequisites
 You need Commerce instance integrated with [CX AI Toolkit](README-toolkit.md)
@@ -19,10 +19,12 @@ You need Commerce instance integrated with [CX AI Toolkit](README-toolkit.md)
 This guide allows you to quickly connect the component with your Spartacus application using default backend extensions.
 
 ### Add backend extensions
-1. Add https://github.com/SAP-samples/cxii-commerce-extn as a git submodule to your codebase
+1. Add https://github.com/SAP-samples/cxii-commerce-extn as a git submodule to your codebase (jdk21 branch)
 
-   `git submodule add https://github.com/SAP-samples/cxii-commerce-extn` (usually inside `core-customize`)
-2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component as a git submodule to your codebase
+   `git submodule add -b jdk21 https://github.com/SAP-samples/cxii-commerce-extn` (usually inside `core-customize`)
+2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component as a git submodule to your codebase (jdk21 branch)
+
+   `git submodule add -b jdk21 https://github.com/SAP-samples/cxii-shopping-assistant-ui-component`
 3. Add `cxaiocc`, `cxaibackoffice`, `cxaiaskproductocc` to `manifest.json` or `localextensions.xml`
 4. Deploy with migrate data (update system)
 

@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 
 
@@ -43,7 +43,7 @@ public class ClientHttpResponseWrapper implements ClientHttpResponse
 		return new ByteArrayInputStream(responseBody);
 	}
 
-	public HttpStatus getStatusCode() throws IOException
+	public HttpStatusCode getStatusCode() throws IOException
 	{
 		return originalResponse.getStatusCode();
 	}

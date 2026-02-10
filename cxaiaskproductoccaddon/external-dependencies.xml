@@ -8,4 +8,9 @@
 	<artifactId>cxaiaskproductoccaddon</artifactId>
 	<version>2211.42</version>
 	<packaging>jar</packaging>
+	
+	<properties>
+        <maven.compiler.release>21</maven.compiler.release>
+    </properties>
+
 </project>

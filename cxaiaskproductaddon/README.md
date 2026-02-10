@@ -11,15 +11,15 @@ Choose the appropriate option depending on whether you use OCC extensions or dep
 
 ### Add Required Extensions to Manifest - OCC Extensions
 If you use OCC Extensions (`commercewebservices`):
-1. Add https://github.com/SAP-samples/cxii-commerce-extn as submodule, and extensions `cxaiocc`, `cxaibackoffice` to CCV2 manifest
-2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component as a submodule, and extensions `cxaiaskproductocc` to manifest
+1. Add https://github.com/SAP-samples/cxii-commerce-extn as submodule (use `-b jdk21` to specify branch), and extensions `cxaiocc`, `cxaibackoffice` to CCV2 manifest
+2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component as a submodule (use `-b jdk21` to specify branch), and extensions `cxaiaskproductocc` to manifest
 3. Add `cxaiaskproductaddon` extension to manifest, including `storefrontAddons` section
 4. Deploy with migrate data
 
 ### Add Required Extensions to Manifest - Legacy OCC Addons
 If you use legacy OCC addons (`ycommercewebservices` generated extension instead of `commercewebservices`):
-1. Add https://github.com/SAP-samples/cxii-commerce-extn/ as submodule, and extensions `cxaioccaddon`, `cxaibackoffice` to CCV2 manifest
-2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/ as a submodule, and extensions `cxaiaskproductoccaddon` to manifest
+1. Add https://github.com/SAP-samples/cxii-commerce-extn/ as submodule (use `-b jdk21` to specify branch), and extensions `cxaioccaddon`, `cxaibackoffice` to CCV2 manifest
+2. Add https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/ as a submodule (use `-b jdk21` to specify branch), and extensions `cxaiaskproductoccaddon` to manifest
 3. Add `cxaiaskproductaddon` extension to manifest, including `storefrontAddons` section
 4. Add `cxaioccaddon` and `cxaiaskproductoccaddon` to `storefrontAddons` of your `ycommercewebservices` template extension
 5. Deploy with migrate data
@@ -256,7 +256,7 @@ You can modify `cxaiaskproductchatjspcomponent.jsp` and serving controllers to c
 ### OCC Tokens (Assistant)
 Assistant component requires a valid customer OCC token to perform actions like checking orders or adding items to the cart. Since Accelerator doesn't natively authorize with OCC, this token is not available by default.
 
-Sample code is provided with `DefaultAcceleratorOccTokenService`, which attempts to create a customer token. However, this only works with the default configuration.
+~~Sample code is provided with `DefaultAcceleratorOccTokenService`, which attempts to create a customer token. However, this only works with the default configuration.~~ (not available in jdk21 branch)
 
 You may need to develop your own `AcceleratorOccTokenService` implementation to handle OCC authorization, for example, by generating the token when a customer logs in.
 
