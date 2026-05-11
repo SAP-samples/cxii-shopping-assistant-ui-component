@@ -1,8 +1,35 @@
 // Styles specific to ask-product
+@keyframes userMessage {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes agentMessage {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
 
 .chat {
   max-height: 600px;
   overflow-y: auto;
+  .message.user {
+    animation: userMessage var(--cxai-transition-duration) ease;
+  }
+  .message.assistant {
+    animation: agentMessage var(--cxai-transition-duration) ease;
+  }
 
   .sources {
     margin-top: var(--cxai-spacer--small);

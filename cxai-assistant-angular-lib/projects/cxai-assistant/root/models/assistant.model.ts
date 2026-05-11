@@ -35,6 +35,8 @@ export interface AssistantChatSession {
 export interface AssistantUserInput {
   session_id: string;
   user_input: string;
+  //context data
+  product_id?: string;
 }
 
 //for send first message & open session endpoint

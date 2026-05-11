@@ -4,6 +4,7 @@
 package com.sap.cxaiaskproductocc.populator;
 
 import de.hybris.platform.apiregistryservices.model.ConsumedDestinationModel;
+import de.hybris.platform.category.model.CategoryModel;
 import de.hybris.platform.converters.Populator;
 import de.hybris.platform.servicelayer.config.ConfigurationService;
 import de.hybris.platform.servicelayer.dto.converter.ConversionException;
@@ -43,5 +44,10 @@ public class CxaiConfigAssistantPopulator implements Populator<CxaiConfigModel, 
 
 		target.setAssistantProductFiltersJson(source.getAssistantProductFiltersJson());
 		target.setAssistantConfigId(source.getAssistantConfigId());
+		if (source.getCollapseVariantCategories() != null) {
+			target.setCollapseVariantCategories(
+					source.getCollapseVariantCategories().stream().map(CategoryModel::getCode).toList()
+			);
+		}
 	}
 }

@@ -1,7 +1,7 @@
-<ng-container *ngIf="!!media">
+@if (!!media) {
   <img
     [alt]="media.alt"
     [title]="media.alt"
     [src]="media.src"
-  />
-</ng-container>
+    />
+}

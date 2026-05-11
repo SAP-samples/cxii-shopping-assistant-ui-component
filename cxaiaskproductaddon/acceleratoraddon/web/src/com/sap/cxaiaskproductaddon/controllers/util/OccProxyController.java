@@ -140,8 +140,8 @@ public class OccProxyController
 		{
 			return true;
 		}
-
-		return true;
+		
+		return false;
 	}
 
 	//not using RequestBody and ResponseEntity to avoid Jackson processing of binary data [accelerator default config]
@@ -242,6 +242,12 @@ public class OccProxyController
 		filtered.putAll(headers);
 
 		this.removeHopByHopHeaders(filtered);
+
+		final org.springframework.http.MediaType contentType = filtered.getContentType();
+		if (contentType != null)
+		{
+			filtered.setContentType(new org.springframework.http.MediaType(contentType.getType(), contentType.getSubtype()));
+		}
 
 		return filtered;
 	}

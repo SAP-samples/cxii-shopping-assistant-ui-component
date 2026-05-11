@@ -208,9 +208,6 @@ export class CxaiAskProductChatComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  trackByIndex(index: number) {
-    return index;
-  }
 }
 
 const CONVERSATION_STORAGE_KEY = 'cxai-ask-product-conversation';

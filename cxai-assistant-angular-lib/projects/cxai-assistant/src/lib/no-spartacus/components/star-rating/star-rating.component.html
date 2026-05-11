@@ -6,13 +6,14 @@
   [attr.aria-label]="
     'productReview.ratedOutOf' | cxTranslate: { rating: rating.toFixed(1) }
   "
->
+  >
   <ng-container *ngTemplateOutlet="starRating"></ng-container>
 </div>
 
 <ng-template #starRating>
-  <i class="fas fa-star"
-    *ngFor="let i of [1, 2, 3, 4, 5]"
-    class="star"
-  ></i>
+  @for (i of [1, 2, 3, 4, 5]; track i) {
+    <i class="fas fa-star"
+      class="star"
+    ></i>
+  }
 </ng-template>

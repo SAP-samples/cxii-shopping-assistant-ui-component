@@ -1,17 +1,25 @@
-<div class="chat-product-carousel-container">
-  <button class="scroll-button prev-button" (click)="scrollCarousel(-1)" *ngIf="scrollValue > 0">
-    <i class="fas fa-angle-left"></i>
-  </button>
+<div class="chat-product-carousel-container" [style.--_product-width.px]="elementWidth">
+  @if (scrollValue > 0) {
+    <button class="scroll-button prev-button" (click)="scrollCarousel(-1)">
+      <i class="fas fa-angle-left"></i>
+    </button>
+  }
 
   <div class="chat-product-carousel inline-snap scroll-{{scrollValue}}" [class.scrollMax]="scrollValue === maxScrollValue" #carousel>
-    @for (product$ of products$; track $index) {
-      @if({ product: product$ | async }; as data) {
-        <lib-product-card [product]="data.product" [class.empty]="!data.product"></lib-product-card>
+    @if (products$ | async; as products) {
+      @for (product of products; track $index) {
+        <lib-product-card [product]="product"></lib-product-card>
+      }
+    } @else {
+      @for (code of productCodes; track $index) {
+        <div class="product-card-skeleton"></div>
       }
     }
   </div>
 
-  <button class="scroll-button next-button" (click)="scrollCarousel(1)" *ngIf="scrollValue < maxScrollValue">
-    <i class="fas fa-angle-right"></i>
-  </button>
+  @if (scrollValue < maxScrollValue) {
+    <button class="scroll-button next-button" (click)="scrollCarousel(1)">
+      <i class="fas fa-angle-right"></i>
+    </button>
+  }
 </div>

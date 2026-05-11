@@ -1,6 +1,7 @@
 import { CommonModule, NgComponentOutlet } from '@angular/common';
 import { NgModule, Optional, SkipSelf } from '@angular/core';
 import { CxaiAssistantService } from './cxai-assistant.service';
+import { ChatProductService } from './chat-product.service';
 import { CxaiAssistantApiService } from '@cx-spartacus/cxai-assistant/root';
 import { CxaiAssistantOccApiService } from './cxai-assistant-occ.api.service';
 import { AssistantTokenComponent } from './cms-components/assistant-token/assistant-token.component';
@@ -35,6 +36,7 @@ import { AssistantTokenComponent } from './cms-components/assistant-token/assist
     //this can't be providedIn root, because CxaiAssistantApiService won't be resolved
     //(spartacus lazy loading modules mechanism doesn't set proper injector hierarchy)
     CxaiAssistantService,
+    ChatProductService,
   ]
 })
 export class CxaiAssistantMainBaseModule { }

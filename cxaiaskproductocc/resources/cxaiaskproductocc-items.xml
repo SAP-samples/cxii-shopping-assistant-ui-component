@@ -9,6 +9,10 @@
 <items 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 			xsi:noNamespaceSchemaLocation="items.xsd">
 
+	<collectiontypes>
+		<collectiontype code="CollapseVariantCategoryList" elementtype="VariantCategory" />
+	</collectiontypes>
+
 	<itemtypes>
 		<typegroup name="ask-product">
 			<itemtype code="CxaiConfig" autocreate="false" generate="false">
@@ -61,6 +65,10 @@
 								<value>HYBRIS.LONG_STRING</value>
 							</columntype>
 						</persistence>
+						<modifiers optional="true"/>
+					</attribute>
+					<attribute type="CollapseVariantCategoryList" qualifier="collapseVariantCategories">
+						<persistence type="property"/>
 						<modifiers optional="true"/>
 					</attribute>
 				</attributes>

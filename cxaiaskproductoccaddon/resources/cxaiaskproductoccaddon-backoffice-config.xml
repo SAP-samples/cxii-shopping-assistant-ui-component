@@ -59,6 +59,7 @@
 				</ea:section>
 				<ea:section name="cxai.cxaiConfig.editorArea.tab.assistantFilters">
 					<ea:panel>
+						<ea:attribute qualifier="collapseVariantCategories" />
 						<ea:attribute qualifier="assistantProductFiltersJson">
 							<ea:editor-parameter>
 								<ea:name>rows</ea:name>

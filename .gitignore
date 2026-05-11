@@ -39,7 +39,7 @@ ruleset.xml
 *.iml
 .idea/
 .settings/
-.vscode/
+
 
 # Others
 **/backup/
