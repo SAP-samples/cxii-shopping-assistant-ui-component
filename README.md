@@ -10,7 +10,8 @@ Spartacus library to use CXII Assistant and Ask Product API.
 This instruction is for Composable Storefront library. If you use Accelerator see [Accelerator Addon](cxaiaskproductaddon/README.md)
 
 ## JDK17
-To use with JDK17 SAP Commerce Cloud, use [main](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/) branch.
+To use with JDK17 SAP Commerce Cloud, use [jdk17](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/tree/jdk17) branch.
+**Note**: `jdk17` branch is no longer receiving updates, last version for it is `2211.47.1`
 
 ## Prerequisites
 You need Commerce instance integrated with [CX AI Toolkit](README-toolkit.md)
