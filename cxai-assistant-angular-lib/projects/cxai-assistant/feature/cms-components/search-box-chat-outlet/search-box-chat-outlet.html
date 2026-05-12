@@ -1,9 +1,15 @@
 @if (moduleEnabled$ | async) {
   @if(outletContext$?.context$| async; as data) {
-    <div class="chat-search-outlet" *ngIf="data?.search?.length > 3" (click)="startChat(data.search)" (mousedown)="$event.preventDefault()">
-      <i *ngIf="!useSapIcons" class="fa-regular fa-message"></i>
-      <i *ngIf="useSapIcons" class="sap-icon post"></i>
-      <span>{{ 'cxaiAssistant.searchBoxChatInvite' | cxTranslate }}: <i>{{data.search}}</i></span>
-    </div>
+    @if (data?.search?.length > 3) {
+      <div class="chat-search-outlet" (click)="startChat(data.search)" (mousedown)="$event.preventDefault()">
+        @if (!useSapIcons) {
+          <i class="fa-regular fa-message"></i>
+        }
+        @if (useSapIcons) {
+          <i class="sap-icon post"></i>
+        }
+        <span>{{ 'cxaiAssistant.searchBoxChatInvite' | cxTranslate }}: <i>{{data.search}}</i></span>
+      </div>
+    }
   }
 }

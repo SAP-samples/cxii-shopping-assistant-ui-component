@@ -31,6 +31,8 @@ export interface CxaiAssistantConfigInternal {
   assistantProductFiltersJson?: string;
   //parsed product filters
   assistantProductFilters?: AssistantProductFilter[];
+  //if specified default recommendation carousel will filter out duplicate variants within these categories (e.g. size)
+  collapseVariantCategories?: string[];
   //returns additional context pasted directly into chat message - see sampleAssistantContextProvider for example
   //context is not visible in the UI, it's appended into each message and stripped before displaying it in the chat
   //however it may allow the user to ask about current product, or cart contents etc

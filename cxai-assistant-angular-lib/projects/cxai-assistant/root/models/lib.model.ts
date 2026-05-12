@@ -15,11 +15,12 @@ export interface AssistantChatWindowComponentInterface {
   inputTextDisabled: Signal<boolean>;
 }
 
-export declare type AssistantTokenType = 'html' | 'product' | 'order' | 'tracking_id' | 'unknown';
+export declare type AssistantTokenType = 'html' | 'product' | 'order' | 'tracking_id' | 'unknown' | 'products_recommendation';
 
 export declare type ChatMessageToken = {
   type: AssistantTokenType;
   content: string;
+  data?: any;
 };
 
 export abstract class AssistantTokenContext {
@@ -38,4 +39,7 @@ export enum AssistantComponents {
   AssistantToken_product = 'AssistantToken_product',
   AssistantToken_order = 'AssistantToken_order',
   AssistantToken_tracking_id = 'AssistantToken_tracking_id',
+
+  //this is not a token inside message, but we use the same mechanism to customize product recommendations display
+  AssistantToken_products_recommendation = 'AssistantToken_products_recommendation'
 }

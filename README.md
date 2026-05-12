@@ -43,24 +43,18 @@ $assistantProdUrl = $toolkitProdUrl/shopping-assistant/api/v1
 
 # Ask about product (you can leave it as-is if not used)
 $askProductProdUrl = https://ai-assistant-<usea-prod>-api.cxai.cloud.sap
-$askProductProdAuthUrl = https://<ias>.accounts.ondemand.com/oauth2/token
-# IAS credentials only for ask-product
-$askProductProdClientId = <askProductProdClientId>
-$askProductProdClientSecret = <askProductProdClientSecret>
 
 # Created by toolkit integration - <org-id> is your toolkit organisation id.
 # You can also find this in Backoffice ConsumedOauthCredentials
 $toolkitCredentialId = CXAICredentials_<org-id>
+$askProductCredentialId = CXAIToolkitCredentials_<org-id>
 
 # Assistant Config ID if already created by the API, otherwise ignore it for now
 $assistantConfigIdProd = <CONFIG_67658b0c...>
 
-INSERT_UPDATE ConsumedOAuthCredential; id[unique = true]  ; clientId                 ; clientSecret                 ; oAuthUrl
-                                     ; ask-product-prod   ; $askProductProdClientId  ; $askProductProdClientSecret  ; $askProductProdAuthUrl
-
-INSERT_UPDATE ConsumedDestination; id[unique = true]  ; url                  ; destinationTarget(id); credential(id)       ; active[default = true]
-                                 ; visual-search-prod ; $visualSearchProdUrl ; Default_Template     ; $toolkitCredentialId ;
-                                 ; ask-product-prod   ; $askProductProdUrl   ; Default_Template     ; ask-product-prod;
+INSERT_UPDATE ConsumedDestination; id[unique = true]  ; url                  ; destinationTarget(id); credential(id)          ; active[default = true]
+                                 ; visual-search-prod ; $visualSearchProdUrl ; Default_Template     ; $toolkitCredentialId    ;
+                                 ; ask-product-prod   ; $askProductProdUrl   ; Default_Template     ; $askProductCredentialId ;
 
 # empty values are taken from spartacus provideConfig, concrete values overwrite spartacus config
 INSERT_UPDATE CxaiConfig; code[unique = true]; baseSites(uid); consumedDestination(id); askProductDestination(id); active[default = false];
@@ -193,7 +187,15 @@ If successful, you should be able to see chat component on every page (bottom ri
 
 #### Common troubleshooting
 1. If you can't see the components, try logging in or adjust `cxai.anonymous.api.access.enabled` property in hac
-2. If you get `401` response from ask-product (despite correct credentials) make sure you [configured IAS client id](README-toolkit.md) in toolkit 
+2. If you get `401` response from ask-product (despite correct credentials) make sure you [configured IAS client id](README-toolkit.md) in toolkit **Organization Management** - it should be the same as in `CXAIToolkitCredentials_<org-id>` `ConsumedOauthCredentials` created in Commerce after integrating with Toolkit.
+3. Make sure you use proper URL formats in `ConsumedDestination`, exactly as specified in the sample impex
+   * `https://{usea-prod}.cxai.cloud.sap/vision/api/v2` (in **Basic** tab)
+     * Example of wrong URL: https://**api-**{usea-prod}.cxai.cloud.sap **/cxai/**...
+   * https://**ai-assistant-**{usea-prod}.cxai.cloud.sap/ for ask product API (**Ask product** tab)
+4. Make sure CX AI Config is `Active` in backoffice, and connected with a valid base site. `/occ/v2/{siteUid}/cxai/config` OCC endpoint should return an object including `assistantConfigId` (as assigned in **Assisant** tab)
+5. Error `Content type 'application/json;charset=UTF-8' is not supported`:
+    * `MappingJackson2HttpMessageConverter` and `StringHttpMessageConverter` must be registered in OCC converters chain
+    * Default configuration registers them: `WebConfig.configureMessageConverters` → `super.addDefaultHttpMessageConverters(converters)` - if this was disabled you have to add above converters to the end of `messageConvertersV2` explicitly
 
 ## Next Steps
 After finishing this quick start guide you can check detailed documentation:

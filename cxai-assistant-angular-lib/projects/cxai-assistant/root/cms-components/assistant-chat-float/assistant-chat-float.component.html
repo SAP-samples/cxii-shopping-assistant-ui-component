@@ -3,8 +3,12 @@
   <span class="chat-btn-wrapper" (click)="openChat()">
     <ng-content select="[slot=chat-button]">
       <button class="chat-btn">
-        <i *ngIf="!useSapIcons" class="fa-regular fa-message"></i>
-        <i *ngIf="useSapIcons" class="sap-icon post"></i>
+        @if (!useSapIcons) {
+          <i class="fa-regular fa-message"></i>
+        }
+        @if (useSapIcons) {
+          <i class="sap-icon post"></i>
+        }
       </button>
     </ng-content>
   </span>

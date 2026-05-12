@@ -23,7 +23,8 @@
 		<property name="assistantDestination" type="com.sap.cxai.askproduct.ConsumedDestinationData"/>
 		<property name="assistantConfigId" type="String"/>
 		<property name="assistantProductFiltersJson" type="String"/>
-		
+		<property name="collapseVariantCategories" type="java.util.List&lt;String&gt;"/>
+
 	</bean>
 	
 	<bean class="com.sap.cxai.askproduct.ConsumedDestinationWsDTO">
@@ -40,6 +41,7 @@
 		<property name="assistantDestination" type="com.sap.cxai.askproduct.ConsumedDestinationWsDTO"/>
 		<property name="assistantConfigId" type="String"/>
 		<property name="assistantProductFiltersJson" type="String"/>
-		
+		<property name="collapseVariantCategories" type="java.util.List&lt;String&gt;"/>
+
 	</bean>
 </beans>

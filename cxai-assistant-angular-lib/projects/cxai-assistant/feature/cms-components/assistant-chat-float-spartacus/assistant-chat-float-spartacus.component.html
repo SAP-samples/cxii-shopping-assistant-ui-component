@@ -2,8 +2,12 @@
   <ng-container slot="chat-button">
     <ng-template [cxOutlet]="outlets.START_BUTTON">
       <button class="chat-btn" [@showHide]="buttonState">
-        <i *ngIf="!useSapIcons" class="fa-regular fa-message"></i>
-        <i *ngIf="useSapIcons" class="sap-icon post"></i>
+        @if (!useSapIcons) {
+          <i class="fa-regular fa-message"></i>
+        }
+        @if (useSapIcons) {
+          <i class="sap-icon post"></i>
+        }
       </button>
     </ng-template>
   </ng-container>
@@ -13,7 +17,7 @@
         [cxComponentWrapper]="{
           flexType: mainComponent,
         }"
-      >
+        >
       </ng-container>
     }
   </ng-container>

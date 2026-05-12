@@ -142,7 +142,7 @@ This will expose relevant part of OCC through storefront controller (`/cxai/*` +
 Assistant requires font-awesome icons to be loaded. If you already use them then set `cxaiaskproductaddon.importFontAwesome` to `false`.
 ```properties
 # Change when script is updated to invalidate browser cache
-cxaiaskproductaddon.script.version=2211.47.1
+cxaiaskproductaddon.script.version=221121.7.0
 # Set to false if you already have font awesome icons
 cxaiaskproductaddon.importFontAwesome=true
 # If medias require some custom base url

@@ -5,17 +5,18 @@
   [style.width.px]="width"
   [style.height.px]="height"
   [class.maximized]="maximized"
->
+  >
   <div class="title-bar">
-    <div
-      *ngIf="!maximized"
-      class="resize-handle"
-      [class.resize-nw-icon-gradient]="!useSapIcons"
-      (mousedown)="setResizeStatus(true, $event); $event.stopPropagation();"
-      (window:mouseup)="setResizeStatus(false, $event)"
-    >
-      <lib-chat-icon [faIcon]="'resize-corner'"></lib-chat-icon>
-    </div>
+    @if (!maximized) {
+      <div
+        class="resize-handle"
+        [class.resize-nw-icon-gradient]="!useSapIcons"
+        (mousedown)="setResizeStatus(true, $event); $event.stopPropagation();"
+        (window:mouseup)="setResizeStatus(false, $event)"
+        >
+        <lib-chat-icon [faIcon]="'resize-corner'"></lib-chat-icon>
+      </div>
+    }
 
     <div class="assistant-title" (mousedown)="onTitleBarMouseDown($event)">{{ 'cxaiAssistant.title' | cxTranslate : { siteName: currentSiteName } }}</div>
 
@@ -26,14 +27,14 @@
           [title]="'cxaiAssistant.newSession' | cxTranslate"
           [disabled]="!messages || (messages.chat_history.length < 2 && !messages.chat_history[0]?.error)"
           (click)="newSession()"
-        >
+          >
           <lib-chat-icon faIcon="fas fa-redo"></lib-chat-icon>
         </button>
         <button
           class="action maximize"
           (click)="toggleMaximize()"
           [title]="'cxaiAssistant.' + (maximized ? 'restore' : 'maximize') | cxTranslate"
-        >
+          >
           <lib-chat-icon [faIcon]="'fas ' + (maximized ? 'fa-compress' : 'fa-expand')"></lib-chat-icon>
         </button>
       </ng-template>
@@ -45,33 +46,40 @@
   <div class="chat cxai-chat" #chat (click)="closeAllProductRefences()">
     @if(messages) {
       @for (message of messages.chat_history; track $index) {
-        <div *ngIf="message.content" class="message {{ message.role }}" [class.error]="!!message.error">
-          @if (message.role === 'assistant') {
-          <div class="message-content">
-            @for (token of message | chatMessage; track $index) {
-              @if(token.type === 'html') {
-                <span [innerHTML]="token.content"></span>
-              } @else {
-                <lib-assistant-token [context]="{ token, chatWindowComponent: this }">
-                </lib-assistant-token>
-              }
+        @if (message.content) {
+          <div class="message {{ message.role }}" [class.error]="!!message.error">
+            @if (message.role === 'assistant') {
+              <div class="message-content">
+                @for (token of message | chatMessage; track $index) {
+                  @if(token.type === 'html') {
+                    <span [innerHTML]="token.content"></span>
+                  } @else {
+                    <lib-assistant-token [context]="{ token, chatWindowComponent: this }">
+                    </lib-assistant-token>
+                  }
+                }
+              </div>
+            } @else {
+              <div class="message-content" [attr.title]="message.contextString || ''">{{ message.content }}</div>
             }
           </div>
-          } @else {
-          <div class="message-content" [attr.title]="message.contextString || ''">{{ message.content }}</div>
-          }
-        </div>
+        }
 
         @if(message.recommendations?.[0]?.codes?.length) {
-          <lib-chat-product-carousel [productCodes]="message.recommendations![0].codes!"></lib-chat-product-carousel>
+          <lib-assistant-token [context]="{
+            token: { type: 'products_recommendation', content: '', data: message.recommendations![0].codes! },
+            chatWindowComponent: this }">
+          </lib-assistant-token>
         }
       }
     }
-    <div *ngIf="sendQuestionSubscription() || !(hasValidSession() || messages?.chat_history?.length)" class="message assistant waiting">
-      <div class="message-content">
-        <div class="dot-loader"></div>
+    @if (sendQuestionSubscription() || !(hasValidSession() || messages?.chat_history?.length)) {
+      <div class="message assistant waiting">
+        <div class="message-content">
+          <div class="dot-loader"></div>
+        </div>
       </div>
-    </div>
+    }
   </div>
   <form class="cxai-chat-form">
     <textarea

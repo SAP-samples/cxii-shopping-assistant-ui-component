@@ -14,7 +14,8 @@ export default defineConfig([{
         "**/dist/**",
         "**/node_modules/**",
         "**/*.generated.ts",
-        "**/*.gen.ts"
+        "**/*.gen.ts",
+        "**/*.scss",
     ],
 
     files: ["**/*.ts"],
@@ -72,14 +73,4 @@ export default defineConfig([{
         "@angular-eslint/template/click-events-have-key-events": "off",
         "@angular-eslint/template/interactive-supports-focus": "off",
     },
-}, {
-    files: ["**/*.scss"],
-
-    extends: compat.extends(
-        "plugin:@angular-eslint/template/recommended",
-        "plugin:@angular-eslint/template/accessibility",
-    ),
-
-    plugins: {},
-    rules: {},
 }]);

@@ -1,35 +1,34 @@
 @if(product$ | async; as product) {
-<span
-  class="assistant-chat-token token-type-{{token.type}} product valid"
-  [class.active]="popupVisible"
-  [title]="product.code"
-  (click)="togglePopup($event)"
-  >{{ product | assistantProductName }}</span
->
+  <span
+    class="assistant-chat-token token-type-{{token.type}} product valid"
+    [class.active]="popupVisible"
+    [title]="product.code"
+    (click)="togglePopup($event)"
+    >{{ product | assistantProductName }}</span
+    >
 
-<div
-  *ngIf="loadPopup"
-  class="product-popup"
-  [style.display]="popupVisible ? '' : 'none'"
-  (click)="close()"
->
-  <div
-    class="action close-chat"
-    (click)="close()"
-    [title]="'common.close' | cxTranslate"
-  >
-    <lib-chat-icon faIcon="fas fa-times"></lib-chat-icon>
-  </div>
-
-  <lib-product-card class="square" [product]="product"></lib-product-card>
-
-  <div class="buttons">
-    <button class="btn" (click)="copyToClipboard(product)">
-      <i class="fa-solid fa-copy"></i>
-      {{ "cxaiAssistant.copyProduct" | cxTranslate }}
-    </button>
-  </div>
-</div>
-} @else {
-<span class="assistant-chat-token token-type-{{token.type}} product" [class.invalid]="invalidProduct">{{ token.content }}</span>
-}
+    @if (loadPopup) {
+      <div
+        class="product-popup"
+        [style.display]="popupVisible ? '' : 'none'"
+        (click)="close()"
+        >
+        <div
+          class="action close-chat"
+          (click)="close()"
+          [title]="'common.close' | cxTranslate"
+          >
+          <lib-chat-icon faIcon="fas fa-times"></lib-chat-icon>
+        </div>
+        <lib-product-card class="square" [product]="product"></lib-product-card>
+        <div class="buttons">
+          <button class="btn" (click)="copyToClipboard(product)">
+            <i class="fa-solid fa-copy"></i>
+            {{ "cxaiAssistant.copyProduct" | cxTranslate }}
+          </button>
+        </div>
+      </div>
+    }
+  } @else {
+    <span class="assistant-chat-token token-type-{{token.type}} product" [class.invalid]="invalidProduct">{{ token.content }}</span>
+  }

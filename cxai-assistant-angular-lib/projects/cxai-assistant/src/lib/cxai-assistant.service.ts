@@ -366,6 +366,10 @@ export class CxaiAssistantService {
   }
 
   protected addContextToUserInput(message: AssistantUserInput, context: AssistantContext): void {
+    if(context.pdpProductCode) {
+      message.product_id = context.pdpProductCode;
+    }
+
     if(this.config?.chatMessageContextProvider) {
       const additionalContext = this.config.chatMessageContextProvider(context);
       if(additionalContext) {

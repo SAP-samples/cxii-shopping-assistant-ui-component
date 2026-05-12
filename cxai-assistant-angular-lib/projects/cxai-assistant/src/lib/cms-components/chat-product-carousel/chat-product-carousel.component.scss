@@ -1,5 +1,4 @@
 .chat-product-carousel-container {
-  --_product-width: 150px;
   position: relative;
   display: flex;
   align-items: center;
@@ -53,6 +52,22 @@
       var(--cx-color-background),
       transparent
     );
+  }
+
+  .product-card-skeleton {
+    flex: 0 0 auto;
+    width: var(--_product-width);
+    height: 220px;
+    border-radius: var(--cxai-border-radius, 8px);
+    background: linear-gradient(90deg, var(--cx-color-light) 25%, var(--cx-color-background) 50%, var(--cx-color-light) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s infinite;
+    scroll-snap-align: start;
+  }
+
+  @keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
   }
 
   lib-product-card {

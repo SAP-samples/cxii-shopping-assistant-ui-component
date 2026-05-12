@@ -1,0 +1,19 @@
+{
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": ["**/README.md"],
+      "options": {
+        "printWidth": 80
+      }
+    },
+    {
+      "files": [
+        "projects/**/*.html"
+      ],
+      "options": {
+        "parser": "angular"
+      }
+    }
+  ]
+}

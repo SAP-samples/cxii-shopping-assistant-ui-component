@@ -140,8 +140,8 @@ public class OccProxyController
 		{
 			return true;
 		}
-
-		return true;
+		
+		return false;
 	}
 
 	//not using RequestBody and ResponseEntity to avoid Jackson processing of binary data [accelerator default config]
