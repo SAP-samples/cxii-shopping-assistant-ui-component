@@ -243,12 +243,6 @@ public class OccProxyController
 
 		this.removeHopByHopHeaders(filtered);
 
-		final org.springframework.http.MediaType contentType = filtered.getContentType();
-		if (contentType != null)
-		{
-			filtered.setContentType(new org.springframework.http.MediaType(contentType.getType(), contentType.getSubtype()));
-		}
-
 		return filtered;
 	}
 
