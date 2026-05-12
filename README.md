@@ -193,9 +193,9 @@ If successful, you should be able to see chat component on every page (bottom ri
      * Example of wrong URL: https://**api-**{usea-prod}.cxai.cloud.sap **/cxai/**...
    * https://**ai-assistant-**{usea-prod}.cxai.cloud.sap/ for ask product API (**Ask product** tab)
 4. Make sure CX AI Config is `Active` in backoffice, and connected with a valid base site. `/occ/v2/{siteUid}/cxai/config` OCC endpoint should return an object including `assistantConfigId` (as assigned in **Assisant** tab)
-5. Error `Content type 'application/json;charset=UTF-8 not supported`:
-  * `MappingJackson2HttpMessageConverter` and `StringHttpMessageConverter` must be registered in OCC converters chain
-  * Default configuration registers them: `WebConfig.configureMessageConverters` -> `super.addDefaultHttpMessageConverters(converters)` - if this was disabled you have to add above converters to the end of `messageConvertersV2` explicitly
+5. Error `Content type 'application/json;charset=UTF-8' is not supported`:
+    * `MappingJackson2HttpMessageConverter` and `StringHttpMessageConverter` must be registered in OCC converters chain
+    * Default configuration registers them: `WebConfig.configureMessageConverters` → `super.addDefaultHttpMessageConverters(converters)` - if this was disabled you have to add above converters to the end of `messageConvertersV2` explicitly
 
 ## Next Steps
 After finishing this quick start guide you can check detailed documentation:
