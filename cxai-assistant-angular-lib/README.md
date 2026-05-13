@@ -20,7 +20,7 @@ The following instructions are for assistant library. For ask-product you can fo
 1. Open latest [release](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/releases) 
 2. Modify your application's `package.json` by adding entries specified on release page
     > Optionally you can `npm publish` the tgzs to your private npm registry and use version syntax instead of URLs
-3. Run `npm i`
+3. Run `npm i` in your application
 4. Skip to [Importing Assistant Library Module](#importing-assistant-library-module)
 
 ### Building the Library
@@ -32,8 +32,8 @@ Development guide for building and debugging the library.
 3. Verify and adjust `.npmrc` file
     - if you use private npm registry (e.g. Verdaccio, GitHub Packages etc.) as a proxy for `@spartacus` (and to host your own packages) then just set environment variables to your proxy URL and auth token
     - otherwise replace `@spartacus:registry` with URL and credentials that you use in your spartacus app (e.g. RBSC) and optionally add `@cx-spartacus:registry` to be able to `npm publish`
-4. `npm i`
-    - never run `npm install` inside `projects/*`, only in workspace root
+4. `npm ci`
+    - never run `npm ci` inside `projects/*`, only in workspace root
 5. `npm run build:assistant`
 
 #### Publishing to Your Private npm Repository
@@ -59,10 +59,10 @@ If you want to run the library in watch mode:
 3. Run the library using `npm run watch:assistant`
 4. Run your app `ng s`
 5. When you modify library code, the application will reload automatically
-6. `npm link` is temporary and will be removed after each `npm install` in your application
+6. `npm link` is temporary and will be removed after each `npm ci / i` in your application
 
 ### Importing Assistant Library Module
-After you've successfully added library as a dependency in your application's `package.json`, and either run `npm install` or `npm link` you can now use it.
+After you've successfully added library as a dependency in your application's `package.json`, and either run `npm ci` or `npm link` you can now use it.
 1. Add import `CxaiAssistantFeatureModule` from `@cx-spartacus/cxai-assistant/feature` into `app.module`
 2. Build your application - it must build without errors.
 

@@ -238,7 +238,7 @@ All defined veriables:
 ### Build the Library
 1. Go to angular workspace `cxai-assistant-angular-lib`
 2. Run `nvm use`
-3. Run `npm i`
+3. Run `npm ci`
 4. Run `./build-web-component.sh` - this will build the bundle and update files in this addon
 5. To make sure file is fetched after modification you can modify `cxaiaskproductaddon.script.version` property when `cxai-components.js` file is updated
 6. You can also run `npm run build:web-component` to just build the code but not copy it to addon
