@@ -30,6 +30,16 @@ This guide allows you to quickly connect the component with your Spartacus appli
 4. Deploy with migrate data (update system)
 
 ### Add CX AI Toolkit Configuration
+
+> **Note:** `CXAIToolkitCredentials_<org-id>` object used in the following impex is created automatically only if the **Use Product Reviews from Commerce** checkbox is selected when adding the Commerce integration in CX AI Toolkit. If it was not selected and you want to use the Ask Product feature, you have to manually create a new IAS application, generate a client secret, and create the `ConsumedOAuthCredential` with the correct data. Then use this credential in place of `CXAIToolkitCredentials_<org-id>`.
+>
+> ```
+> INSERT_UPDATE ConsumedOAuthCredential; id[unique = true]; clientId              ; clientSecret              ; oAuthUrl
+>                                      ; ask-product      ; {{iasAppClientId}}    ; {{iasAppClientSecret}}    ; https://{{ias}}.accounts.ondemand.com/oauth2/token
+> ```
+>
+> See [Managing SAP CX AI Toolkit Application in your SAP Cloud Identity Services tenant](https://help.sap.com/docs/cx-ai-toolkit/set-up/managing-sap-cx-ai-toolkit-application-in-your-sap-cloud-identity-services-tenant) for reference.
+
 Run impex with toolkit configuration. **Enable code execution toggle in hac** to respect `if` directives. 
 **Adjust values in `<braces>` to your local environment**.
 
@@ -189,10 +199,13 @@ If successful, you should be able to see chat component on every page (bottom ri
 #### Common troubleshooting
 1. If you can't see the components, try logging in or adjust `cxai.anonymous.api.access.enabled` property in hac
 2. If you get `401` response from ask-product (despite correct credentials) make sure you [configured IAS client id](README-toolkit.md) in toolkit **Organization Management** - it should be the same as in `CXAIToolkitCredentials_<org-id>` `ConsumedOauthCredentials` created in Commerce after integrating with Toolkit.
-3. Make sure you use proper URL formats in `ConsumedDestination`, exactly as specified in the sample impex
-   * `https://{usea-prod}.cxai.cloud.sap/vision/api/v2` (in **Basic** tab)
-     * Example of wrong URL: https://**api-**{usea-prod}.cxai.cloud.sap **/cxai/**...
-   * https://**ai-assistant-**{usea-prod}.cxai.cloud.sap/ for ask product API (**Ask product** tab)
+   ![Toolkit IAS Client ID](docs/images/toolkit_ias_client_id.png)
+3. Verify that you use proper URL formats in `ConsumedDestination`, exactly as specified in the sample impex. Using invalid API URLs cause JSON parse errors.
+   * **visual-search-prod** (referenced in CX AI Config **Basic** tab → **Consumed Destination**):
+     * Valid: `https://<usea-prod>.cxai.cloud.sap/vision/api/v2`
+     * Invalid examples: `https://api-<usea-prod>.cxai.cloud.sap/cxai/...` or `https://ai-assistant-<usea-prod>.cxai.cloud.sap`
+   * **ask-product-prod** (referenced in CX AI Config **Ask about Product** tab → **Ask about product destination**):
+     * Valid: `https://ai-assistant-<usea-prod>-api.cxai.cloud.sap`
 4. Make sure CX AI Config is `Active` in backoffice, and connected with a valid base site. `/occ/v2/{siteUid}/cxai/config` OCC endpoint should return an object including `assistantConfigId` (as assigned in **Assisant** tab)
 5. Error `Content type 'application/json;charset=UTF-8' is not supported`:
     * `MappingJackson2HttpMessageConverter` and `StringHttpMessageConverter` must be registered in OCC converters chain
