@@ -2,6 +2,8 @@
 Spartacus library to use CXII Assistant and Ask Product API.
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/cxii-shopping-assistant-ui-component)](https://api.reuse.software/info/github.com/SAP-samples/cxii-shopping-assistant-ui-component)
 
+⚠️ This branch is no longer being maintained, please migrate to [jdk21](https://github.com/SAP-samples/cxii-shopping-assistant-ui-component/tree/jdk21) version.
+
 ## Description
 - CXAI Assistant library for use with CXAI assistant API.
 - CXAI Ask Product library for use with CXAI Ask Product API.
